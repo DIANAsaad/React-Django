@@ -1,0 +1,57 @@
+{%extends 'main/base.html'%}
+{%load static%}
+{% load crispy_forms_tags%}
+{%block title%} Add Flashcard {%endblock%}
+
+{% block sidebar_dynamic_content %}
+<li><a href="/home" class="sidebar-link"> Home</a></li>
+<li><a href="{% url 'Redirect Module Page' module_id %}" class="sidebar-link"> Back to Lesson</a></li>
+{% endblock %}
+
+{%block content%}
+<div class="col-md-10">
+    <div class="container card-style mt-4">
+        <div class="flashcard-info-box d-flex align-items-center p-4 mb-4 shadow rounded">
+            <form method="post" enctype="multipart/form-data" class="w-100" id="flashcard-form">
+                {% csrf_token %}
+                <!-- Hidden input to track the number of flashcards -->
+                <input type="hidden" name="flashcard_count" id="flashcard-count" value="0">
+                
+                <div id="flashcards-container">
+                    <!-- Dynamically added flashcards will appear here -->
+                </div>
+                <button id="add-flashcard" type="button" class="btn mt-3">Add New Flashcard</button>
+                <button type="submit" class="btn btn-primary mt-3">Submit All Flashcards</button>
+            </form>
+
+            <!-- Flashcard Form Template -->
+            <template id="flashcard-form-template">
+                <div class="row flashcard-form mb-3">
+                    <!-- Flashcard Image -->
+                    <div class="col-md-4 module-header">
+                        <input type="file" name="flashcard_image___INDEX__" class="form-control" placeholder="Upload Image">
+                    </div>
+
+                    <!-- Flashcard Details -->
+                    <div class="col-md-8 module-details">
+                        <p>
+                            <input type="text" name="flashcard_question___INDEX__" class="form-control" placeholder="Enter Question" required>
+                        </p>
+                        <p>
+                            <input type="text" name="flashcard_answer___INDEX__" class="form-control" placeholder="Enter Answer" required>
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <button type="button" class="btn btn-danger remove-flashcard">Remove Flashcard</button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/add_flashcard.js' %}"></script>
+{%endblock%}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/add_flashcard.css' %}">
+{% endblock %}

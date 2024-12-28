@@ -1,0 +1,89 @@
+
+
+  .course-page-btn {
+    font-family: 'Georgia', serif;
+    font-size: 1.25rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .course-page-btn:hover {
+    color: #333;
+    transform: translateY(-2px);
+  }
+
+  .module-info-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+  }
+
+  .module-header .module-img {
+    max-width: 150px;
+    height: auto;
+    border-radius: 10px;
+    margin-right: 20px;
+    overflow: hidden;
+  }
+
+  .module-details {
+    flex-grow: 1;
+  }
+
+  .module-details p {
+    font-size: 1rem;
+    color: #6c757d;
+  }
+
+
+  .modules-box {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+  }
+
+  .modules-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+
+
+  .module-item a {
+    color: #333;
+    text-decoration: none;
+  }
+
+  .module-item a:hover {
+    color: #000;
+  }
+
+  .module-item strong {
+    font-weight: bold;
+    font-family: 'Georgia', serif;
+    font-size: 1.1rem;
+  }
+
+  .card-style {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    border: 1px solid #ffd8c3;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .btn-success {
+    background-color: #ff6000; 
+    border-color: #ff6000; 
+    color: white; 
+  }
+
+  .btn-success:hover {
+    background-color: #ff6000; 
+    border-color: #ff6000; 
+  }

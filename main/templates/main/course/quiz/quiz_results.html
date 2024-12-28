@@ -1,0 +1,89 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+{% block title %}
+{{quiz.quiz_title}} Results
+{% endblock %}
+
+{% block sidebar_dynamic_content %}
+<li><a href="/home" class="sidebar-link"> Home</a></li>
+<li><a href="{%url 'Redirect Module Page' quiz.module.id%}" class="sidebar-link"> Back to Lesson</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-10">
+  <div class="container card-style mt-4">
+    <!-- Quiz Info Box -->
+    <div class="quiz-info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded">
+      <div class="quiz-details ms-4">
+        <h1 class="quiz-title">{{ quiz.quiz_title }} Answers</h1>
+        <p class="text-muted">{{ quiz.quiz_description }}</p>
+        <p class="text-muted"><strong>Time Limit:</strong> {{ quiz.time_limit }}</p>
+        <p class="text-muted"><strong>Total Marks:</strong> {{ quiz.total_mark }}</p>
+        <p class="text-muted"><strong>Taken by:</strong> {{ quiz.latest_attempt.taken_by.first_name }} {{ quiz.latest_attempt.taken_by.last_name }}</p>
+        <p class="text-muted"><strong>Taken at:</strong> <span id="taken-at">{{ quiz.latest_attempt.taken_at|date:"c" }}</span></p>
+      </div>
+    </div>
+
+    <!-- Questions Table -->
+    <div class="question-table mb-4">
+      <table class="custom-table table-bordered table-striped shadow-sm">
+        <thead class="custom-header">
+          <tr>
+            <th>Question</th>
+            <th>Correct Answer</th>
+            <th>Your Answer</th>
+            <th>Your Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for question in quiz.annotated_questions %}
+            <tr>
+              <!-- Question Text -->
+              <td><strong>{{ question.question_text }}</strong></td>
+              <!-- Correct Answer -->
+              <td>{{ question.correct_answer }}</td>
+              <!-- User's Answer -->
+              <td>
+                {% if question.latest_answer %}
+                  {{ question.latest_answer.answer_text }}
+                {% else %}
+                  No answer provided
+                {% endif %}
+              </td>
+              <!-- Points for the Question -->
+              <td>
+                {% if question.latest_answer and question.latest_answer.is_correct %}
+                  +{{ question.question_point }}
+                {% else %}
+                  0
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+          <!-- Final Score Row -->
+          <tr class="custom-table-info">
+            <td colspan="3" class="text-end"><strong>Total Score</strong></td>
+            <td>
+              <strong>
+                {% if quiz.latest_attempt %}
+                  {{ quiz.latest_attempt.score }}/{{ quiz.total_mark }}
+                {% else %}
+                  0/{{ quiz.total_mark }}
+                {% endif %}
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.0/luxon.min.js"></script>
+<script src="{% static 'js/quiz_results.js' %}"></script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/quiz_results.css' %}">
+{% endblock %}

@@ -1,0 +1,85 @@
+.navbar {
+    background-color: #bc98c5;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 25px;
+}
+
+.navbar .navbar-brand {
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.navbar .navbar-brand:hover {
+    color: #FF5733;
+}
+
+.navbar-nav .nav-item .nav-link {
+    color: white;
+    font-size: 1.3rem;
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    padding: 12px 25px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-item .nav-link:hover {
+    background-color: #ff6000;
+}
+
+
+.navbar-text {
+    color: white;
+    font-size: 1rem;
+    margin-left: 7px;
+    font-family: 'Georgia', serif;
+    margin-right: -10px;
+}
+
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.navbar .navbar-brand img {
+    width: 120px;
+    height: auto;
+    margin-bottom: -1px;
+}
+
+
+.navbar:hover {
+    box-shadow: 8px 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button {
+    font-family: 'Georgia', serif;
+    font-size: 1rem; 
+    background: none;
+    border: none;
+    color: white;
+    padding: 0;
+    margin-left: -5px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    font-family: 'Georgia', serif;
+    background: none;
+    border: none;
+    color: white;
+    padding: 0;
+    margin-left: -5px;
+    text-decoration: none;
+    cursor: pointer;
+}
+

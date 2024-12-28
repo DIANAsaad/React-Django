@@ -1,0 +1,36 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %} 
+    {{ course_title }} Study Guide 
+{% endblock %}
+
+{% block sidebar_dynamic_content %}
+<li><a href="/home" class="sidebar-link"> Home</a></li>
+<li><a href="{%url 'Redirect Course Page' id %}" class="sidebar-link"> Back to Course</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-10">
+<div class="study-guide-box p-4 shadow rounded">
+    <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'Georgia', serif; padding-bottom: 10px;">
+        <p style="margin: 0;">Here is your study guide:</p>
+    
+    </div>
+    <div style="margin-bottom: 20px;"></div> 
+    <div class="iframe-container" style="width: 100%; height: 550px; overflow: hidden; position: relative;">
+        <iframe 
+            src="{{ study_guide}}" 
+            style="position: absolute; top: -50px; left: 0; width: 100%; height: calc(520px + 70px); border: none;" 
+            title="Study Guide">
+        </iframe>
+    </div>
+</div>
+</div>
+
+<style>
+.course-page-btn {
+    color: black;          
+    text-decoration: none; 
+}
+</style>
+{% endblock %}

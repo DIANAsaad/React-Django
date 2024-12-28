@@ -1,0 +1,177 @@
+
+h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-family: 'Georgia', serif;
+  }
+  
+  .col-md-10 {
+    padding-left: 40px;
+  }
+  
+  .card {
+  
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    margin-bottom: 10px; 
+    margin-left: 5px;
+    margin-right: 0; 
+  }
+  
+  .card-img-top {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+  }
+  
+  .card-body {
+    padding: 15px;
+    background-color: #f8f9fa;
+    height: 120px; 
+    overflow: hidden;
+    position: relative;
+  }
+  
+  
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .card-text {
+    font-size: 1rem;
+    color: #6c757d;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 1;
+   
+  }
+  
+  a.card-title {
+    text-decoration: none;
+  }
+  
+  a.card-title h5 {
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .d-flex {
+    align-items: center; 
+  }
+  
+  .ellipsis {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #ff6000;
+    display: none;
+    font-size: 1.2rem; 
+    font-weight: bold;
+  }
+  
+  
+  .ellipsis-btn {
+    cursor: pointer;
+    color: black; 
+    font-size: 1.2rem; 
+    line-height: 1;
+    display: inline-block;
+    position: relative;
+    top: -6px; 
+    font-weight: bold;
+  
+  }
+  
+  .ellipsis-btn:hover {
+    color: #343a40; 
+  }
+  
+  .card-body.expanded {
+    height: auto;
+  }
+  
+  .card-body .ellipsis.show {
+    display: block;
+  }
+  
+  
+  /*ADD COURSE CARD*/
+  .card-img-top-add {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+  }
+  
+  .card-img-top-add:hover {
+    opacity: 0.8;
+  }
+  
+  .btn-outline-orange {
+    color: #ff6000;
+    border: 1px solid #ff6000;
+    background-color: transparent;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .btn-outline-orange:hover {
+    background-color: #ff6000;
+    color: white;
+  }
+  
+  
+  .col-md-10 {
+    padding-left: 40px;
+  }
+  
+  
+  
+  
+  /*NOTIFICATION BELL*/
+  
+  .notification-bell {
+    position: relative;
+    display: inline-block;
+    background-color: transparent;
+  }
+  
+  .notification-bell i {
+    font-size: 24px; 
+    color: #6a0dad;
+  }
+  
+  .notification-bell .notification-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background-color: #ff6000; 
+    border-radius: 50%;
+    border: 2px solid white; 
+    color: white;
+    font-size: 8px;
+    text-align: center;
+    line-height: 12px;
+  }
+  
+  

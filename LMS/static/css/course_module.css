@@ -1,0 +1,153 @@
+  .lower-header {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .lower-header:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .course-page-btn {
+    font-family: 'Georgia', serif;
+    font-size: 1.25rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .course-page-btn:hover {
+    color: #333;
+    transform: translateY(-2px);
+  }
+
+  .module-info-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+  }
+
+  .module-header .module-img {
+    max-width: 150px;
+    height: auto;
+    border-radius: 10px;
+    margin-right: 20px;
+    overflow: hidden;
+  }
+
+  .module-details {
+    flex-grow: 1;
+  }
+
+  .module-details h1 {
+    font-family: 'Georgia', serif;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+  }
+
+  .module-details p {
+    font-size: 1rem;
+    color: #6c757d;
+    overflow-wrap: anywhere;
+  }
+
+
+  .modules-box {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+  }
+
+  .modules-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .module-item a {
+    color: #333;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .module-item a:hover {
+    color: #000;
+  }
+
+  .module-item strong {
+    font-weight: bold;
+    font-family: 'Georgia', serif;
+    font-size: 1.1rem;
+  }
+
+  .card-style {
+  background-color: #ffffff; 
+  border-radius: 15px;  
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+  padding: 20px;           
+  border: 1px solid #ffd8c3; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+.ellipsis-btn {
+  cursor: pointer;
+  color: black; 
+  font-size: 1.2rem; 
+  line-height: 1;
+  display: inline-block;
+  position: relative;
+  top: -6px; 
+  font-weight: bold;
+
+}
+
+.ellipsis-btn:hover {
+  color: #343a40; 
+}
+
+.btn-outline-orange {
+  border-color: #e85d04;
+  color: #e85d04;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-orange:hover {
+  background-color: #e85d04;
+  color: #fff;
+}
+
+
+/* Flashback Card */
+.flashcard-box {
+  background-color: #ffe7d6;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+
+.flashcard-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Quiz Card */
+.quiz-box {
+  background-color: #d7b5e0;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.quiz-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}

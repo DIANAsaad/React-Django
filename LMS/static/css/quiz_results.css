@@ -1,0 +1,87 @@
+
+.quiz-info-box {
+    background-color:  #fff5f0;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .quiz-info-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .quiz-title{
+    font-size: 1.7rem;
+    font-family: 'Georgia', serif;
+  }
+  .quiz-details p {
+    color: #6c757d; 
+    word-wrap: break-word; 
+    white-space: normal; 
+    overflow-wrap: anywhere;
+  }
+
+  .question-box {
+    background-color: #fff5f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .question-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .question-item p {
+    text-decoration: none;
+    color: #343a40;
+    transition: color 0.3s ease;
+  }
+  
+  .question-item p:hover {
+    color: #e85d04;
+  }
+
+
+
+.custom-table {
+  width: 100% !important;  
+  table-layout: auto !important;  
+  margin: 0 auto; 
+  padding: 0;
+}
+
+
+
+.custom-header th {
+  background-color: #ff6000 !important;
+  color: white !important;
+  font-family: 'Georgia', serif;
+  padding: 5px;
+  text-align: center;
+}
+
+/* Alternate shades for table rows */
+/* Even rows */
+.custom-table tbody tr:nth-child(even) {
+  background-color: #ffe7d6;
+  padding: 2px;
+  text-align: center;
+  
+}
+
+/* Odd rows */
+.custom-table tbody tr:nth-child(odd) {
+  background-color:  #ffd8c3; 
+  padding: 2px;
+  text-align: center;
+
+}
+
+/* Final row */
+.custom-table-info {
+background-color: white !important;
+  color: black !important;
+}

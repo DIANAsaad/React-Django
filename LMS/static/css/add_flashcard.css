@@ -1,0 +1,22 @@
+/* For the Add Question button (hollow with orange contour) */
+#add-flashcard {
+    background-color: transparent;
+    border: 2px solid #ff6000;
+    color: #ff6000;
+}
+
+#add-flashcard:hover {
+    background-color: #ff6000;
+    color: white;
+}
+
+/* For the Submit Quiz button (solid orange) */
+.btn-primary {
+    background-color: #ff6000;
+    border-color: #ff6000;
+}
+
+.btn-primary:hover {
+    background-color: #e65c00;
+    border-color: #e65c00;
+}

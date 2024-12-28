@@ -1,0 +1,98 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}{{ course.course_title }}{% endblock %}
+
+{% block sidebar_dynamic_content %}
+<li><a href="/home" class="sidebar-link"> Home</a></li>
+{% endblock %}
+
+
+{% block content %}
+<!-- Main Content (Course Info Box) -->
+<div class="col-md-10">
+  <div class="container card-style mt-4">
+    <!-- Course Info Box -->
+    <div class="course-info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded">
+      <div class="course-header">
+        {% if course.course_image %}
+        <img src="{{ course.course_image.url }}" class="course-img" alt="{{ course.course_title }}">
+        {% else %}
+        <img src="{% static 'images/achieve_a_mark.png' %}" class="course-img" alt="default">
+        {% endif %}
+      </div>
+
+      <div class="course-details ms-4">
+        <h1 class="course-title">{{ course.course_title }}</h1>
+        <p class="text-muted ">{{ course.description }}</p>
+        {%if user.is_staff or perms.main.add_course %}
+        <p class="text-muted "> <strong>Created by: </strong>{{ course.creator.first_name}} {{ course.creator.last_name}} </p>
+        {%endif%}
+      </div>
+    </div>
+
+    <div>
+      {% for module in course.modules.all %}
+      <div class="modules-box p-4 shadow-sm rounded mb-4" id="module-{{ module.id }}">
+        <ul class="list-unstyled">
+          <li class="module-item d-flex justify-content-between align-items-center">
+            <!-- Title and Topic stick together -->
+            <div>
+              <strong>
+                <a href="/course_module/{{ module.module_slug }}"
+                   style="font-family: 'Georgia', serif; font-size: 1.1rem; color: #333; text-decoration: none;">
+                  {{ module.module_title }}
+                </a>
+              </strong>: {{ module.topic }}
+            </div>
+          
+            <!-- Conditional Delete Dropdown -->
+            {% if user.is_staff or perms.main.delete_module %}
+            <div class="dropdown ms-auto">
+              <span class="ellipsis-btn" id="dropdownMenuButton{{ module.id }}" data-bs-toggle="dropdown">
+                ⋮
+              </span>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ module.id }}"
+                  style="font-size: 0.85rem;">
+                <li>
+                  <button class="dropdown-item text-danger" onclick="deleteItem(('{{ module.id }}'), '/delete_module/', 'module')">
+                    Delete
+                  </button>
+                </li>
+              </ul>
+            </div>
+            {% endif %}
+          </li>
+          
+        </ul>
+      </div>
+
+      {% endfor %}
+
+      {% if user.is_staff or perms.main.add_module %}
+      <div class="modules-box-staff p-4 shadow-sm rounded mb-4 text-center">
+        <a href="{% url 'Add Module' course.id%}" class="btn btn-outline-orange btn-lg">
+          <i class="fas fa-plus"></i> Add Module
+        </a>
+      </div>
+      {% endif %}
+
+      {% if course.study_guide %}
+      <div class="study-guide-box p-4 shadow-sm rounded">
+        <a href="{% url 'Study Guide' course.course_slug %}" class="card-title">
+          <strong style="font-family: 'Georgia', serif; font-size: 1.1rem;">Study Guide:</strong> Get study guide
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script src="{% static 'js/course_page.js' %}"></script>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/course_page.css' %}">
+{% endblock %}
+
+

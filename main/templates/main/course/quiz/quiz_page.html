@@ -1,0 +1,113 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}
+{{ module_title }} Quiz
+{% endblock %}
+
+{% block sidebar_dynamic_content %}
+<li><a href="/home" class="sidebar-link">Home</a></li>
+<li><a href="{% url 'Redirect Module Page' quiz.module.id %}" class="sidebar-link">Back to Lesson</a></li>
+{% endblock %}
+
+{% block content %}
+{% load custom_filters %}
+
+<div class="col-md-10">
+    <div class="container card-style mt-4">
+        <div class="quiz-info-box d-flex align-items-center p-5 mb-4 shadow rounded">
+            <div class="module-details ms-4">
+                <h1 class="display-4">{{ quiz.quiz_title }}</h1>
+                <p class="text-muted">Total Marks: <span class="fw-bold">{{ quiz.total_mark }}</span></p>
+                {% if quiz.attempts_allowed %}
+                <p class="text-muted">Allowed Attempts: <span class="fw-bold">{{ quiz.attempts_allowed }}</span></p>
+                {% else %}
+                <p class="text-muted">Allowed Attempts: <span class="fw-bold">Open</span></p>
+                {% endif %}
+
+                {%if user.is_staff or perms.main.add_quiz%}
+                <p class="text-muted">Created by: <span class="fw-bold">{{quiz.quiz_creator.first_name}} {{quiz.quiz_creator.last_name}}</span></p>
+                {%endif%}
+                {% if quiz.time_limit %}
+                <p class="text-muted">Time Limit: <span class="fw-bold">{{ quiz.time_limit }}</span></p>
+                <p class="text-muted">
+                    <i class="fas fa-clock me-2"></i>Remaining Time: 
+                    <span class="fw-bold" id="time-remaining">{{ quiz.time_limit }}</span>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Hidden main quiz time limit -->
+        <p class="d-none" id="quiz-time-limit">{{ quiz.time_limit }}</p>
+
+        <form method="POST" id="quiz-form" enctype="multipart/form-data" class="w-100">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <div class="quiz-questions">
+                {% for question in quiz.questions.all %}
+                <div class="question-box p-4 shadow-lg rounded mb-4 hover-shadow" data-question-id="{{ question.id }}" style="cursor: pointer;">
+                    
+                    {% if question.question_time_limit %}
+                    <!-- Timed question prompt -->
+                    <div class="question-timed-prompt">
+                        <p><strong>This is a timed question:</strong> The timer will start running as soon as you view this question.</p>
+                        <p>Time Limit: {{ question.question_time_limit }} {{ question.question_time_limit|pluralize:"Minute,Minutes" }}</p>
+                        <button type="button" class="btn btn-confirm confirm-question">View Question</button>
+                    </div>
+                    {% endif %}
+
+                    <!-- Question content initially hidden if timed -->
+                    <div class="question-content" id="question-content-{{ question.id }}"
+                         {% if question.question_time_limit %}style="display: none;"{% else %}style="display: block;"{% endif %}>
+                        <h5 class="fw-bold">{{ question.question_text }}</h5>
+                        {% if question.question_time_limit %}
+                        <p class="text-muted">
+                            <i class="fas fa-clock me-2"></i>Remaining question time: 
+                            <span class="fw-bold" id="question-time-remaining-{{ question.id }}">
+                                {{ question.question_time_limit }} {{ question.question_time_limit|pluralize:"Minute,Minutes" }}
+                            </span>
+                        </p>
+                        {% endif %}
+                        
+                        <!-- Hidden time limit for JS access -->
+                        <p class="d-none question-time-limit" id="question-time-limit-{{ question.id }}">
+                            {{ question.question_time_limit }}
+                        </p>
+
+                        <div class="mb-3">
+                            {% if question.question_type == 'MCQ' %}
+                            <label class="form-label fs-6">Choose the correct option:</label>
+                            <div class="form-check">
+                                {% for choice in question.choices|split:"," %}
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="choice_{{ question.id }}_{{ forloop.counter }}" value="{{ choice }}">
+                                <label class="form-check-label" for="choice_{{ question.id }}_{{ forloop.counter }}">{{ choice }}</label><br>
+                                {% endfor %}
+                            </div>
+                            {% elif question.question_type == 'TF' %}
+                            <label class="form-label fs-6">True or False:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="true_{{ question.id }}" value="True">
+                                <label class="form-check-label" for="true_{{ question.id }}">True</label><br>
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="false_{{ question.id }}" value="False">
+                                <label class="form-check-label" for="false_{{ question.id }}">False</label>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-end mt-4">
+                <button id="submit-button" type="submit" class="btn btn-success btn-lg shadow-sm">Submit Quiz</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="{% static 'js/quiz_page.js' %}"></script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/quiz_page.css' %}">
+{% endblock %}

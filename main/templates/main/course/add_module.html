@@ -1,0 +1,54 @@
+ {% extends 'main/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Add Lesson{% endblock %}
+
+{% block sidebar_dynamic_content %}
+<li><a href="/home" class="sidebar-link"> Home</a></li>
+<li><a href="{%url 'Redirect Course Page' course_id%}" class="sidebar-link">Back to Course</a></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-md-10">
+  <div class="container card-style mt-4">
+
+  <!-- Module Info Box -->
+  <div class="module-info-box d-flex align-items-center p-4 mb-4 shadow rounded">
+    <form method="post" enctype="multipart/form-data" class="w-100">
+      {% csrf_token %}
+      <div class="row">
+        <!-- Module Image -->
+        <div class="col-md-4 module-header">
+          {{ form.module_image|as_crispy_field }}
+        </div>
+
+        <!-- Module Details -->
+        <div class="col-md-8 module-details">
+          <p>{{ form.module_title|as_crispy_field }}</p>
+          <p class="text-muted">{{ form.topic|as_crispy_field }}</p>
+        </div>
+      </div>
+  </div>
+
+  <!-- Lesson PDF Block -->
+  <div class="modules-box p-4 shadow rounded mb-4">
+    <ul class="list-unstyled">
+      <li class="module-item">
+        {{ form.lesson_pdf|as_crispy_field }}
+      </li>
+    </ul>
+  </div>
+
+  <!-- Submit Button -->
+    <button type="submit" class="btn btn-success">Add Module</button>
+
+  </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/add_module.css' %}">
+
+{% endblock %}

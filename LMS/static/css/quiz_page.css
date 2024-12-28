@@ -1,0 +1,115 @@
+.quiz-info-box {
+    background-color: #fff5f0;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+h1.display-4 {
+    font-size: 2rem; 
+    font-weight: 700; 
+    color:#ff6000;
+    margin-bottom: 1rem; 
+    letter-spacing: 1px; 
+    font-family: 'Georgia', serif;
+}
+
+.quiz-info-box:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.question-box {
+    background-color: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.question-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.question-box h5 {
+    font-size: 1.25rem;
+    color: #343a40;
+}
+
+.text-muted {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+.module-details p.fs-5 {
+    font-size: 1rem;
+}
+
+p.fs-6 {
+    font-size: 1.1rem;
+    line-height: 1.5;}
+
+.btn-success {
+    background-color: #ff6000;
+    border-color: #ff6000;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #e55a00;
+    border-color: #e55a00;
+    transform: scale(1.05);
+}
+
+.btn-success:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(255, 96, 0, 0.5);
+}
+
+.text-end {
+    text-align: right;
+}
+
+
+.hover-shadow:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-check-label {
+    font-size: 1.1rem;
+}
+
+
+.form-check-input:checked + .form-check-label {
+    color: #495057;
+    font-weight: bold;
+}
+
+/* When question time is up! */
+
+input:disabled {
+    opacity: 0.5; 
+    pointer-events: none; 
+}
+
+.question-box {
+    opacity: 1; 
+}
+
+.btn-confirm{
+    background-color: transparent;
+    border: 2px solid #ff6000;
+    color: #ff6000;
+}
+
+.btn-confirm:hover{
+    background-color: #ff6000;
+    color: white;
+}
+

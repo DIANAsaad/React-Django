@@ -1,0 +1,117 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}
+Add Lesson Quiz
+{% endblock %}
+
+{% block sidebar_dynamic_content %}
+<li><a href="/home" class="sidebar-link"> Home</a></li>
+<li><a href="{%url 'Redirect Module Page' module_id%}" class="sidebar-link"> Back to Lesson</a></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-md-10">
+    <!-- Removed col-md-10 and replaced container with container-fluid -->
+    <div class="card-style p-4 shadow rounded">
+        <!-- Quiz Info Box -->
+        <div class="quiz-info-box mb-4">
+            <form id="quiz-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Quiz Information -->
+                <div class="mb-4">
+                    <label for="quiz_title" class="form-label">Quiz Title:</label>
+                    <input type="text" name="quiz_title" id="quiz_title" class="form-control" required>
+                </div>
+                <div class="mb-4">
+                    <label for="quiz_description" class="form-label">Quiz Description:</label>
+                    <textarea name="quiz_description" id="quiz_description" class="form-control" required></textarea>
+                </div>
+                <div class="row mb-4">
+                    <div class="col">
+                        <label for="time_limit" class="form-label">Time Limit (minutes):</label>
+                        <input type="number" name="time_limit" id="time_limit" min="0"  class="form-control">
+                    </div>
+                    <div class="col">
+                        <label for="total_mark" class="form-label">Total Marks:</label>
+                        <input type="number" name="total_mark" id="total_mark" min="0"  class="form-control" required>
+                    </div>
+                    <div class="col">
+                        <label for="attempts_allowed" class="form-label">Attempts Allowed:</label>
+                        <input type="number" name="attempts_allowed" id="attempts_allowed" min="0" class="form-control">
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Questions Section -->
+                <div id="questions-container"></div>
+
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn btn-warning mb-3" id="add-question">Add Question</button>
+                </div>
+
+                <hr>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submit-quiz">Submit Quiz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Question Template -->
+<template id="question-template">
+    <div class="card p-3 mb-4 shadow-sm w-100">
+        <div class="mb-3">
+            <label class="form-label">Question Text:</label>
+            <input type="text" name="question_text[]" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Question Type:</label>
+            <select name="question_type[]" class="form-control question-type-selector">
+                <option value="MCQ">Multiple Choice</option>
+                <option value="TF">True/False</option>
+            </select>
+        </div>
+       
+        <!-- Wrap the choices input in a container -->
+        <div class="mb-3 choices-container">
+            <label class="form-label">Enter Choices (comma-separated):</label>
+            <input type="text" name="choices[]" class="form-control" placeholder="Enter choices here" required>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Choose Correct Answer:</label>
+            <select name="correct_answer[]" class="form-control" required>
+                <option value="" disabled selected>Select an answer</option> 
+                <!-- Options will be populated dynamically -->
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Points:</label>
+            <input type="number" name="question_point[]" class="form-control" min="0"  required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Time Limit:</label>
+            <input type="number" name="question_time_limit[]" class="form-control" min="0">
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-danger btn-sm remove-question">Remove Question</button>
+        </div>
+    </div>
+</template>
+
+<script src="{% static 'js/add_quiz.js' %}"></script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/add_quiz.css' %}">
+{% endblock %}

@@ -1,0 +1,168 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+.header-bottom {
+    background-color: whitesmoke;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-bottom .header-bottom-brand {
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.header-bottom .header-bottom-brand img {
+    width: 130px;
+    height: auto;
+    margin-bottom: -1px;
+    opacity: 1;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    color: #ff6000;
+    text-decoration: none;
+    font-size: 1em;
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    padding: 12px 25px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+}
+
+.social-btn {
+    background-color: #ff6000;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.social-btn:hover {
+    background-color:  #ff6000;
+}
+
+.social-btn i {
+    font-size: 18px;
+}
+
+.image-wrapper {
+    position: relative;
+    text-align: center;
+    margin-top: 0;
+}
+
+img {
+    width: 100%;
+    height: auto;
+    opacity: 0.9;
+}
+
+.content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #222c36;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 40px;
+    border-radius: 15px;
+    width: 80%;
+    box-sizing: border-box;
+}
+
+.content p {
+    font-size: 1.3em;
+    font-family: 'Georgia', serif;
+    margin-bottom: 20px;
+}
+
+
+button[type="submit"] {
+    background-color: #ff6000;
+    border-color: #ff6000;
+}
+
+/* Change color of submit button on hover */
+button[type="submit"]:hover {
+    background-color: #e55c00;
+    border-color: #e55c00;
+}
+
+
+
+footer {
+    background-color:#332254;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Media Queries for Mobile Optimization */
+@media screen and (max-width: 768px) {
+    .header-top h1 {
+        font-size: 2.2em;
+        padding: 15px;
+    }
+
+    .content {
+        width: 90%;
+        padding: 25px;
+    }
+
+}
+
+@media screen and (max-width: 480px) {
+    .header-top h1 {
+        font-size: 1.8em;
+        padding: 12px;
+    }
+
+    .content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    /* Set the logo size to 30% of its original size */
+    .header-bottom img {
+        max-width: 30%;
+        height: auto;  /* Ensure the aspect ratio is maintained */
+    }
+}
