@@ -1,5 +1,6 @@
 // src/WelcomePage.tsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Welcome.css';  // Link to your CSS file
 import 'font-awesome/css/font-awesome.min.css';
 import { useAuth } from '../AuthContext';
@@ -10,6 +11,7 @@ const Welcome: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const navigate =useNavigate();
 
     // Handle login form submission
     const handleLogin = async (e: React.FormEvent) => {
@@ -17,6 +19,8 @@ const Welcome: React.FC = () => {
 
         try {
             await login(email,password);
+            navigate('/home'); // Redirect to welcome page
+            console.log('Logged out');
         } catch (error){
             setErrorMessage('Invalid username or password.)')
         }

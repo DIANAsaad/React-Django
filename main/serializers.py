@@ -3,6 +3,13 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from .models import AchieveUser
 
+
+class AchieveUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AchieveUser
+        fields = ['id', 'first_name', 'last_name', 'email']
+
+
 class AchieveUserLoginSerializer(serializers.Serializer):
     email=serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True)

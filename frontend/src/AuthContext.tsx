@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 import { ReactNode } from 'react';
-import {useNavigate  } from 'react-router-dom';
 
 // Define User type
 interface AchieveUser {
@@ -9,6 +8,7 @@ interface AchieveUser {
     first_name: string;
     last_name: string;
     email: string;
+    password:string;
 }
 
 // Define AuthContext type
@@ -31,11 +31,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<AchieveUser | null>(null);
-    const navigate = useNavigate();
+
     const login = async (email: string, password: string) => {
         try {
             const response = await axios.post(
-                'http://127.0.0.1:8000/login',
+                'http://127.0.0.1:8000',
                 { email, password },
                 {
                     headers: { 'Content-Type': 'application/json' },
@@ -45,18 +45,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.setItem('access_token', response.data.access);
             localStorage.setItem('refresh_token', response.data.refresh);
             setIsAuthenticated(true);
-            setUser(response.data.user); // Assuming the user data is returned in the response
+            setUser(response.data.user); 
+            if (response.data.user) {
+                console.log('Logged in as', response.data.user.first_name);
+            } else {
+                console.error('User data is missing in the response');
+            }
         } catch (error) {
-            console.error('Login failed', error);
+            console.error("Login failed: User doesn't exis", error);
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        setIsAuthenticated(false);
-        setUser(null);
-        navigate('/');
+    const logout = async () => {
+        try {
+            await axios.post('http://127.0.0.1:8000/logout');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            setIsAuthenticated(false);
+            setUser(null);
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
     };
 
     return (

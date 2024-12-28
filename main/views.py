@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from .serializers import AchieveUserLoginSerializer
+from .serializers import AchieveUserLoginSerializer, AchieveUserSerializer
 from rest_framework import status
 #Authentication & Authorization
 
@@ -31,7 +31,7 @@ class CustomLoginView(APIView):
             refresh= RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             
-            return Response({"acces_token":access_token}, 
+            return Response({"acces_token":access_token, 'user':AchieveUserSerializer(user).data},
                             status=status.HTTP_200_OK)
         return Response(
             {"details":'user not found'},
