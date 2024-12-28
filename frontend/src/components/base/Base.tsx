@@ -2,24 +2,18 @@ import React from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
-interface User {
-    isAuthenticated: boolean;
-    firstName: string;
-  }
-  
-  interface BaseProps {
-    user: User;
-    children: React.ReactNode;
-  }
+
+interface BaseProps {
+  children: React.ReactNode;
+}
 
 
-  const Base: React.FC<BaseProps> = ({ user,children }) => {
+const Base: React.FC<BaseProps> = ({ children }) => {
 
-   
-  
+
   return (
     <div>
-      <Navbar user={user}/>
+      <Navbar />
       <div className="container">
         <div className="row">
           <Sidebar />

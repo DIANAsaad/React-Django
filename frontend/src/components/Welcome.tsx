@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import '../styles/Welcome.css';  // Link to your CSS file
 import 'font-awesome/css/font-awesome.min.css';
-import axios from 'axios';
+import { useAuth } from '../AuthContext';
 
 const Welcome: React.FC = () => {
     // State to manage form data and error messages
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -15,26 +16,9 @@ const Welcome: React.FC = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(
-                'http://127.0.0.1:8000',  // Django JWT endpoint
-                { email, password },
-                {
-                    headers: {
-                        'Content-Type': 'application/json', // Set correct content type
-                    },
-                }
-            );
-
-            // On success, store JWT tokens in localStorage
-            localStorage.setItem('access_token', response.data.access);
-            localStorage.setItem('refresh_token', response.data.refresh);
-
-
-            console.log('Login successful');
-
-        } catch (error) {
-            setErrorMessage('Invalid username or password. Please try again.');
-            console.error('Error during login: User not found', error);
+            await login(email,password);
+        } catch (error){
+            setErrorMessage('Invalid username or password.)')
         }
     };
 
