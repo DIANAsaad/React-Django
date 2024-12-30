@@ -15,10 +15,12 @@ const Base: React.FC<BaseProps> = ({ children }) => {
   return (
     <div>
       <Navbar />
-      <div className="container">
-        <div className="row">
+      <div className="container-base">
+      <div className="row">
           <Sidebar />
+          <div className="content-base">
             {children}
+          </div>
           </div>
         </div>
       </div>
