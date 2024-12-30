@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { ReactNode } from 'react';
 
@@ -31,6 +31,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<AchieveUser | null>(null);
+    
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        const storedIsAuthenticated = localStorage.getItem('isAuthenticated');
+
+        if (storedUser && storedIsAuthenticated) {
+            setUser(JSON.parse(storedUser));
+            setIsAuthenticated(JSON.parse(storedIsAuthenticated));
+        }
+    }, []);
 
     const login = async (email: string, password: string) => {
         try {

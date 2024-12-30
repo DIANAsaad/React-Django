@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import '../../styles/Base.css'
 
 
 interface BaseProps {
@@ -17,12 +18,10 @@ const Base: React.FC<BaseProps> = ({ children }) => {
       <div className="container">
         <div className="row">
           <Sidebar />
-          <div className="col-md-10">
             {children}
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

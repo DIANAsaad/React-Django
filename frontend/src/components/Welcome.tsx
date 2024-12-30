@@ -19,8 +19,7 @@ const Welcome: React.FC = () => {
 
         try {
             await login(email,password);
-            navigate('/home'); // Redirect to welcome page
-            console.log('Logged out');
+            navigate('/home')
         } catch (error){
             setErrorMessage('Invalid username or password.)')
         }
