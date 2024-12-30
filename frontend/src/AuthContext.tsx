@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { ReactNode } from 'react';
+import {jwtDecode} from 'jwt-decode';
 
 // Define User type
 interface AchieveUser {
@@ -8,7 +9,6 @@ interface AchieveUser {
     first_name: string;
     last_name: string;
     email: string;
-    password:string;
 }
 
 // Define AuthContext type
@@ -31,15 +31,38 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<AchieveUser | null>(null);
-    
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        const storedIsAuthenticated = localStorage.getItem('isAuthenticated');
 
-        if (storedUser && storedIsAuthenticated) {
-            setUser(JSON.parse(storedUser));
-            setIsAuthenticated(JSON.parse(storedIsAuthenticated));
-        }
+    useEffect(() => {
+        const fetchUser = () => {
+            const accessToken = localStorage.getItem('access_token');
+            console.log(accessToken)
+            if (accessToken) {
+                try {
+                    const parts = accessToken.split('.');
+                    if (parts.length !== 3) {
+                        throw new Error('Invalid token');
+                    }
+                    const decodedToken: any = jwtDecode(accessToken);
+                    if (!decodedToken || !decodedToken.id) {
+                        throw new Error('Invalid token');
+                    }
+                    const userData: AchieveUser = {
+                        id: decodedToken.id,
+                        first_name: decodedToken.first_name,
+                        last_name: decodedToken.last_name,
+                        email: decodedToken.email,
+                    };
+                    setUser(userData);
+                    setIsAuthenticated(true);
+                } catch (error) {
+                    console.error('Failed to fetch user data', error);
+                    setIsAuthenticated(false);
+                    setUser(null);
+                }
+            }
+        };
+
+        fetchUser();
     }, []);
 
     const login = async (email: string, password: string) => {
@@ -52,17 +75,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 }
             );
 
-            localStorage.setItem('access_token', response.data.access);
-            localStorage.setItem('refresh_token', response.data.refresh);
+            localStorage.setItem('access_token', response.data.access_token);
+            localStorage.setItem('refresh_token', response.data.refresh_token);
             setIsAuthenticated(true);
-            setUser(response.data.user); 
-            if (response.data.user) {
-                console.log('Logged in as', response.data.user.first_name);
-            } else {
-                console.error('User data is missing in the response');
-            }
+            console.log('access_token', response.data.access_token);
         } catch (error) {
-            console.error("Login failed: User doesn't exis", error);
+            if (axios.isAxiosError(error) && error.response?.status === 400) {
+                console.error('Bad Request: ', error.response.data);
+            } else {
+                console.error('Login failed', error);
+            }
         }
     };
 
@@ -73,6 +95,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.removeItem('refresh_token');
             setIsAuthenticated(false);
             setUser(null);
+
+            localStorage.removeItem('user');
+            localStorage.removeItem('isAuthenticated');
         } catch (error) {
             console.error('Logout failed', error);
         }

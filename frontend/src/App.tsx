@@ -31,4 +31,5 @@ const AppWrapper: React.FC = () => (
     <App />
   </AuthProvider>
 );
+
 export default AppWrapper;

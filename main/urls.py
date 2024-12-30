@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns=[
     path('', CustomLoginView.as_view(), name='Welcome'),
-    path('logout',views.CustomLogoutView.as_view(), name='logout'),
+    path('logout',CustomLogoutView.as_view(), name='logout'),
     path("home", views.home, name='Home'),
     path("course_page/<slug:course_slug>/", views.course_page, name='Course Page'),
     path("course_page/id/<int:course_id>", views.course_page, name='Redirect Course Page'),

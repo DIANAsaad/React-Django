@@ -19,7 +19,8 @@ const Welcome: React.FC = () => {
 
         try {
             await login(email,password);
-            navigate('/home')
+            navigate('/home'); 
+          
         } catch (error){
             setErrorMessage('Invalid username or password.)')
         }

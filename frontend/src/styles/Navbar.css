@@ -67,19 +67,11 @@
     border: none;
     color: white;
     padding: 0;
-    margin-left: -5px;
+    margin-left: -30px;
+    margin-right: 20px;
     text-decoration: none;
     cursor: pointer;
 }
 
-.logout-button:hover {
-    font-family: 'Georgia', serif;
-    background: none;
-    border: none;
-    color: white;
-    padding: 0;
-    margin-left: -5px;
-    text-decoration: none;
-    cursor: pointer;
-}
+
 

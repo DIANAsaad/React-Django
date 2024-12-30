@@ -20,26 +20,31 @@ from rest_framework import status
 #Authentication & Authorization
 
 class CustomLoginView(APIView):
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
     
-    def post(self,request,*args,**kargs):
-        serializer=AchieveUserLoginSerializer(data=request.data)
+    def post(self, request, *args, **kwargs):
+        serializer = AchieveUserLoginSerializer(data=request.data)
         
         if serializer.is_valid():
-            user=serializer.validated_data['user']
-            #Generates the JWT Tokens
-            refresh= RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
+            user = serializer.validated_data['user']
+            # Generates the JWT Tokens
+            refresh_token = RefreshToken.for_user(user)
+            access_token = str(refresh_token.access_token)
+            data = {
+                'access_token': access_token,
+                'refresh_token': str(refresh_token),
+                'user': AchieveUserSerializer(user).data
+            }
             
-            return Response({"acces_token":access_token, 'user':AchieveUserSerializer(user).data},
-                            status=status.HTTP_200_OK)
+            return Response(data, status=status.HTTP_200_OK)
+        
         return Response(
-            {"details":'user not found'},
+            {"details": 'Invalid credentials'},
             status=status.HTTP_400_BAD_REQUEST
         )
    
 class CustomLogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     def post(self,request,*args,**kwargs):
       data=request.data
       user=data.user
