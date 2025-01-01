@@ -89,10 +89,10 @@ class GetUserView(APIView):
 
 class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        queryset = Course.objects.all()
-        serializer = CourseSerializer(queryset, many=True)
+   
+    def get(self, request, *args, **kwargs): 
+        courses = Course.objects.all()
+        serializer = CourseSerializer(courses,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

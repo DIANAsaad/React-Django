@@ -1,12 +1,18 @@
-import  { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import axios from "axios";
 
-// Define the shape of a Course (adjust fields to match your API response)
+// Define the shape of a Course
 interface Course {
   id: number;
   course_title: string;
-  course_description: string;
-  course_image:File;
+  description: string;
+  course_image: string; // Now a string representing the image URL
 }
 
 // Define the context structure
@@ -21,7 +27,7 @@ const CourseContext = createContext<CourseContextProps | undefined>(undefined);
 
 // Provider component
 export const CourseProvider = ({ children }: { children: ReactNode }) => {
-  const [courses, setCourses] = useState<Course[] | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,12 +36,19 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("/api/homepage/", {
+        const response = await axios.get("http://localhost:8000/courses", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Adjust token retrieval logic if necessary
           },
         });
-        setCourses(response.data);
+
+        // Assuming the image URL in the response is a relative path, prepend the full URL
+        const updatedCourses = response.data.map((course: Course) => ({
+          ...course,
+          course_image: `http://localhost:8000${course.course_image}`, // Prepend the base URL to the image
+        }));
+
+        setCourses(updatedCourses);
       } catch (err) {
         setError("Failed to fetch courses.");
       } finally {

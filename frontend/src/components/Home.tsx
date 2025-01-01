@@ -1,6 +1,8 @@
 import React from "react";
 import CourseCard from "./home_components/CourseCard";
 import { useCourseContext } from "../context/CourseContext";
+import "../styles/Home.css";
+
 
 const Home: React.FC = () => {
   const { courses, loading, error } = useCourseContext();
@@ -18,19 +20,26 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="container mt-4">
-      <h1 className="mb-4">Available Courses</h1>
+    <>
+      <div className="col-12 mb-4">
+        <h2 className="d-flex">
+          <span>My Courses |</span>
+          <input
+            type="text"
+            className="form-control ms-2"
+            placeholder="Search courses..."
+            id="course-search"
+          />
+        </h2>
+      </div>
       <div className="row">
-        {Array.isArray(courses) &&
+        {courses &&
           courses.map((course) => (
-            <CourseCard courseId={course.id}/>
+            <CourseCard key={course.id} courseId={course.id} />
           ))}
       </div>
-    </div>
+    </>
   );
 };
 
 export default Home;
-
-
-

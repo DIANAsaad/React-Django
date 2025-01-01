@@ -26,7 +26,8 @@ class AchieveUserLoginSerializer(serializers.Serializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    course_image = serializers.ImageField()
     class Meta:
         model = Course
-        fields = ['id', 'course_title', 'course_description', 'course_image']
-        read_only_fields = ['id']
+        fields = ['id', 'course_title', 'description', 'course_image']
+        read_only_fields = ['id'] 
