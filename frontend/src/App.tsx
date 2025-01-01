@@ -6,9 +6,10 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { useAuth, AuthProvider } from "./AuthContext";
+import { useAuth, AuthProvider } from "./context/AuthContext";
 import Base from "./components/base/Base";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { CourseProvider } from './context/CourseContext';
 
 const App: React.FC = () => {
   const { isAuthenticated } = useAuth(); // State to store user data
@@ -39,7 +40,9 @@ const App: React.FC = () => {
 
 const AppWrapper: React.FC = () => (
   <AuthProvider>
+    <CourseProvider>
     <App />
+    </CourseProvider>
   </AuthProvider>
 );
 

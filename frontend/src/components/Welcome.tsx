@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Welcome.css"; // Link to your CSS file
 import "font-awesome/css/font-awesome.min.css";
-import { useAuth } from "../AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 const Welcome: React.FC = () => {
   // State to manage form data and error messages

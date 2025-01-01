@@ -21,7 +21,11 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from .serializers import AchieveUserLoginSerializer, AchieveUserSerializer
+from .serializers import (
+    AchieveUserLoginSerializer,
+    AchieveUserSerializer,
+    CourseSerializer,
+)
 from rest_framework import status
 
 # Authentication & Authorization
@@ -83,10 +87,13 @@ class GetUserView(APIView):
 # Web functionality
 
 
-@login_required(login_url="/")
-def home(request):
-    courses = Course.objects.all()
-    return render(request, "main/home.html", {"courses": courses})
+class HomePageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        queryset = Course.objects.all()
+        serializer = CourseSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @login_required(login_url="/")

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Navbar.css";
-import { useAuth } from "../../AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -10,7 +10,6 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     logout();
     navigate("/");
-    console.log("Logged out");
   };
  
   return (

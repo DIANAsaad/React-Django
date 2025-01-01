@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import AchieveUser
+from .models import AchieveUser, Course
 
 
 class AchieveUserSerializer(serializers.ModelSerializer):
@@ -23,3 +23,10 @@ class AchieveUserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid email or password")
         data["user"] = user
         return data
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['id', 'course_title', 'course_description', 'course_image']
+        read_only_fields = ['id']

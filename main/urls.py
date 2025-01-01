@@ -1,6 +1,6 @@
 from main import views
 from django.urls import path
-from main.views import CustomLoginView, CustomLogoutView, GetUserView
+from main.views import CustomLoginView, CustomLogoutView, GetUserView, HomePageView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -8,7 +8,7 @@ urlpatterns = [
     path("", CustomLoginView.as_view(), name="Welcome"),
     path("logout", CustomLogoutView.as_view(), name="logout"),
     path("user", GetUserView.as_view(), name="get_user"),
-    path("home", views.home, name="Home"),
+    path("courses/", HomePageView.as_view(), name="course-list"),
     path("course_page/<slug:course_slug>/", views.course_page, name="Course Page"),
     path(
         "course_page/id/<int:course_id>", views.course_page, name="Redirect Course Page"

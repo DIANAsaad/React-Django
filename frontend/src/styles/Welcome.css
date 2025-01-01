@@ -1,212 +1,192 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  background-color: #f4f4f4;
 }
 
 .header-bottom {
-    background-color: whitesmoke;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background-color: whitesmoke;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .header-bottom .header-bottom-brand {
-    font-family: 'Georgia', serif;
-    font-weight: bold;
-    color: white;
-    transition: color 0.3s ease;
+  font-family: "Georgia", serif;
+  font-weight: bold;
+  color: white;
+  transition: color 0.3s ease;
 }
 
 .header-bottom .header-bottom-brand img {
-    width: 130px;
-    height: auto;
-    margin-bottom: -1px;
-    opacity: 1;
+  width: 130px;
+  height: auto;
+  margin-bottom: -1px;
+  opacity: 1;
 }
 
 nav ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    justify-content: flex-start;
-    gap: 20px;
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
 }
 
 nav ul li {
-    display: inline;
+  display: inline;
 }
 
 nav ul li a {
-    color: #ff6000;
-    text-decoration: none;
-    font-size: 1em;
-    font-family: 'Georgia', serif;
-    font-weight: bold;
-    padding: 12px 25px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+  color: #ff6000;
+  text-decoration: none;
+  font-size: 1em;
+  font-family: "Georgia", serif;
+  font-weight: bold;
+  padding: 12px 25px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .social-icons {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .social-btn {
-    background-color: #ff6000;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-decoration: none;
+  background-color: #ff6000;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
 }
 
 .social-btn:hover {
-    background-color:  #ff6000;
+  background-color: #ff6000;
 }
 
 .social-btn i {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .image-wrapper {
-    position: relative;
-    text-align: center;
-    margin-top: 0;
+  position: relative;
+  text-align: center;
+  margin-top: 0;
 }
 
 img {
-    width: 100%;
-    height: auto;
-    opacity: 0.9;
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
 }
 
 .content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #222c36;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 40px;
-    border-radius: 15px;
-    width: 80%;
-    box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #222c36;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 40px;
+  border-radius: 15px;
+  width: 80%;
+  box-sizing: border-box;
 }
 
 .content p {
-    font-size: 1.3em;
-    font-family: 'Georgia', serif;
-    margin-bottom: 20px;
+  font-size: 1.3em;
+  font-family: "Georgia", serif;
+  margin-bottom: 20px;
 }
-
-
-button[type="submit"] {
-    background-color: #ff6000;
-    border-color: #ff6000;
-}
-
-/* Change color of submit button on hover */
-button[type="submit"]:hover {
-    background-color: #e55c00;
-    border-color: #e55c00;
-}
-
-
 
 footer {
-    background-color:#332254;
-    color: white;
-    padding: 15px 0;
-    text-align: center;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
+  background-color: #332254;
+  color: white;
+  padding: 15px 0;
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
 }
 
-/* Media Queries for Mobile Optimization */
-@media screen and (max-width: 768px) {
-    .header-top h1 {
-        font-size: 2.2em;
-        padding: 15px;
-    }
-
-    .content {
-        width: 90%;
-        padding: 25px;
-    }
-
-}
-
-/* Ensure the form container is aligned properly */
 .container {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center; /* Center align form items */
-    gap: 15px; /* Add some space between elements */
-    margin-top: 20px; /* Optional: Add some space at the top */
+  display: flex;
+  max-width:500px;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  text-align: center;
 }
 
 /* Style for input fields */
-.container input {
-    width: 100%; /* Ensure the input takes full width */
-    max-width: 300px; /* Limit maximum width */
-    padding: 10px;
-    margin: 5px 0; /* Add some margin between fields */
-    border: 1px solid #ccc;
-    border-radius: 5px;
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  max-width: 500px !important;
+  padding: 10px;
+  margin: 15px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Button styling */
 .container button {
-    width: 100%; /* Ensure the button takes full width */
-    max-width: 150px; /* Limit maximum width */
-    padding: 10px;
-    background-color:#ff6000;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+  width: 100%;
+  max-width: 150px;
+  padding: 10px;
+  background-color: #ff6000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  display: block;
+  margin: 10px auto 0 auto;
 }
 
 /* Add a hover effect for the button */
 .container button:hover {
-    background-color: #fc8236;
+  background-color: #fc8236;
 }
 
 /* Optional: Style error messages */
 .container .error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 10px;
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
 }
 
 @media screen and (max-width: 480px) {
-    .header-top h1 {
-        font-size: 1.8em;
-        padding: 12px;
-    }
+  .header-top h1 {
+    font-size: 1.8em;
+    padding: 12px;
+  }
 
-    .content {
-        width: 95%;
-        padding: 20px;
-    }
+  .content {
+    width: 95%;
+    padding: 20px;
+  }
 
-    /* Set the logo size to 30% of its original size */
-    .header-bottom img {
-        max-width: 30%;
-        height: auto;  /* Ensure the aspect ratio is maintained */
-    }
+  /* Set the logo size to 30% of its original size */
+  .header-bottom img {
+    max-width: 30%;
+    height: auto; /* Ensure the aspect ratio is maintained */
+  }
 }
