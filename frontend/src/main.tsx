@@ -7,7 +7,6 @@ import { CourseProvider } from "./context/CourseContext"; // Import CourseProvid
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <CourseProvider>
-  
       <App />
     </CourseProvider>
   </StrictMode>

@@ -7,12 +7,12 @@ import {
 } from "react";
 import axios from "axios";
 
-// Define the shape of a Course
+// Define the shape of a Course (adjust fields to match your API response)
 interface Course {
   id: number;
   course_title: string;
   description: string;
-  course_image: string; // Now a string representing the image URL
+  course_image: File;
 }
 
 // Define the context structure
@@ -42,10 +42,11 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           },
         });
 
-        // Assuming the image URL in the response is a relative path, prepend the full URL
         const updatedCourses = response.data.map((course: Course) => ({
           ...course,
-          course_image: `http://localhost:8000${course.course_image}`, // Prepend the base URL to the image
+          course_image: course.course_image
+            ? `http://localhost:8000${course.course_image}`
+            : "/achieve_a_mark.png",
         }));
 
         setCourses(updatedCourses);

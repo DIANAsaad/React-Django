@@ -22,6 +22,7 @@ const App: React.FC = () => {
         <Route path="/" element={<Welcome />} />
 
         {/* Route for the home page after login */}
+        
         {isAuthenticated && (
           <Route
             path="/home"
