@@ -27,6 +27,7 @@ from .serializers import (
     CourseSerializer,
 )
 from rest_framework import status
+from rest_framework.exceptions import NotFound, PermissionDenied
 
 # Authentication & Authorization
 
@@ -95,6 +96,46 @@ class HomePageView(APIView):
         serializer = CourseSerializer(courses,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+#Delete of Models
+class DeleteCourseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        course_id = kwargs.get('course_id')
+        if not course_id:
+            return Response({"detail": "Course ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            
+            delete_object(request, app_label="main", model_name="Course", object_id=course_id)
+            return Response({"message": "Course deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+        except Course.DoesNotExist:
+            raise NotFound(detail="Course not found.", code=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied as e:
+            raise PermissionDenied(detail=str(e), code=status.HTTP_403_FORBIDDEN)
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
 @login_required(login_url="/")
 def course_page(request, course_slug=None, course_id=None):
@@ -253,11 +294,24 @@ def add_flashcard(request, module_id):
     )
 
 
-@permission_required("main.delete_course", login_url="/", raise_exception=True)
-def delete_course(request):
-    return delete_object(
-        request, app_label="main", model_name="Course", object_id="course_id"
-    )
+#Delete of Models
+class DeleteCourseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        course_id = kwargs.get('course_id')
+        if not course_id:
+            return Response({"detail": "Course ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            
+            delete_object(request, app_label="main", model_name="Course", object_id=course_id)
+            return Response({"message": "Course deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+        except Course.DoesNotExist:
+            raise NotFound(detail="Course not found.", code=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied as e:
+            raise PermissionDenied(detail=str(e), code=status.HTTP_403_FORBIDDEN)
+
 
 
 @permission_required("main.delete_module", login_url="/", raise_exception=True)
