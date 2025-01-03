@@ -1,62 +1,123 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useCourseContext } from "../../context/CourseContext";
+import "../../styles/AddCourseCard.css";
 
 const AddCourseCard: React.FC = () => {
   const { addCourse } = useCourseContext();
-  const [showForm, setShowForm] = useState(false);
-  const [course_title, setCourseTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [course_image, setCourseImage] = useState<File | null>(null);
-  const [study_guide, setStudyGuide] = useState("");
+  const [showInputs, setShowInputs] = useState(false);
+  const [formData, setFormData] = useState({
+    course_title: "",
+    description: "",
+    study_guide: "",
+    course_image: null as File | null,
+  });
+  const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    setFormData((prev) => ({ ...prev, course_image: file }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-      await addCourse(course_title, description, course_image, study_guide);
-      setCourseTitle("");
-      setDescription("");
-      setCourseImage(null);
-      setStudyGuide("");
-      setShowForm(false);
+    setLoading(true);
+    try {
+      await addCourse(
+        formData.course_title,
+        formData.description,
+        formData.course_image,
+        formData.study_guide
+      );
+      setFormData({
+        course_title: "",
+        description: "",
+        study_guide: "",
+        course_image: null,
+      });
+      setShowInputs(false);
+    } catch (error) {
+      console.error("Failed to add course", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageClick = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
   };
 
   return (
     <div className="col-12 mb-4">
-      <div className="card shadow-sm add-course-card" onClick={() => setShowForm(true)}>
-        {!showForm && (
-          <div className="card-body d-flex justify-content-center align-items-center">
-            <h5 className="card-title">Add New Course</h5>
+      <div className="card add-course-card text-center">
+        <form onSubmit={handleSubmit} className="add-course-form">
+          <div onClick={handleImageClick}>
+            <img
+              src={
+                formData.course_image
+                  ? URL.createObjectURL(formData.course_image)
+                  : "/achieve_a_mark.png"
+              }
+              className="card-img-top"
+              alt="Course"
+            />
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleImageChange}
+            />
           </div>
-        )}
-        {showForm && (
-          <div className="add-course-form">
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                value={course_title}
-                onChange={(e) => setCourseTitle(e.target.value)}
-                placeholder="Course Title"
-                required
-              />
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Course Description"
-                required
-              />
-              <input
-                type="file"
-                onChange={(e) => setCourseImage(e.target.files ? e.target.files[0] : null)}
-              />
-              <input
-                type="text"
-                value={study_guide}
-                onChange={(e) => setStudyGuide(e.target.value)}
-                placeholder="Study Guide"
-              />
-              <button type="submit">Add Course</button>
-            </form>
+          <div className="card-body">
+            {showInputs && (
+              <>
+                <input
+                  type="text"
+                  name="course_title"
+                  value={formData.course_title}
+                  onChange={handleChange}
+                  placeholder="Course Title"
+                  required
+                  className="form-control form-control-sm mb-2"
+                />
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Course Description"
+                  required
+                  className="form-control form-control-sm mb-2"
+                />
+                <input
+                  type="text"
+                  name="study_guide"
+                  value={formData.study_guide}
+                  onChange={handleChange}
+                  placeholder="Study Guide"
+                  className="form-control form-control-sm mb-2"
+                />
+              </>
+            )}
+            <button
+              type="button"
+              className="btn btn-outline-orange btn-sm"
+              onClick={() => setShowInputs(true)}
+              style={{ display: !showInputs ? "block" : "none" }}
+            >
+              Add Course Details
+            </button>
+            {showInputs && (
+              <button type="submit" className="btn btn-outline-orange btn-sm" disabled={loading}>
+                {loading ? "Adding..." : "Add Course"}
+              </button>
+            )}
           </div>
-        )}
+        </form>
       </div>
     </div>
   );

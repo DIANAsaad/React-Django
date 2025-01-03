@@ -1,0 +1,53 @@
+/*ADD COURSE CARD*/
+
+.card-img-top {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+  }
+  
+  .card-img-top:hover {
+    opacity: 0.8;
+  }
+  
+  .btn-outline-orange {
+    color: #ff6000;
+    border: 1px solid #ff6000;
+    background-color: transparent;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .btn-outline-orange:hover {
+    background-color: #ff6000;
+    color: white;
+  }
+  
+  .add-course-card .form-control {
+    font-size: 0.7rem; /* Smaller text */
+    height: 2.9rem;    /* Reduced height */
+    padding: 0.5rem;   /* Reduced padding */
+  }
+  
+  .add-course-card textarea.form-control {
+    height: 2rem; /* Adjusted height for textarea */
+  }
+  
+  .add-course-card button {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .add-course-card {
+    padding: 1rem;
+  }
+  
+  .card-body {
+    display: flex;
+    height:auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem; /* Add spacing between inputs */
+  }
+  
