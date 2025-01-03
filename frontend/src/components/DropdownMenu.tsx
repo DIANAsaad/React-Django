@@ -1,8 +1,13 @@
 import React from "react";
+import "./../styles/DropdownMenu.css";
 
 interface DropdownMenuProps {
   id: string; // Unique identifier for the dropdown
-  options: { label: string; action?: (() => void) | null; className?: string }[]; // Dropdown options
+  options: {
+    label: string;
+    action?: (() => void) | null;
+    className?: string;
+  }[]; 
 }
 
 const DropdownMenu: React.FC<DropdownMenuProps> = ({ id, options }) => {

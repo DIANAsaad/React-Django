@@ -30,5 +30,15 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ["id", "course_title", "description", "course_image"]
-        read_only_fields = ["id"]
+        fields = ["id", "course_title", "description", "course_image", "creator"]
+        read_only_fields = ["id", "course_slug"]
+
+    def create(self, validated_data):
+        request=self.context.pop('request')
+        creator=request.user
+        course_image=validated_data.pop('course_image', None)
+        course=Course.objects.create(creator=creator, course_image=course_image, **validated_data)
+        course.save()
+        return course
+
+

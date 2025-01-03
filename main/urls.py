@@ -1,6 +1,13 @@
 from main import views
 from django.urls import path
-from main.views import CustomLoginView, CustomLogoutView, GetUserView, HomePageView
+from main.views import (
+    DeleteCourseView,
+    CustomLoginView,
+    CustomLogoutView,
+    GetUserView,
+    HomePageView,
+    AddCourseView
+)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -9,6 +16,7 @@ urlpatterns = [
     path("logout", CustomLogoutView.as_view(), name="logout"),
     path("user", GetUserView.as_view(), name="get_user"),
     path("courses", HomePageView.as_view(), name="course-list"),
+    path("add_course", AddCourseView.as_view(), name="add_Course"),
     path("course_page/<slug:course_slug>/", views.course_page, name="Course Page"),
     path(
         "course_page/id/<int:course_id>", views.course_page, name="Redirect Course Page"
@@ -18,11 +26,14 @@ urlpatterns = [
         views.course_module,
         name="Redirect Module Page",
     ),
+    path(
+        "delete_course/<int:course_id>",
+        DeleteCourseView.as_view(),
+        name="delete_course",
+    ),
     path("course_module/<slug:module_slug>", views.course_module, name="Module Page"),
-    path("add_course", views.add_course, name="Add Course"),
     path("add_module/<int:course_id>", views.add_module, name="Add Module"),
     path("study_guide/<slug:course_slug>/", views.study_guide, name="Study Guide"),
-    path("delete_course/", views.delete_course, name="delete_course"),
     path("delete_module/", views.delete_module, name="delete_module"),
     path("add_quiz/<int:module_id>", views.add_quiz, name="Add Quiz"),
     path("quiz/<int:quiz_id>", views.quiz, name="Quiz"),

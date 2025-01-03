@@ -28,6 +28,7 @@ from .serializers import (
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied
+from .permissions import IsStaffOrHasDeletePermission
 
 # Authentication & Authorization
 
@@ -85,57 +86,50 @@ class GetUserView(APIView):
         return Response(serializer.data)
 
 
-# Web functionality
+# Web API Views
 
 
 class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
-   
-    def get(self, request, *args, **kwargs): 
+
+    def get(self, request, *args, **kwargs):
         courses = Course.objects.all()
-        serializer = CourseSerializer(courses,many=True)
+        serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-#Delete of Models
-class DeleteCourseView(APIView):
+# Functionality
+
+
+class AddCourseView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, *args, **kwargs):
-        course_id = kwargs.get('course_id')
-        if not course_id:
-            return Response({"detail": "Course ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            
-            delete_object(request, app_label="main", model_name="Course", object_id=course_id)
-            return Response({"message": "Course deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    def post(self, request, *args, **kwargs):
+        serializer = CourseSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()
 
+            return Response("Course added successfully", status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCourseView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrHasDeletePermission]
+
+    def delete(self, request, *args, **kwargs):
+        course_id = kwargs.get("course_id")
+        if not course_id:
+            return Response(
+                {"detail": "Course ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            return delete_object(
+                request, app_label="main", model_name="Course", object_id=course_id
+            )
         except Course.DoesNotExist:
             raise NotFound(detail="Course not found.", code=status.HTTP_404_NOT_FOUND)
-        except PermissionDenied as e:
-            raise PermissionDenied(detail=str(e), code=status.HTTP_403_FORBIDDEN)
-        
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
 
 @login_required(login_url="/")
 def course_page(request, course_slug=None, course_id=None):
@@ -292,26 +286,6 @@ def add_flashcard(request, module_id):
         "main/course/lesson_flashcard/add_flashcard.html",
         {"module_id": module_id},
     )
-
-
-#Delete of Models
-class DeleteCourseView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request, *args, **kwargs):
-        course_id = kwargs.get('course_id')
-        if not course_id:
-            return Response({"detail": "Course ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            
-            delete_object(request, app_label="main", model_name="Course", object_id=course_id)
-            return Response({"message": "Course deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-
-        except Course.DoesNotExist:
-            raise NotFound(detail="Course not found.", code=status.HTTP_404_NOT_FOUND)
-        except PermissionDenied as e:
-            raise PermissionDenied(detail=str(e), code=status.HTTP_403_FORBIDDEN)
-
 
 
 @permission_required("main.delete_module", login_url="/", raise_exception=True)

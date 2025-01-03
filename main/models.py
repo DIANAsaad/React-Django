@@ -70,6 +70,7 @@ class Course(models.Model):
             self.course_slug = "placeholder"  # Had to save first to get the ID
             super().save(*args, **kwargs)
             self.course_slug = f"{slug}-{self.id}"
+            kwargs['force_insert'] = False 
             super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
