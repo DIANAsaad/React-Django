@@ -26,19 +26,26 @@ class AchieveUserLoginSerializer(serializers.Serializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    course_image = serializers.ImageField()
+    course_image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Course
         fields = ["id", "course_title", "description", "course_image", "creator"]
         read_only_fields = ["id", "course_slug"]
+        extra_kwargs = {
+            "course_image": {"required": False, "allow_null": True},
+        }
 
     def create(self, validated_data):
-        request=self.context.pop('request')
-        creator=request.user
-        course_image=validated_data.pop('course_image', None)
-        course=Course.objects.create(creator=creator, course_image=course_image, **validated_data)
+
+        request = self.context["request"]
+        creator = request.user
+
+        course_image = validated_data.pop("course_image", None)
+        if not course_image:
+            course_image = None
+        course = Course.objects.create(
+            creator=creator, course_image=course_image, **validated_data
+        )
         course.save()
         return course
-
-

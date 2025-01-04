@@ -15,7 +15,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ id, options }) => {
     <div className="dropdown">
       {/* Trigger Button */}
       <button
-        className="ellipsis-btn btn btn-link p-0"
+        className="ellipsis-cstm-btn btn  p-0"
         id={`dropdownMenuButton-${id}`}
         data-bs-toggle="dropdown"
         aria-expanded="false"

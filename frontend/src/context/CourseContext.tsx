@@ -14,7 +14,7 @@ export interface Course {
   id: number;
   course_title: string;
   description: string;
-  course_image: File;
+  course_image: File | string;
   study_guide: string;
 }
 
@@ -26,7 +26,7 @@ interface CourseContextProps {
     course_name: string,
     description: string,
     course_image: File | null,
-    study_guide: string
+    study_guide: string 
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -36,6 +36,17 @@ interface CourseContextProps {
 const CourseContext = createContext<CourseContextProps | undefined>(undefined);
 
 const ENDPOINT = "http://localhost:8000";
+
+const normalizeCourse = (course: Course) => ({
+  ...course,
+  course_image: course.course_image
+    ? `${ENDPOINT}${course.course_image}`
+    : "/achieve_a_mark.png",
+});
+
+const normalizeCourses= (courses: Course[]) => {
+  return courses.map(normalizeCourse);
+}
 
 // Provider component
 export const CourseProvider = ({ children }: { children: ReactNode }) => {
@@ -54,14 +65,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
 
-        const updatedCourses = response.data.map((course: Course) => ({
-          ...course,
-          course_image: course.course_image
-            ? `${ENDPOINT}${course.course_image}`
-            : "/achieve_a_mark.png",
-        }));
-
-        setCourses(updatedCourses);
+        setCourses(normalizeCourses(response.data ?? []));
       } catch {
         setError("Failed to fetch courses.");
       } finally {
@@ -69,7 +73,9 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    fetchCourses();
+    if (accessToken) {
+      fetchCourses();
+    }
   }, [accessToken]);
 
   const addCourse = useCallback(
@@ -85,7 +91,6 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         formData.append("description", description);
         if (course_image) formData.append("course_image", course_image);
         formData.append("study_guide", study_guide);
-
         const response = await axios.post(`${ENDPOINT}/add_course`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -93,7 +98,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           },
         });
 
-        setCourses((prevCourses) => [...prevCourses, response.data]);
+        setCourses((prevCourses) => [...prevCourses, normalizeCourse(response.data)]);
       } catch (error: any) {
         console.error(
           `Error adding course:`,
@@ -106,7 +111,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         );
       }
     },
-    [accessToken, courses]
+    [accessToken]
   );
 
   const deleteCourse = useCallback(

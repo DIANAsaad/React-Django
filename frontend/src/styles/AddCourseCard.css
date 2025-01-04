@@ -1,6 +1,6 @@
 /*ADD COURSE CARD*/
 
-.card-img-top {
+.card-img-add-top {
     opacity: 0.5;
     transition: opacity 0.3s ease;
     width: 100%;
@@ -8,7 +8,7 @@
     object-fit: cover;
   }
   
-  .card-img-top:hover {
+  .card-img-add-top:hover {
     opacity: 0.8;
   }
   

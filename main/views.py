@@ -105,10 +105,17 @@ class AddCourseView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        serializer = CourseSerializer(data=request.data)
+        # Pass `request` into `context`
+        print(request.data)
+        serializer = CourseSerializer(
+            data=request.data, context={"request": request}  # <--- important!
+        )
         if serializer.is_valid():
-            serializer.save()
-            return Response("Course added successfully", status=status.HTTP_201_CREATED)
+            course = serializer.save()
+            return Response(
+                CourseSerializer(course).data, status=status.HTTP_201_CREATED
+            )
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

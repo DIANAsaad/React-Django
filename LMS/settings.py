@@ -75,7 +75,7 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5174",  # React development server URL
+    "http://localhost:5173",  # React development server URL
 ]
 
 

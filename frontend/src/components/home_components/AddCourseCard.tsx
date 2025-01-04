@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useCourseContext } from "../../context/CourseContext";
 import "../../styles/AddCourseCard.css";
 
@@ -14,43 +14,41 @@ const AddCourseCard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, []);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
-    setFormData((prev) => ({ ...prev, course_image: file }));
-  };
+    setFormData(prev => ({ ...prev, course_image: file }));
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await addCourse(
-        formData.course_title,
-        formData.description,
-        formData.course_image,
-        formData.study_guide
-      );
-      setFormData({
-        course_title: "",
-        description: "",
-        study_guide: "",
-        course_image: null,
-      });
-      setShowInputs(false);
-    } catch (error) {
-      console.error("Failed to add course", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+        await addCourse(formData.course_title, formData.description, formData.course_image, formData.study_guide);
+        setFormData({
+          course_title: '',
+          description: '',
+          study_guide: '',
+          course_image: null
+        });
+        setShowInputs(false);
+      } catch (error) {
+        console.error('Failed to add course', error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [addCourse, formData]
+  );
 
-  const handleImageClick = () => {
+  const handleImageClick = useCallback(() => {
     if (fileInputRef.current) fileInputRef.current.click();
-  };
+  }, []);
 
   return (
     <div className="col-12 mb-4">
@@ -63,7 +61,7 @@ const AddCourseCard: React.FC = () => {
                   ? URL.createObjectURL(formData.course_image)
                   : "/achieve_a_mark.png"
               }
-              className="card-img-top"
+              className="card-img-add-top"
               alt="Course"
             />
             <input
@@ -102,7 +100,9 @@ const AddCourseCard: React.FC = () => {
                   className="form-control form-control-sm mb-2"
                 />
               </>
+              
             )}
+            
             <button
               type="button"
               className="btn btn-outline-orange btn-sm"
