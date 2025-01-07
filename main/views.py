@@ -19,7 +19,7 @@ from django.db import transaction
 from main.utils import delete_object
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.response import Response
 from .serializers import (
     AchieveUserLoginSerializer,
@@ -86,6 +86,34 @@ class GetUserView(APIView):
         return Response(serializer.data)
 
 
+class RefreshAccessTokenView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        refresh_token_str = request.data.get("refresh_token")
+        if not refresh_token_str:
+            return Response(
+                {"error": "Refresh token not provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+
+            refresh_token = RefreshToken(refresh_token_str)
+            user = refresh_token.user
+            new_access_token = str(refresh_token.access_token)
+            data = {
+                "access_token": new_access_token,
+                "refresh_token": str(refresh_token),
+                "user": AchieveUserSerializer(user).data,
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error: refresh token is not valid": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
 # Web API Views
 
 
@@ -105,8 +133,6 @@ class AddCourseView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # Pass `request` into `context`
-        print(request.data)
         serializer = CourseSerializer(
             data=request.data, context={"request": request}  # <--- important!
         )
@@ -115,7 +141,6 @@ class AddCourseView(APIView):
             return Response(
                 CourseSerializer(course).data, status=status.HTTP_201_CREATED
             )
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

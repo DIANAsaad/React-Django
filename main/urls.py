@@ -1,12 +1,13 @@
 from main import views
 from django.urls import path
 from main.views import (
-    DeleteCourseView,
     CustomLoginView,
     CustomLogoutView,
     GetUserView,
+    RefreshAccessTokenView,
     HomePageView,
-    AddCourseView
+    AddCourseView,
+    DeleteCourseView,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -17,6 +18,7 @@ urlpatterns = [
     path("user", GetUserView.as_view(), name="get_user"),
     path("courses", HomePageView.as_view(), name="course-list"),
     path("add_course", AddCourseView.as_view(), name="add_Course"),
+    path("refresh_access_token", RefreshAccessTokenView.as_view(), name="refresh_access_token"),
     path("course_page/<slug:course_slug>/", views.course_page, name="Course Page"),
     path(
         "course_page/id/<int:course_id>", views.course_page, name="Redirect Course Page"

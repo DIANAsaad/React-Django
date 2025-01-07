@@ -1,19 +1,16 @@
-import Welcome from "./components/Welcome";
-import Home from "./components/Home";
+import React from "react";
 import {
   BrowserRouter as Router,
-  Route,
   Routes,
+  Route,
   Navigate,
 } from "react-router-dom";
-import { useAuth, AuthProvider } from "./context/AuthContext";
+import Welcome from "./components/Welcome";
+import Home from "./components/Home";
 import Base from "./components/base/Base";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { CourseProvider } from './context/CourseContext';
-
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
 const App: React.FC = () => {
-  const { isAuthenticated } = useAuth(); // State to store user data
-
   return (
     <Router>
       {/* Routes to handle different pages */}
@@ -21,18 +18,20 @@ const App: React.FC = () => {
         {/* Route for the login/welcome page */}
         <Route path="/" element={<Welcome />} />
 
-        {/* Route for the home page after login */}
-        
-        {isAuthenticated && (
-          <Route
-            path="/home"
-            element={
+        {/* Protected route for the home page after login */}
+
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
               <Base>
                 <Home />
               </Base>
-            }
-          />
-        )}
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Redirect all other routes to the welcome page */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
@@ -41,9 +40,7 @@ const App: React.FC = () => {
 
 const AppWrapper: React.FC = () => (
   <AuthProvider>
-    <CourseProvider>
     <App />
-    </CourseProvider>
   </AuthProvider>
 );
 

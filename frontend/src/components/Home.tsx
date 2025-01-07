@@ -1,8 +1,8 @@
-import React from 'react';
-import CourseCard from './home_components/CourseCard';
-import { useCourseContext } from '../context/CourseContext';
-import '../styles/Home.css';
-import AddCourseCard from './home_components/AddCourseCard';
+import React from "react";
+import CourseCard from "./home_components/CourseCard";
+import { useCourseContext } from "../context/CourseContext";
+import "../styles/Home.css";
+import AddCourseCard from "./home_components/AddCourseCard";
 
 const Home: React.FC = () => {
   const { courses, loading, error } = useCourseContext();
@@ -16,24 +16,37 @@ const Home: React.FC = () => {
   }
 
   if (!courses || courses.length === 0) {
-    return <><AddCourseCard/><div>No courses available</div></>;
+    return (
+      <>
+        <div>No courses available</div>
+        <AddCourseCard />
+      </>
+    );
   }
 
   return (
     <>
-      <div className='col-12 mb-4'>
-        <h2 className='d-flex'>
+      <div className="col-12 mb-4">
+        <h2 className="d-flex">
           My Courses|
-          <input type='text' className='custom-width' placeholder='Search courses...' id='course-search' />
+          <input
+            type="text"
+            className="custom-width"
+            placeholder="Search courses..."
+            id="course-search"
+          />
         </h2>
       </div>
-      <div className='row'>
+      <div className="row">
         {courses &&
-          courses.map(course => (
-            <div className='col-md-4' key={course.id}>
+          courses.map((course) => (
+            <div className="col-md-4" key={course.id}>
               <CourseCard course={course} />
             </div>
           ))}
+        <div className="col-md-4">
+          <AddCourseCard />
+        </div>
       </div>
     </>
   );

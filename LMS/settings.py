@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from os import getenv
+from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -66,7 +69,7 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -112,10 +115,6 @@ CSRF_COOKIE_NAME = "csrftoken"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# Add these at the top of your settings.py
-from os import getenv
-from dotenv import load_dotenv
-from urllib.parse import urlparse
 
 # Replace the DATABASES section of your settings.py with this
 load_dotenv()

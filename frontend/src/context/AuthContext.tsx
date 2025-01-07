@@ -1,7 +1,13 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { ReactNode } from 'react';
-import useLocalStorage from '../hooks/use-local-storage';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import axios from "axios";
+import { ReactNode } from "react";
+import useLocalStorage from "../hooks/use-local-storage";
 
 // Define User type
 interface AchieveUser {
@@ -29,8 +35,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // AuthProvider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [accessToken, setAccessToken] = useLocalStorage('access_token', null);
-  const [refreshToken, setRefreshToken] = useLocalStorage('refresh_token', null);
+  const [accessToken, setAccessToken] = useLocalStorage("access_token", null);
+  const [refreshToken, setRefreshToken] = useLocalStorage(
+    "refresh_token",
+    null
+  );
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<AchieveUser | null>(null);
@@ -39,11 +48,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     async (email: string, password: string) => {
       try {
         const {
-          data: { access_token, refresh_token, user }
+          data: { access_token, refresh_token, user },
         } = await axios.post(
-          'http://127.0.0.1:8000',
+          "http://127.0.0.1:8000",
           { email, password },
-          { headers: { 'Content-Type': 'application/json' } }
+          { headers: { "Content-Type": "application/json" } }
         );
 
         setAccessToken(access_token);
@@ -52,9 +61,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(user);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 400) {
-          console.error('Bad Request: ', error.response.data);
+          console.error("Bad Request: ", error.response.data);
         } else {
-          console.error('Login failed', error);
+          console.error("Login failed", error);
         }
       }
     },
@@ -64,20 +73,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       await axios.post(
-        'http://127.0.0.1:8000/logout',
+        "http://127.0.0.1:8000/logout",
         { refresh_token: refreshToken },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
-      console.log('Logged out');
+      console.log("Logged out");
     } catch (error) {
-      console.error('Logout failed', error);
+      console.error("Logout failed", error);
     } finally {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
 
       setUser(null);
     }
@@ -85,30 +94,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const fetchAndAuthenticateUser = async () => {
-      if (accessToken) {
-        try {
-          const { data } = await axios.get('http://127.0.0.1:8000/user', {
-            headers: { Authorization: `Bearer ${accessToken}` }
-          });
-
-          setUser(data);
-        } catch {
-          await logout();
-        }
+      if (!accessToken) {
+        setLoading(false);
+        return;
       }
 
-      setLoading(false);
+      try {
+        const { data } = await axios.get("http://127.0.0.1:8000/user", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setUser(data);
+      } catch (error) {
+        try {
+          const {
+            data: { access_token, user },
+          } = await axios.post(
+            "http://127.0.0.1:8000/refresh_access_token",
+            {},
+            { headers: { "Content-Type": "application/json" } }
+          );
+          setAccessToken(access_token);
+          setUser(user);
+        } catch (refreshError) {
+          console.error("Failed to refresh token:", refreshError);
+          setAccessToken(null);
+          setUser(null);
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchAndAuthenticateUser();
-  }, [accessToken, logout]);
+  }, [accessToken, user]);
 
   if (loading) {
     return null;
   }
 
   return (
-    <AuthContext.Provider value={{ login, logout, isAuthenticated: !!user, user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{ login, logout, isAuthenticated: !!user, user }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 
@@ -116,7 +145,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
