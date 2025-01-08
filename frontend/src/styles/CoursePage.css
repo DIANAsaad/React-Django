@@ -1,0 +1,153 @@
+.container-cstm-fluid {
+    margin-left: 0;
+  }
+  
+  .course-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+  
+  }
+  
+  .home-btn {
+    font-family: 'Georgia', serif;
+    font-size: 1.25rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .home-btn:hover {
+    color: #333;
+    transform: translateY(-2px);
+  }
+  
+  .course-info-box {
+    background: linear-gradient(120deg, #f8f9fa, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .course-info-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  .course-cstm-header .card-cstm-img-top {
+    max-width: 150px;
+    height: auto;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .course-details h1 {
+    font-family: 'Georgia', serif;
+    color: #343a40;
+  }
+  
+  .modules-box {
+    background-color: #fff5f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .modules-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .module-item a {
+    text-decoration: none;
+    color: #343a40;
+    transition: color 0.3s ease;
+  }
+  
+  .module-item a:hover {
+    color: #e85d04;
+  }
+  .ellipsis-btn {
+    cursor: pointer;
+    color: black; 
+    font-size: 1.2rem; 
+    line-height: 1;
+    display: inline-block;
+    position: relative;
+    top: -6px; 
+    font-weight: bold;
+  
+  }
+  
+  .ellipsis-btn:hover {
+    color: #343a40; 
+  }
+  
+  
+  .study-guide-box {
+    background-color: #ffe7d6;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #333;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  
+  .study-guide-box a {
+    text-decoration: underline;
+    color: black;
+    font-weight: normal;
+    transition: color 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .study-guide-box a:hover {
+    color: black;
+  }
+  
+  .study-guide-box:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+  }
+  
+  .modules-box-staff {
+    background-color: rgba(255, 216, 195, 0.3);
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .modules-box-staff:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn-outline-orange {
+    border-color: #e85d04;
+    color: #e85d04;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-orange:hover {
+    background-color: #e85d04;
+    color: #fff;
+  }
+  
+  .card-style {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    border: 1px solid #ffd8c3;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow:hidden;
+  }
+  
+  
+  .course-details p {
+    color: #6c757d; 
+    word-wrap: break-word; 
+    white-space: normal; 
+    overflow-wrap: anywhere;
+  }

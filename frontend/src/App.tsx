@@ -3,13 +3,18 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import Base from "./components/base/Base";
+import CoursePage from "./components/course_page/CoursePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import "./context/CourseContext";
+
+
+
+
 const App: React.FC = () => {
   return (
     <Router>
@@ -30,9 +35,18 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
+        <Route
+          path="/course_page/:courseId"
+          element={
+            <ProtectedRoute>
+              <Base>
+                <CoursePage/>
+              </Base>
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Redirect all other routes to the welcome page */}
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

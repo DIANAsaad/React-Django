@@ -7,6 +7,7 @@ import AddCourseCard from "./home_components/AddCourseCard";
 const Home: React.FC = () => {
   const { courses, loading, error } = useCourseContext();
 
+
   if (loading) {
     return <div>Loading courses...</div>;
   }
@@ -23,7 +24,7 @@ const Home: React.FC = () => {
       </>
     );
   }
-
+ 
   return (
     <>
       <div className="col-12 mb-4">

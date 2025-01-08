@@ -28,7 +28,7 @@ from .serializers import (
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied
-from .permissions import IsStaffOrHasDeletePermission
+from .permissions import IsStaffOrHasDeletePermission, IsStaffOrHasAddCoursePermission
 
 # Authentication & Authorization
 
@@ -121,16 +121,24 @@ class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        courses = Course.objects.all()
-        serializer = CourseSerializer(courses, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        courses = Course.objects.prefetch_related("modules").all()
+        is_staff = request.user.is_staff
+        can_delete = request.user.has_perm("main.delete_course")
+        can_add = request.user.has_perm("main.add_course")
+        data = {
+            "courses": CourseSerializer(courses, many=True).data,
+            "isStaff": is_staff,
+            "canDelete": can_delete,
+            "canAdd": can_add,
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 
 # Functionality
 
 
 class AddCourseView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffOrHasAddCoursePermission]
 
     def post(self, request, *args, **kwargs):
         serializer = CourseSerializer(

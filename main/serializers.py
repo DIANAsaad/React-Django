@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import AchieveUser, Course
+from .models import AchieveUser, Course, Module
 
 
 class AchieveUserSerializer(serializers.ModelSerializer):
@@ -25,16 +25,42 @@ class AchieveUserLoginSerializer(serializers.Serializer):
         return data
 
 
+#  WEB CONTENT
+
+
+class ModuleSerializer(serializers.ModelSerializer):
+    module_image = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = Module
+        fields = ["id", "module_title", "topic", "module_slug", "module_image"]
+        read_only_fields = ["id", "module_slug"]
+        extra_kwargs = {
+            "module_image": {"required": False, "allow_null": True},
+        }
+
+
 class CourseSerializer(serializers.ModelSerializer):
     course_image = serializers.ImageField(required=False, allow_null=True)
+    modules = ModuleSerializer(many=True, required=False)
 
     class Meta:
         model = Course
-        fields = ["id", "course_title", "description", "course_image", "creator"]
+        fields = [
+            "id",                                              
+            "course_title",
+            "description",
+            "course_image",
+            "creator",
+            "modules",
+        ]
         read_only_fields = ["id", "course_slug"]
         extra_kwargs = {
             "course_image": {"required": False, "allow_null": True},
         }
+        is_staff = serializers.BooleanField()
+        can_delete = serializers.BooleanField()
+        can_add = serializers.BooleanField()
 
     def create(self, validated_data):
 

@@ -16,6 +16,12 @@ export interface Course {
   description: string;
   course_image: File | string;
   study_guide: string;
+  modules: {
+    id: number;
+    module_title: string;
+    topic: string;
+    module_image: File | string;
+  }[];
 }
 
 // Define the context structure
@@ -26,10 +32,13 @@ interface CourseContextProps {
     course_name: string,
     description: string,
     course_image: File | null,
-    study_guide: string 
+    study_guide: string
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
+  isStaff: boolean;
+  canDelete: boolean;
+  canAdd: boolean;
 }
 
 // Create the context
@@ -42,11 +51,12 @@ const normalizeCourse = (course: Course) => ({
   course_image: course.course_image
     ? `${ENDPOINT}${course.course_image}`
     : "/achieve_a_mark.png",
+  modules: course.modules ?? [],
 });
 
-const normalizeCourses= (courses: Course[]) => {
+const normalizeCourses = (courses: Course[]) => {
   return courses.map(normalizeCourse);
-}
+};
 
 // Provider component
 export const CourseProvider = ({ children }: { children: ReactNode }) => {
@@ -55,6 +65,9 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isStaff, setIsStaff] = useState<boolean>(false);
+  const [canDelete, setCanDelete] = useState<boolean>(false);
+  const [canAdd, setCanAdd] = useState<boolean>(false);
 
   useEffect(() => {
     // Fetch courses from your API
@@ -64,8 +77,14 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         const response = await axios.get(`${ENDPOINT}/courses`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-
+        console.log(response.data)
         setCourses(normalizeCourses(response.data ?? []));
+        console.log(setCourses)
+        setIsStaff(response.data.isStaff);
+        console.log(setIsStaff);
+        setCanDelete(response.data.canDelete);
+        setCanAdd(response.data.canAdd);
+
       } catch {
         setError("Failed to fetch courses.");
       } finally {
@@ -98,7 +117,10 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           },
         });
 
-        setCourses((prevCourses) => [...prevCourses, normalizeCourse(response.data)]);
+        setCourses((prevCourses) => [
+          ...prevCourses,
+          normalizeCourse(response.data),
+        ]);
       } catch (error: any) {
         console.error(
           `Error adding course:`,
@@ -139,7 +161,16 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <CourseContext.Provider
-      value={{ addCourse, deleteCourse, courses, loading, error }}
+      value={{
+        courses,
+        deleteCourse,
+        addCourse,
+        loading,
+        error,
+        isStaff,
+        canDelete,
+        canAdd,
+      }}
     >
       {children}
     </CourseContext.Provider>

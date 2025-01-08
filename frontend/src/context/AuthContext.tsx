@@ -104,20 +104,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setUser(data);
-      } catch (error) {
+      } catch {
         try {
           const {
-            data: { access_token, user },
+            data: { access_token, refresh_token },
           } = await axios.post(
             "http://127.0.0.1:8000/refresh_access_token",
-            {},
+            { refresh_token: refreshToken },
             { headers: { "Content-Type": "application/json" } }
           );
           setAccessToken(access_token);
-          setUser(user);
+          setRefreshToken(refresh_token);
+          // Set a timeout to call this functions automatically
+          setTimeout(async () => {
+            await fetchAndAuthenticateUser();
+          }, 300000); //5 minutes
         } catch (refreshError) {
-          console.error("Failed to refresh token:", refreshError);
           setAccessToken(null);
+          setRefreshToken(null);
           setUser(null);
         }
       } finally {
@@ -126,7 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     fetchAndAuthenticateUser();
-  }, [accessToken, user]);
+  }, [accessToken, refreshToken]);
 
   if (loading) {
     return null;
