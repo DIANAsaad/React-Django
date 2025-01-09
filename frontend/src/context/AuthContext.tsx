@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import { ReactNode } from "react";
 import useLocalStorage from "../hooks/use-local-storage";
 
@@ -41,30 +41,73 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     null
   );
 
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<AchieveUser | null>(null);
+
+  const refreshAccessToken = useCallback(async () => {
+    if (!refreshToken) return;
+  
+    const controller = new AbortController(); // Create AbortController
+    const timeoutId = setTimeout(() => {
+      controller.abort(); // Abort request after 5 minutes
+    }, 300_000); // 5 minutes = 300,000 milliseconds
+  
+    try {
+      const { data } = await axios.post(
+        "http://127.0.0.1:8000/refresh_access_token",
+        { refresh_token: refreshToken },
+        {
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal, // Pass the signal to axios
+        }
+      );
+  
+      // Clear the timeout if the request succeeds
+      clearTimeout(timeoutId);
+  
+      setAccessToken(data.access_token);
+      setRefreshToken(data.refresh_token);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
+        console.error("Request timed out");
+      } else {
+        const axiosError = error as AxiosError; // Type assertion to AxiosError
+        console.error("Failed to refresh access token", axiosError?.message);
+      }
+  
+      setAccessToken(null);
+      setRefreshToken(null);
+    }
+  }, [refreshToken, setAccessToken, setRefreshToken]);
+
+  const fetchAndSetUser = useCallback(async () => {
+    if (!accessToken) return;
+
+    try {
+      const { data } = await axios.get("http://127.0.0.1:8000/user", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      setUser(data);
+    } catch (error) {
+      console.error("Failed to fetch user", error);
+      setUser(null);
+    }
+  }, [accessToken]);
 
   const login = useCallback(
     async (email: string, password: string) => {
       try {
-        const {
-          data: { access_token, refresh_token, user },
-        } = await axios.post(
+        const { data } = await axios.post(
           "http://127.0.0.1:8000",
           { email, password },
           { headers: { "Content-Type": "application/json" } }
         );
 
-        setAccessToken(access_token);
-        setRefreshToken(refresh_token);
-
-        setUser(user);
+        setAccessToken(data.access_token);
+        setRefreshToken(data.refresh_token);
+        setUser(data.user);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 400) {
-          console.error("Bad Request: ", error.response.data);
-        } else {
-          console.error("Login failed", error);
-        }
+        console.error("Login failed", error);
       }
     },
     [setAccessToken, setRefreshToken]
@@ -75,66 +118,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await axios.post(
         "http://127.0.0.1:8000/logout",
         { refresh_token: refreshToken },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-      console.log("Logged out");
-    } catch (error) {
-      console.error("Logout failed", error);
-    } finally {
+
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-
       setUser(null);
+    } catch (error) {
+      console.error("Logout failed", error);
     }
   }, [accessToken, refreshToken]);
 
   useEffect(() => {
-    const fetchAndAuthenticateUser = async () => {
-      if (!accessToken) {
-        setLoading(false);
-        return;
-      }
+    if (accessToken) {
+      // Fetch user with the current token
+      fetchAndSetUser();
+  
+      // Optionally refresh the access token if it's about to expire
+      const refreshInterval = setInterval(() => {
+        refreshAccessToken(); // Refresh the token periodically
+      }, 5 * 60 * 1000); // Refresh every 5 minutes
+  
+      return () => clearInterval(refreshInterval); // Clean up the interval when component unmounts
+    }
+  }, [accessToken, fetchAndSetUser, refreshAccessToken]);
+  
 
-      try {
-        const { data } = await axios.get("http://127.0.0.1:8000/user", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        setUser(data);
-      } catch {
-        try {
-          const {
-            data: { access_token, refresh_token },
-          } = await axios.post(
-            "http://127.0.0.1:8000/refresh_access_token",
-            { refresh_token: refreshToken },
-            { headers: { "Content-Type": "application/json" } }
-          );
-          setAccessToken(access_token);
-          setRefreshToken(refresh_token);
-          // Set a timeout to call this functions automatically
-          setTimeout(async () => {
-            await fetchAndAuthenticateUser();
-          }, 300000); //5 minutes
-        } catch (refreshError) {
-          setAccessToken(null);
-          setRefreshToken(null);
-          setUser(null);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchAndAuthenticateUser();
-  }, [accessToken, refreshToken]);
-
-  if (loading) {
-    return null;
-  }
 
   return (
     <AuthContext.Provider

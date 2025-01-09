@@ -25,6 +25,10 @@ class AchieveUserLoginSerializer(serializers.Serializer):
         return data
 
 
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField(required=True)
+
+
 #  WEB CONTENT
 
 
@@ -43,12 +47,11 @@ class ModuleSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     course_image = serializers.ImageField(required=False, allow_null=True)
     modules = ModuleSerializer(many=True, required=False)
-
     class Meta:
         model = Course
         fields = [
-            "id",                                              
-            "course_title",
+            "id",
+            "course_title", 
             "description",
             "course_image",
             "creator",
@@ -58,9 +61,6 @@ class CourseSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "course_image": {"required": False, "allow_null": True},
         }
-        is_staff = serializers.BooleanField()
-        can_delete = serializers.BooleanField()
-        can_add = serializers.BooleanField()
 
     def create(self, validated_data):
 

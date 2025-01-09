@@ -77,11 +77,9 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         const response = await axios.get(`${ENDPOINT}/courses`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        console.log(response.data)
-        setCourses(normalizeCourses(response.data ?? []));
-        console.log(setCourses)
+        console.log(response.data);
+        setCourses(normalizeCourses(response.data.courses ?? []));
         setIsStaff(response.data.isStaff);
-        console.log(setIsStaff);
         setCanDelete(response.data.canDelete);
         setCanAdd(response.data.canAdd);
 
