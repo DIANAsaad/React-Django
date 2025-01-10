@@ -1,5 +1,5 @@
 from django.contrib.auth import logout as logout
-from main.models import Course
+from main.models import Course, Module
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object
 from rest_framework.views import APIView
@@ -10,7 +10,8 @@ from main.serializers import (
     AchieveUserLoginSerializer,
     AchieveUserSerializer,
     CourseSerializer,
-    RefreshTokenSerializer
+    RefreshTokenSerializer,
+    ModuleSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -77,9 +78,7 @@ class RefreshAccessTokenView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = RefreshTokenSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         refresh_token_str = serializer.validated_data["refresh_token"]
 
@@ -99,7 +98,6 @@ class RefreshAccessTokenView(APIView):
             )
 
 
-
 # Web API Views
 
 
@@ -109,16 +107,26 @@ class HomePageView(APIView):
     def get(self, request, *args, **kwargs):
         courses = Course.objects.prefetch_related("modules").all()
         is_staff = request.user.is_staff
-        can_delete = request.user.has_perm("main.delete_course")
-        can_add = request.user.has_perm("main.add_course")
+        can_delete_course = request.user.has_perm("main.delete_course")
+        can_add_course = request.user.has_perm("main.add_course")
+        can_add_module = request.user.has_perms(
+            ["main.add_module"]
+        )  # Pass a list of permissions
+        can_delete_module = request.user.has_perm("main.delete_module")
         data = {
             "courses": CourseSerializer(courses, many=True).data,
             "isStaff": is_staff,
-            "canDelete": can_delete,
-            "canAdd": can_add,
+            "canDeleteCourse": can_delete_course,
+            "canAddCourse": can_add_course,
+            "canAddModule": can_add_module,
+            "canDeleteModule": can_delete_module,
         }
         print(data)
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CoursePageView(APIView):
+    permission_classes = [IsAuthenticated]
 
 
 # Functionality
@@ -128,9 +136,7 @@ class AddCourseView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrHasAddCoursePermission]
 
     def post(self, request, *args, **kwargs):
-        serializer = CourseSerializer(
-            data=request.data, context={"request": request} 
-        )
+        serializer = CourseSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             course = serializer.save()
             return Response(
@@ -156,3 +162,14 @@ class DeleteCourseView(APIView):
             raise NotFound(detail="Course not found.", code=status.HTTP_404_NOT_FOUND)
 
 
+class AddModuleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = ModuleSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            module = serializer.save()
+            return Response(
+                ModuleSerializer(module).data, status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

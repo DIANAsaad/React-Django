@@ -5,7 +5,7 @@ import "../styles/Home.css";
 import AddCourseCard from "./home_components/AddCourseCard";
 
 const Home: React.FC = () => {
-  const { courses, loading, error, isStaff, canAdd} = useCourseContext();
+  const { courses, loading, error, isStaff, canAddCourse} = useCourseContext();
 
 
   if (loading) {
@@ -18,10 +18,9 @@ const Home: React.FC = () => {
 
   if (!courses || courses.length === 0) {
     return (
-      console.log(canAdd),
       <>
         <div>No courses available</div>
-        {(isStaff || canAdd) &&(
+        {(isStaff || canAddCourse) &&(
         <div className="col-md-4">
           <AddCourseCard />
         </div>)}
@@ -49,7 +48,7 @@ const Home: React.FC = () => {
               <CourseCard course={course} />
             </div>
           ))}
-          {(isStaff || canAdd) &&(
+          {(isStaff || canAddCourse) &&(
         <div className="col-md-4">
           <AddCourseCard />
         </div>)}

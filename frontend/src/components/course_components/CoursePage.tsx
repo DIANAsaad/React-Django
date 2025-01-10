@@ -1,10 +1,11 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
-import "../../styles/CoursePage.css";
+import "../../styles/Course&LessonPage.css";
+import AddModuleBox from "./AddModuleBox";
 
 const CoursePage: React.FC = () => {
-  const { courses, loading, error } = useCourseContext();
+  const { courses, loading, error, canAddModule, isStaff } = useCourseContext();
   const { courseId } = useParams<{ courseId: string }>();
 
   const course = courses?.find((c) => c.id === parseInt(courseId!, 10));
@@ -25,17 +26,18 @@ const CoursePage: React.FC = () => {
     <>
       <div className="row">
         <div className="container-cstm card-style mt-4" key={course.id}>
-          <div className="course-info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded">
-            <div className="course-cstm-header">
+          <div className="info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded">
+            <div className="cstm-header">
               <img
                 src={String(course.course_image)}
                 className="card-cstm-img-top"
                 alt={course.course_title}
               />
             </div>
-            <div className="course-details ms-4">
-              <h1 className="course-title">{course.course_title}</h1>
+            <div className="details ms-4">
+              <h1 className="title">{course.course_title}</h1>
               <p className="text-muted ">{course.description}</p>
+              <p className="text-muted ">{`${course.creator.first_name} ${course.creator.last_name}`}</p>
             </div>
           </div>
           {course.modules &&
@@ -54,6 +56,17 @@ const CoursePage: React.FC = () => {
                 </ul>
               </div>
             ))}
+          {course.study_guide && (
+            <div
+              className="material-box p-4 shadow-sm rounded"
+              onClick={() => window.open(course.study_guide)}
+            >
+              <strong>Study Guide:</strong>
+              Access you study guide here!
+            </div>
+          )}
+
+          {(isStaff || canAddModule) && <AddModuleBox />}
         </div>
       </div>
     </>

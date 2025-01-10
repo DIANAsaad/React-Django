@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
   const navigate= useNavigate();
-  const { deleteCourse, isStaff, canDelete } = useCourseContext();
+  const { deleteCourse, isStaff, canDeleteCourse } = useCourseContext();
 
   if (!course) return null;
 
@@ -25,7 +25,7 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
           <h5 className='course-cstm-title mb-0'>{course.course_title}</h5>
           <small className='course-id'>(ID: {course.id})</small>
         </div>
-        {(isStaff || canDelete) && (
+        {(isStaff || canDeleteCourse) && (
           <div className="dropdown-container">
             <DropdownMenu
               id={`course-${course.id}`}

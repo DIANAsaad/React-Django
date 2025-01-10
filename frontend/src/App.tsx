@@ -1,19 +1,14 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import Base from "./components/base/Base";
-import CoursePage from "./components/course_page/CoursePage";
+import CoursePage from "./components/course_components/CoursePage";
+import ModulePage from "./components/course_components/Modules/ModulePage"
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
-import "./context/CourseContext";
-
-
-
+import { CourseProvider } from "./context/CourseContext"; 
+import { ModuleProvider } from './context/ModuleContext';
 
 const App: React.FC = () => {
   return (
@@ -23,7 +18,7 @@ const App: React.FC = () => {
         {/* Route for the login/welcome page */}
         <Route path="/" element={<Welcome />} />
 
-        {/* Protected route for the home page after login */}
+        {/* Protected route for the home page and what follows after login */}
 
         <Route
           path="/home"
@@ -35,18 +30,28 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/course_page/:courseId"
           element={
             <ProtectedRoute>
               <Base>
-                <CoursePage/>
+                <CoursePage />
               </Base>
             </ProtectedRoute>
           }
         />
 
+        <Route
+          path="/module_page/:moduleId"
+          element={
+            <ProtectedRoute>
+              <Base>
+                <ModulePage />
+              </Base>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
@@ -54,8 +59,13 @@ const App: React.FC = () => {
 
 const AppWrapper: React.FC = () => (
   <AuthProvider>
-    <App />
+    <CourseProvider>
+      <ModuleProvider>
+        <App />
+      </ModuleProvider>
+    </CourseProvider>
   </AuthProvider>
 );
+
 
 export default AppWrapper;

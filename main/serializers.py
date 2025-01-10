@@ -34,26 +34,53 @@ class RefreshTokenSerializer(serializers.Serializer):
 
 class ModuleSerializer(serializers.ModelSerializer):
     module_image = serializers.ImageField(required=False, allow_null=True)
-
+    lesson_pdf= serializers.FileField(required=False, allow_null=True)
     class Meta:
         model = Module
-        fields = ["id", "module_title", "topic", "module_slug", "module_image"]
+        fields = [
+            "id",
+            "module_title",
+            "topic",
+            "module_slug",
+            "module_image",
+            "module_creator",
+            "lesson_pdf",
+        ]
         read_only_fields = ["id", "module_slug"]
         extra_kwargs = {
             "module_image": {"required": False, "allow_null": True},
+            "lesson_pdf": {"required": False, "allow_null": True},
         }
+
+    def create(self, validated_data):
+
+        request = self.context["request"]
+
+        module_image = validated_data.pop("module_image", None)
+        lesson_pdf = validated_data.pop("lesson_pdf", None)
+        if not module_image:
+            module_image = None
+        if not lesson_pdf:
+            lesson_pdf = None 
+        module = Module.objects.create(
+            module_creator=request.user, module_image=module_image, lesson_pdf=lesson_pdf **validated_data
+        )
+        return module
 
 
 class CourseSerializer(serializers.ModelSerializer):
     course_image = serializers.ImageField(required=False, allow_null=True)
     modules = ModuleSerializer(many=True, required=False)
+    creator = AchieveUserSerializer(read_only=True)
+
     class Meta:
         model = Course
         fields = [
             "id",
-            "course_title", 
+            "course_title",
             "description",
             "course_image",
+            "study_guide",
             "creator",
             "modules",
         ]
@@ -65,13 +92,11 @@ class CourseSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         request = self.context["request"]
-        creator = request.user
 
         course_image = validated_data.pop("course_image", None)
         if not course_image:
             course_image = None
         course = Course.objects.create(
-            creator=creator, course_image=course_image, **validated_data
+            creator=request.user, course_image=course_image, **validated_data
         )
-        course.save()
         return course
