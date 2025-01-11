@@ -63,7 +63,7 @@ class ModuleSerializer(serializers.ModelSerializer):
         if not lesson_pdf:
             lesson_pdf = None 
         module = Module.objects.create(
-            module_creator=request.user, module_image=module_image, lesson_pdf=lesson_pdf **validated_data
+            module_creator=request.user, module_image=module_image, lesson_pdf=lesson_pdf, **validated_data
         )
         return module
 

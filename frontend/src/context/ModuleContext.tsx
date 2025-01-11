@@ -34,7 +34,7 @@ interface ModuleContextProps {
     Module_name: string,
     topic: string,
     module_image: File | null,
-    lesson_pdf: string
+    lesson_pdf:  File | null,
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -93,7 +93,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
 
 
   const addModule = useCallback(
-    async (module_title: string, topic: string, module_image: File | null, lesson_pdf: string) => {
+    async (module_title: string, topic: string, module_image: File | null, lesson_pdf: File | null) => {
       try {
         const formData = new FormData();
         formData.append('module_title', module_title);

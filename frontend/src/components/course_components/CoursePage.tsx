@@ -66,7 +66,7 @@ const CoursePage: React.FC = () => {
             </div>
           )}
 
-          {(isStaff || canAddModule) && <AddModuleBox />}
+{(isStaff || canAddModule) && courseId !== undefined && <AddModuleBox courseId={Number(courseId)} />}
         </div>
       </div>
     </>

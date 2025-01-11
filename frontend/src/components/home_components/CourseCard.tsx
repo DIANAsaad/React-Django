@@ -13,7 +13,7 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
   return (
     <div className='col-12 mb-4' id={`course-${course.id}`}>
     <div className='card shadow-sm course-card'>
-      <div className='image-container position-relative'  onClick={()=>{navigate(`/course_page/${course.id}`)}}>
+      <div className='image-container position-relative'  onClick={()=>{navigate(`/coursePage/${course.id}`)}}>
         <img
           src={String(course.course_image)}
           className='card-img-top'

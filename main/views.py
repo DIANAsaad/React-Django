@@ -166,6 +166,7 @@ class AddModuleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         serializer = ModuleSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             module = serializer.save()
