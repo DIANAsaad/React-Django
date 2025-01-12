@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useMemo} from "react";
 import { useParams } from "react-router-dom";
 import { useModuleContext } from "../../../context/ModuleContext";
 
@@ -6,7 +6,10 @@ import { useModuleContext } from "../../../context/ModuleContext";
 const ModulePage: React.FC = () => {
   const { modules, loading, error } = useModuleContext();
   const { moduleId } = useParams<{ moduleId: string }>();
-  const module = modules?.find((c) => c.id === parseInt(moduleId!, 10));
+
+    const module = useMemo(() => {
+      return modules?.find((c) => c.id === parseInt(moduleId!, 10));
+    }, [modules, moduleId]);
   
 
 

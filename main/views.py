@@ -1,6 +1,7 @@
+import logging
 from django.contrib.auth import logout as logout
 from main.models import Course, Module
-from django.shortcuts import get_object_or_404
+
 from main.utils import delete_object
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -18,6 +19,9 @@ from rest_framework.exceptions import NotFound
 from .permissions import IsStaffOrHasDeletePermission, IsStaffOrHasAddCoursePermission
 
 # Authentication & Authorization
+
+logger = logging.getLogger(__name__) 
+
 
 
 class CustomLoginView(APIView):
@@ -121,7 +125,7 @@ class HomePageView(APIView):
             "canAddModule": can_add_module,
             "canDeleteModule": can_delete_module,
         }
-        print(data)
+
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -166,10 +170,10 @@ class AddModuleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         serializer = ModuleSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             module = serializer.save()
+
             return Response(
                 ModuleSerializer(module).data, status=status.HTTP_201_CREATED
             )

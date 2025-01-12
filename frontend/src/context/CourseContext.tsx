@@ -13,12 +13,6 @@ export interface Course {
   description: string;
   course_image: File | string;
   study_guide: string;
-  modules: {
-    id: number;
-    module_title: string;
-    topic: string;
-    module_image: File | string;
-  }[];
 }
 
 // Define the context structure
@@ -48,7 +42,6 @@ const ENDPOINT = 'http://localhost:8000';
 const normalizeCourse = (course: Course) => ({
   ...course,
   course_image: course.course_image ? `${ENDPOINT}${course.course_image}` : '/achieve_a_mark.png',
-  modules: course.modules ?? []
 });
 
 const normalizeCourses = (courses: Course[]) => {

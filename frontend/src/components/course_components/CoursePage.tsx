@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
+import { useModuleContext } from "../../context/ModuleContext";
 import "../../styles/Course&LessonPage.css";
 import AddModuleBox from "./AddModuleBox";
 
 const CoursePage: React.FC = () => {
   const { courses, loading, error, canAddModule, isStaff } = useCourseContext();
   const { courseId } = useParams<{ courseId: string }>();
+  const { modules } = useModuleContext();
+  const filteredModules = modules
+    ? modules.filter((module) => module.course_id === Number(courseId))
+    : [];
+    console.log(filteredModules)
+  const course = useMemo(() => {
+    return courses?.find((c) => c.id === parseInt(courseId!, 10));
+  }, [courses, courseId]);
 
-  const course = courses?.find((c) => c.id === parseInt(courseId!, 10));
 
   if (loading) {
     return <div>Loading course...</div>;
@@ -25,7 +33,7 @@ const CoursePage: React.FC = () => {
   return (
     <>
       <div className="row">
-        <div className="container-cstm card-style mt-4" key={course.id}>
+        <div className="container-cstm card-style mt-4" key={courseId}>
           <div className="info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded">
             <div className="cstm-header">
               <img
@@ -37,25 +45,38 @@ const CoursePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{course.course_title}</h1>
               <p className="text-muted ">{course.description}</p>
-              <p className="text-muted ">{`${course.creator.first_name} ${course.creator.last_name}`}</p>
+              <p className="text-muted ">
+                {" "}
+                Created by:{" "}
+                {`${course.creator.first_name} ${course.creator.last_name}`}
+              </p>
             </div>
           </div>
-          {course.modules &&
-            course.modules.map((module) => (
+          {filteredModules.length > 0 &&
+            filteredModules.map((module) => (
               <div
                 className="modules-box p-4 shadow-sm rounded mb-4"
                 id={`module-${module.id}`}
                 key={module.id}
               >
                 <ul className="list-unstyled">
-                  <li className="module-item d-flex justify-content-between align-items-center">
-                    <div>
+                  <li className="module-item d-flex">
+                    <div className="module-image mr-2">
+                      <img
+                        src={String(module.module_image)}
+                        className="module-img"
+                      />
+                    </div>
+                    <div className="module-details">
                       <strong>{module.module_title}</strong>: {module.topic}
                     </div>
                   </li>
                 </ul>
               </div>
             ))}
+          {(isStaff || canAddModule) && courseId !== undefined && (
+            <AddModuleBox courseId={Number(courseId)} />
+          )}
           {course.study_guide && (
             <div
               className="material-box p-4 shadow-sm rounded"
@@ -65,8 +86,6 @@ const CoursePage: React.FC = () => {
               Access you study guide here!
             </div>
           )}
-
-{(isStaff || canAddModule) && courseId !== undefined && <AddModuleBox courseId={Number(courseId)} />}
         </div>
       </div>
     </>

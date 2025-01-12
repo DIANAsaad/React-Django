@@ -70,8 +70,7 @@ class Course(models.Model):
             self.course_slug = "placeholder"  # Had to save first to get the ID
             super().save(*args, **kwargs)
             self.course_slug = f"{slug}-{self.id}"
-            kwargs['force_insert'] = False 
-            super().save(*args, **kwargs)
+            super().save(update_fields=['course_slug'])
 
     def delete(self, *args, **kwargs):
         if self.course_image:
@@ -104,10 +103,10 @@ class Module(models.Model):
     def save(self, *args, **kwargs):
         if not self.module_slug:
             slug = slugify(self.module_title)
-            self.module_slug = "module_slug_placeholder"
+            self.module_slug = "placeholder"
             super().save(*args, **kwargs)  # Save to get the ID
             self.module_slug = f"{slug}-{self.id}"
-            super().save(*args, **kwargs)
+            super().save(update_fields=['module_slug'])
 
     def delete(self, *args, **kwargs):
         if self.module_image:

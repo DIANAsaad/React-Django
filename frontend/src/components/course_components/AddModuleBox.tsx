@@ -1,23 +1,20 @@
 import React, { useState, useCallback, useRef } from "react";
 import { useModuleContext } from "../../context/ModuleContext";
 
-
-
-interface AddModuleBoxProps{
-  courseId:number;
-
+interface AddModuleBoxProps {
+  courseId: number;
 }
 
-const AddModuleBox: React.FC<AddModuleBoxProps> = () => {
+const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
   const { addModule } = useModuleContext();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [formData, setFormData] = useState({
+    course_id: courseId,
     module_title: "",
     topic: "",
     lesson_pdf: null as File | null,
     module_image: null as File | null,
   });
-
   const [loading, setLoading] = useState(false);
   const toggleFormVisibility = useCallback(() => {
     setIsFormVisible((prev) => !prev);
@@ -29,12 +26,14 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = () => {
       setLoading(true);
       try {
         await addModule(
+          (formData.course_id = courseId),
           formData.module_title,
           formData.topic,
           formData.module_image,
           formData.lesson_pdf
         );
         setFormData({
+          course_id: courseId,
           module_title: "",
           topic: "",
           lesson_pdf: null,
@@ -46,7 +45,7 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = () => {
         setLoading(false);
       }
     },
-    [addModule, formData]
+    [addModule, formData, courseId]
   );
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -73,15 +72,14 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = () => {
 
   return (
     <div className="modules-box-staff p-4 shadow-sm rounded mb-4 text-center">
+      {!isFormVisible &&(
       <button
         onClick={toggleFormVisibility}
-        className="btn btn-outline-orange btn-lg"
-      >
+        className="btn btn-outline-orange btn-lg mb-1 mt-1">
         <i className="fas fa-plus"></i> Add Lesson
-      </button>
+      </button>)}
       {isFormVisible && (
-        <form onSubmit={handleSubmit}>
-          {/* Your form fields go here */}
+        <form onSubmit={handleSubmit} className="d-flex">
           <div className="image-upload" onClick={handleImageClick}>
             <img
               src={
@@ -99,7 +97,7 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = () => {
               onChange={handleImageChange}
             />
           </div>
-          <div className="form-group">
+          <div className="form-group  w-100">
             <input
               type="text"
               name="module_title"
@@ -124,11 +122,10 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = () => {
               placeholder="Lesson PDF"
               className="form-control form-control-sm mb-2"
             />
+            <button type="submit" className="btn btn-success">
+              {loading ? "Adding..." : "Add Lesson"}
+            </button>
           </div>
-
-          <button type="submit" className="btn btn-success">
-            {loading ? "Adding..." : "Add Lesson"}
-          </button>
         </form>
       )}
     </div>
