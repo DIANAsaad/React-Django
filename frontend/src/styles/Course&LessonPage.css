@@ -34,11 +34,20 @@
   color: #343a40;
 }
 
+.details p {
+  font-family: "Georgia", serif;
+  color: #343a40;
+  font-weight: normal; 
+} 
+
 .modules-box {
   background-color: #fff5f0;
-  border-radius: 10px;
+  border-radius: 5px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
+  margin-bottom:4px;
+  padding:10px;
+
 }
 
 .modules-box:hover {
@@ -171,4 +180,26 @@
   flex: 1;
 }
 
+.module-details p {
+  margin-top: 10px;
+  font-weight: normal; 
+}
 
+.module-image{
+  width: 100px;
+  height: 100px;
+  margin-right: 20px;
+
+}
+
+.module-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dropdown-container{
+  margin-right: 10px;
+  margin-top: 10px;
+
+}

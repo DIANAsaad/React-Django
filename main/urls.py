@@ -8,6 +8,7 @@ from main.views import (
     AddCourseView,
     DeleteCourseView,
     AddModuleView,
+    CoursePageView,
 )
 
 
@@ -27,6 +28,6 @@ urlpatterns = [
         DeleteCourseView.as_view(),
         name="delete_course",
     ),
-    path("modules/<int:course_id>", AddModuleView.as_view(), name="course_modules"),
+    path("modules/<int:course_id>", CoursePageView.as_view(), name="course_modules"),
     path("add_module", AddModuleView.as_view(), name="add_module"),
 ]

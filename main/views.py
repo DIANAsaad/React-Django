@@ -16,7 +16,12 @@ from main.serializers import (
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from .permissions import IsStaffOrHasDeletePermission, IsStaffOrHasAddCoursePermission
+from .permissions import (
+    IsStaffOrHasDeleteCoursePermission,
+    IsStaffOrHasAddCoursePermission,
+    IsStaffOrHasAddModulePermission,
+    IsStaffOrHasDeleteModulePermission,
+)
 
 # Authentication & Authorization
 
@@ -155,7 +160,7 @@ class AddCourseView(APIView):
 
 
 class DeleteCourseView(APIView):
-    permission_classes = [IsAuthenticated, IsStaffOrHasDeletePermission]
+    permission_classes = [IsAuthenticated, IsStaffOrHasDeleteCoursePermission]
 
     def delete(self, request, *args, **kwargs):
         course_id = kwargs.get("course_id")
@@ -172,7 +177,7 @@ class DeleteCourseView(APIView):
 
 
 class AddModuleView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsStaffOrHasAddModulePermission]
 
     def post(self, request, *args, **kwargs):
         serializer = ModuleSerializer(data=request.data, context={"request": request})

@@ -38,7 +38,7 @@ interface ModuleContextProps {
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
-  isStaff: boolean;
+
 }
 
 const ModuleContext = createContext<ModuleContextProps | undefined>(undefined);
@@ -62,24 +62,27 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isStaff, setIsStaff] = useState<boolean>(false);
-  
 
-  const fetchModules = async (courseId:number) => {
+  
+  const fetchModules = useCallback(async (courseId: number) => {
+    if (!accessToken) {
+      setError('No access token available');
+      return;
+    }
+
     try {
       setLoading(true);
+      console.log(accessToken);
       const response = await axios.get(`${ENDPOINT}/modules/${courseId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
       setModules(normalizeModules(response.data.modules ?? []));
-      setIsStaff(response.data.isStaff);
     } catch (err) {
       setError('Failed to fetch modules');
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [accessToken]);
 
 
   const addModule = useCallback(
@@ -155,7 +158,6 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
         addModule,
         loading,
         error,
-        isStaff
       }}
     >
       {children}

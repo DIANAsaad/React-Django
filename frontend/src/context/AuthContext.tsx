@@ -3,6 +3,10 @@ import axios, { AxiosError } from 'axios';
 import { ReactNode } from 'react';
 import useLocalStorage from '../hooks/use-local-storage';
 
+
+
+const TOKEN_EXPIRATION_TIME = 86_400_000; 
+
 // Define User type
 interface AchieveUser {
   id: number;
@@ -147,7 +151,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (refreshToken) {
       refreshInterval = setInterval(() => {
         refreshAccessToken().catch(err => console.error('Error in scheduled refresh:', err));
-      }, 1 * 60_000);
+      }, TOKEN_EXPIRATION_TIME);
     }
 
     return () => {
