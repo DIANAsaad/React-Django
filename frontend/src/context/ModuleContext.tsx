@@ -2,7 +2,6 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
   ReactNode,
   useCallback,
 } from "react";
@@ -28,6 +27,7 @@ interface Module {
 
 interface ModuleContextProps {
   modules: Module[] | null;
+  fetchModules: (courseId:number)=> Promise<void>;
   deleteModule: (moduleId: number) => Promise<void>;
   addModule: (
     courseId: number,
@@ -39,8 +39,6 @@ interface ModuleContextProps {
   loading: boolean;
   error: string | null;
   isStaff: boolean;
-  canDeleteModule: boolean;
-  canAddModule: boolean;
 }
 
 const ModuleContext = createContext<ModuleContextProps | undefined>(undefined);
@@ -65,32 +63,24 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [canDeleteModule, setCanDeleteModule] = useState<boolean>(false);
-  const [canAddModule, setCanAddModule] = useState<boolean>(false);
+  
 
-  useEffect(() => {
-    // Fetch modules when in CoursePage.
-    const fetchModules = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${ENDPOINT}/modules`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        setModules(normalizeModules(response.data.courses ?? []));
-        setIsStaff(response.data.isStaff);
-        setCanDeleteModule(response.data.canDeleteModule);
-        setCanAddModule(response.data.canAddModule);
-      } catch {
-        setError("Failed to fetch courses.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (accessToken) {
-      fetchModules();
+  const fetchModules = async (courseId:number) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${ENDPOINT}/modules/${courseId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setModules(normalizeModules(response.data.modules ?? []));
+      setIsStaff(response.data.isStaff);
+    } catch (err) {
+      setError('Failed to fetch modules');
+    } finally {
+      setLoading(false);
     }
-  }, [accessToken]);
+  };
+
+
 
   const addModule = useCallback(
     async (
@@ -160,13 +150,12 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
     <ModuleContext.Provider
       value={{
         modules,
+        fetchModules,
         deleteModule,
         addModule,
         loading,
         error,
-        isStaff,
-        canDeleteModule,
-        canAddModule,
+        isStaff
       }}
     >
       {children}

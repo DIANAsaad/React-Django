@@ -1,5 +1,5 @@
 // src/WelcomePage.tsx
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Welcome.css"; // Link to your CSS file
 import "font-awesome/css/font-awesome.min.css";
@@ -7,14 +7,14 @@ import { useAuth } from "../context/AuthContext";
 
 const Welcome: React.FC = () => {
   // State to manage form data and error messages
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   // Handle login form submission
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -23,7 +23,14 @@ const Welcome: React.FC = () => {
     } catch (error) {
       setErrorMessage("Invalid username or password.)");
     }
-  };
+  },[email, password, login, navigate ]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, navigate]);
+
 
   return (
     <div>

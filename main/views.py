@@ -20,8 +20,7 @@ from .permissions import IsStaffOrHasDeletePermission, IsStaffOrHasAddCoursePerm
 
 # Authentication & Authorization
 
-logger = logging.getLogger(__name__) 
-
+logger = logging.getLogger(__name__)
 
 
 class CustomLoginView(APIView):
@@ -131,6 +130,12 @@ class HomePageView(APIView):
 
 class CoursePageView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        course_id = kwargs.get("course_id")
+        modules = Module.objects.filter(course_id=course_id).all()
+        data = {"modules": ModuleSerializer(modules, many=True).data}
+        return Response(data, status=status.HTTP_200_OK)
 
 
 # Functionality

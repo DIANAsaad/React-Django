@@ -4,13 +4,14 @@ import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import Base from "./components/base/Base";
 import CoursePage from "./components/course_components/CoursePage";
-import ModulePage from "./components/course_components/Modules/ModulePage"
+import ModulePage from "./components/course_components/modules/ModulePage"
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext"; 
 import { ModuleProvider } from './context/ModuleContext';
 
 const App: React.FC = () => {
+
   return (
     <Router>
       {/* Routes to handle different pages */}
@@ -60,7 +61,7 @@ const App: React.FC = () => {
 const AppWrapper: React.FC = () => (
   <AuthProvider>
     <CourseProvider>
-      <ModuleProvider>
+      <ModuleProvider >
         <App />
       </ModuleProvider>
     </CourseProvider>

@@ -1,18 +1,23 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
-import { useModuleContext } from "../../context/ModuleContext";
+import { useModuleContext, } from "../../context/ModuleContext";
 import "../../styles/Course&LessonPage.css";
+
 import AddModuleBox from "./AddModuleBox";
 
 const CoursePage: React.FC = () => {
   const { courses, loading, error, canAddModule, isStaff } = useCourseContext();
   const { courseId } = useParams<{ courseId: string }>();
-  const { modules } = useModuleContext();
-  const filteredModules = modules
-    ? modules.filter((module) => module.course_id === Number(courseId))
-    : [];
-    console.log(filteredModules)
+  const { modules, fetchModules } = useModuleContext();
+   
+  useEffect(() => {
+      fetchModules(Number(courseId));
+  }, [ courseId]);
+
+
+
+
   const course = useMemo(() => {
     return courses?.find((c) => c.id === parseInt(courseId!, 10));
   }, [courses, courseId]);
@@ -52,8 +57,8 @@ const CoursePage: React.FC = () => {
               </p>
             </div>
           </div>
-          {filteredModules.length > 0 &&
-            filteredModules.map((module) => (
+          {modules &&
+            modules.map((module) => (
               <div
                 className="modules-box p-4 shadow-sm rounded mb-4"
                 id={`module-${module.id}`}
