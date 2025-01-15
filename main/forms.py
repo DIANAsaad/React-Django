@@ -55,4 +55,4 @@ class AddAnswerForm(forms.ModelForm):
 class AddFlashcardForm(forms.ModelForm):
     class Meta:
         model = Flashcard
-        fields = ["flashcard_question", "flashcard_answer", "flashcard_image"]
+        fields = ["flashcard_question", "flashcard_answer"]

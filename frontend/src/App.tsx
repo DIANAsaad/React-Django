@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import Base from "./components/base/Base";
-import CoursePage from "./components/course_components/CoursePage";
-import ModulePage from "./components/course_components/modules/ModulePage"
+import CoursePage from "./components/coursePages/CoursePage";
+import ModulePage from "./components/coursePages/modules/ModulePage"
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext"; 

@@ -5,11 +5,28 @@ import { useModuleContext } from "../../context/ModuleContext";
 import "../../styles/Course&LessonPage.css";
 import DropdownMenu from "../DropdownMenu";
 import AddModuleBox from "./AddModuleBox";
+import { useNavigate } from "react-router-dom";
 
 const CoursePage: React.FC = () => {
-  const { courses, loading, error, canAddModule, isStaff } = useCourseContext();
+  const {
+    courses,
+    loading: courseLoading,
+    error,
+    isStaff,
+  } = useCourseContext();
+
   const { courseId } = useParams<{ courseId: string }>();
-  const { modules, fetchModules } = useModuleContext();
+  const {
+    modules,
+    canAddModule,
+    fetchModules,
+    loading: moduleLoading,
+    error: moduleError,
+    deleteModule,
+    canDeleteModule
+  } = useModuleContext();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchModules(Number(courseId));
@@ -19,7 +36,7 @@ const CoursePage: React.FC = () => {
     return courses?.find((c) => c.id === parseInt(courseId!, 10));
   }, [courses, courseId]);
 
-  if (loading) {
+  if (courseLoading) {
     return <div>Loading course...</div>;
   }
 
@@ -46,46 +63,65 @@ const CoursePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{course.course_title}</h1>
               <p className="text-muted ">{course.description}</p>
-              <p className="text-muted ">
-                <strong>Created by: </strong>
-                {`${course.creator.first_name} ${course.creator.last_name}`}
-              </p>
+              {isStaff && (
+                <p className="text-muted ">
+                  <strong>Created by: </strong>
+                  {`${course.creator.first_name} ${course.creator.last_name}`}
+                </p>
+              )}
             </div>
           </div>
-          {modules &&
+
+          {moduleLoading ? (
+            <div>Loading lessons...</div>
+          ) : moduleError ? (
+            <div>Error: {moduleError}</div>
+          ) : modules && modules.length > 0 ? (
             modules.map((module) => (
               <div
                 className="modules-box shadow-sm rounded mb-4"
-                id={`module-${module.id}`}
                 key={module.id}
               >
                 <ul className="list-unstyled">
-                  <li className="module-item d-flex">
-                    <div className="module-image">
-                      <img
-                        src={String(module.module_image)}
-                        className="module-img"
+                  <li className="module-item d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center">
+                      <div
+                        className="module-image"
+                        onClick={() => {
+                          navigate(`/modulePage/${module.id}`);
+                        }}
+                      >
+                        <img
+                          src={String(module.module_image)}
+                          className="module-img"
+                          alt={module.module_title}
+                        />
+                      </div>
+                      <div className="module-details">
+                        <strong>{module.module_title}</strong>
+                        <p>{module.topic}</p>
+                      </div>
+                    </div>
+                    {isStaff || canDeleteModule &&(
+                    <div className="dropdownmenu">
+                      <DropdownMenu
+                        options={[
+                          {
+                            label: "Delete",
+                            action: () => {
+                              deleteModule(module.id);
+                            },
+                          },
+                        ]}
                       />
-                    </div>
-                    <div className="module-details">
-                      <strong>{module.module_title}</strong>:
-                      <p>{module.topic}</p>
-                    </div>
+                    </div>)}
                   </li>
-                  <div className="dropdown-container">
-                    <DropdownMenu
-                      id={`module-${module.id}`}
-                      options={[
-                        {
-                          label: "Delete",
-                          action: () => {},
-                        },
-                      ]}
-                    />
-                  </div>
                 </ul>
               </div>
-            ))}
+            ))
+          ) : (
+            <p>No lessons available for this course.</p>
+          )}
           {(isStaff || canAddModule) && courseId !== undefined && (
             <AddModuleBox courseId={Number(courseId)} />
           )}

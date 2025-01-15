@@ -2,12 +2,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../../styles/Sidebar.css";
 
-const Sidebar: React.FC = () => {
+
+
+interface SidebarProps {
+  children?: React.ReactNode;
+}
+const Sidebar: React.FC<SidebarProps> = ({children}) => {
   return (
     <div className="col-md-2 sidebar">
       <h4 className="text-center mb-4">Menu</h4>
       <ul className="list-unstyled">
-        {/* Sidebar dynamic content can be passed as props */}
+        { children}
         <li>
           {/* Use Link here */}
           <Link to="/#" className="sidebar-link">

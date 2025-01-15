@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import AchieveUser, Course, Module
+from .models import AchieveUser, Course, Module, Flashcard
 from django.shortcuts import get_object_or_404
 
 
@@ -37,6 +37,7 @@ class ModuleSerializer(serializers.ModelSerializer):
     module_image = serializers.ImageField(required=False, allow_null=True)
     lesson_pdf = serializers.FileField(required=False, allow_null=True)
     course_id = serializers.IntegerField(write_only=True)
+    module_creator = AchieveUserSerializer(read_only=True)
 
     class Meta:
         model = Module
@@ -66,14 +67,13 @@ class ModuleSerializer(serializers.ModelSerializer):
             course=course,
             **validated_data
         )
-     
         return module
 
 
 class CourseSerializer(serializers.ModelSerializer):
     course_image = serializers.ImageField(required=False, allow_null=True)
-    modules = ModuleSerializer(many=True, required=False)
     creator = AchieveUserSerializer(read_only=True)
+    lesson_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Course
@@ -84,7 +84,6 @@ class CourseSerializer(serializers.ModelSerializer):
             "course_image",
             "study_guide",
             "creator",
-            "modules",
             "course_slug",
         ]
         read_only_fields = ["id", "course_slug"]
@@ -96,5 +95,16 @@ class CourseSerializer(serializers.ModelSerializer):
         course = Course.objects.create(
             creator=request.user, course_image=course_image, **validated_data
         )
-
         return course
+
+
+class FlashcardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Flashcard
+        fields = ["id", "flashcard_question", "flashcard_answer", "lesson_id"]
+
+    def create(self, validated_data):
+        lesson_id = validated_data.pop("module_id")
+        lesson = get_object_or_404(Module, id=lesson_id)
+        flashcard = Flashcard.objects.create(lesson=lesson, **validated_data)
+        return flashcard

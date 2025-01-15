@@ -8,7 +8,9 @@ from main.views import (
     AddCourseView,
     DeleteCourseView,
     AddModuleView,
+    DeleteModuleView,
     CoursePageView,
+    AddFlashcardView
 )
 
 
@@ -17,6 +19,7 @@ urlpatterns = [
     path("logout", CustomLogoutView.as_view(), name="logout"),
     path("user", GetUserView.as_view(), name="get_user"),
     path("courses", HomePageView.as_view(), name="course-list"),
+    path("flashcards", AddFlashcardView.as_view(), name="add_flashcard"),
     path("add_course", AddCourseView.as_view(), name="add_Ccourse"),
     path(
         "refresh_access_token",
@@ -30,4 +33,9 @@ urlpatterns = [
     ),
     path("modules/<int:course_id>", CoursePageView.as_view(), name="course_modules"),
     path("add_module", AddModuleView.as_view(), name="add_module"),
+    path(
+        "delete_module/<int:module_id>",
+        DeleteModuleView.as_view(),
+        name="delete_module",
+    ),
 ]

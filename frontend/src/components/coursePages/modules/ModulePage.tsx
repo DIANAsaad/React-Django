@@ -1,17 +1,15 @@
-import React, {useMemo} from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useModuleContext } from "../../../context/ModuleContext";
-
+import "../../../styles/Course&LessonPage.css";
 
 const ModulePage: React.FC = () => {
-  const { modules, loading, error } = useModuleContext();
+  const { modules, loading, error, canAddModule, isStaff } = useModuleContext();
   const { moduleId } = useParams<{ moduleId: string }>();
 
-    const module = useMemo(() => {
-      return modules?.find((c) => c.id === parseInt(moduleId!, 10));
-    }, [modules, moduleId]);
-  
-
+  const module = useMemo(() => {
+    return modules?.find((c) => c.id === parseInt(moduleId!, 10));
+  }, [modules, moduleId]);
 
   if (loading) {
     return <div>Loading Lesson...</div>;
@@ -24,13 +22,19 @@ const ModulePage: React.FC = () => {
   if (!module) {
     return <div>Lesson not found</div>;
   }
-  const lessonPdfUrl = module.lesson_pdf ? URL.createObjectURL(module.lesson_pdf) : null;
+  const lessonPdfUrl =
+    module.lesson_pdf instanceof File
+      ? URL.createObjectURL(module.lesson_pdf)
+      : typeof module.lesson_pdf === "string"
+      ? module.lesson_pdf
+      : null;
+
   return (
     <>
       <div className="row">
         <div className="container-cstm card-style mt-4" key={module.id}>
           <div className="info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded">
-            <div className="stm-header">
+            <div className="cstm-header">
               <img
                 src={String(module.module_image)}
                 className="card-cstm-img-top"
@@ -40,19 +44,24 @@ const ModulePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{module.module_title}</h1>
               <p className="text-muted ">{module.topic}</p>
-              <p className="text-muted ">{`${module.module_creator.first_name} ${module.module_creator.last_name}`}</p>
+              {isStaff && canAddModule && ( <p className="text-muted ">
+                
+                {" "}
+                <strong>Created by: </strong>{" "}
+                {`${module.module_creator.first_name} ${module.module_creator.last_name}`}
+              </p>)}
             </div>
           </div>
           {lessonPdfUrl && (
             <div>
-              <div className="material-box p-4 shadow-sm rounded">
-                <strong>Lesson:</strong>
+              <div className="material-box p-4 shadow-sm rounded ">
+                <strong>Lesson PDF: </strong>
                 <a
                   href={lessonPdfUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  View your Lesson Here!
+                  Access and download your lesson
                 </a>
               </div>
             </div>

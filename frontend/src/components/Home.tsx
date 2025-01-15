@@ -1,8 +1,8 @@
 import React from "react";
-import CourseCard from "./home_components/CourseCard";
+import CourseCard from "./homePage/CourseCard";
 import { useCourseContext } from "../context/CourseContext";
 import "../styles/Home.css";
-import AddCourseCard from "./home_components/AddCourseCard";
+import AddCourseCard from "./homePage/AddCourseCard";
 
 const Home: React.FC = () => {
   const { courses, loading, error, isStaff, canAddCourse} = useCourseContext();

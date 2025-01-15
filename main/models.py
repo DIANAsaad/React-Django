@@ -127,16 +127,6 @@ class Flashcard(models.Model):
     )
     flashcard_question = models.TextField()
     flashcard_answer = models.TextField()
-    flashcard_image = models.ImageField(
-        upload_to="flashcard_images/", blank=True, null=True
-    )
-
-    def delete(self, *args, **kwargs):
-        if self.flashcard_image:
-            flashcard_image_path = self.flashcard_image.path
-            if os.path.isfile(flashcard_image_path):
-                os.remove(flashcard_image_path)
-        super().delete(*args, **kwargs)
 
 
 # QUIZ

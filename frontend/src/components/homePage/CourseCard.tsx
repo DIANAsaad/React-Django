@@ -11,7 +11,7 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
   if (!course) return null;
 
   return (
-    <div className='col-12 mb-4' id={`course-${course.id}`}>
+    <div className='col-12 mb-4' key={course.id}>
     <div className='card shadow-sm course-card'>
       <div className='image-container position-relative'  onClick={()=>{navigate(`/coursePage/${course.id}`)}}>
         <img
@@ -28,7 +28,6 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
         {(isStaff || canDeleteCourse) && (
           <div className="dropdown-container">
             <DropdownMenu
-              id={`course-${course.id}`}
               options={[
                 {
                   label: 'Delete',

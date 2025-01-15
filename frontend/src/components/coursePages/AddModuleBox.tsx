@@ -66,20 +66,34 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
     []
   );
 
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files ? e.target.files[0] : null;
+      setFormData((prev) => ({ ...prev, lesson_pdf: file }));
+    },
+    []
+  );
+
   const handleImageClick = useCallback(() => {
     if (fileInputRef.current) fileInputRef.current.click();
   }, []);
 
   return (
     <div className="modules-box-staff p-4 shadow-sm rounded mb-4 text-center">
-      {!isFormVisible &&(
-      <button
-        onClick={toggleFormVisibility}
-        className="btn btn-outline-orange btn-lg mb-1 mt-1">
-        <i className="fas fa-plus"></i> Add Lesson
-      </button>)}
+      {!isFormVisible && (
+        <button
+          onClick={toggleFormVisibility}
+          className="btn btn-outline-orange btn-lg mb-1 mt-1"
+        >
+          <i className="fas fa-plus"></i> Add Lesson
+        </button>
+      )}
       {isFormVisible && (
-        <form onSubmit={handleSubmit} className="d-flex">
+        <form
+          onSubmit={handleSubmit}
+          className="d-flex"
+          encType="multipart/form-data"
+        >
           <div className="image-upload" onClick={handleImageClick}>
             <img
               src={
@@ -118,7 +132,8 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
             <input
               type="file"
               name="lesson_pdf"
-              onChange={handleChange}
+              ref={fileInputRef}
+              onChange={handleFileChange}
               placeholder="Lesson PDF"
               className="form-control form-control-sm mb-2"
             />

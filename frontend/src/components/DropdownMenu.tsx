@@ -2,7 +2,7 @@ import React from "react";
 import "./../styles/DropdownMenu.css";
 
 interface DropdownMenuProps {
-  id: string; // Unique identifier for the dropdown
+
   options: {
     label: string;
     action?: (() => void) | null;
@@ -10,13 +10,12 @@ interface DropdownMenuProps {
   }[]; 
 }
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ id, options }) => {
+const DropdownMenu: React.FC<DropdownMenuProps> = ({ options }) => {
   return (
     <div className="dropdown">
       {/* Trigger Button */}
       <button
         className="ellipsis-cstm-btn btn  p-0"
-        id={`dropdownMenuButton-${id}`}
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
@@ -26,7 +25,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ id, options }) => {
       {/* Dropdown Menu */}
       <ul
         className="dropdown-menu dropdown-menu-end"
-        aria-labelledby={`dropdownMenuButton-${id}`}
+    
       >
         {options.map((option, index) => (
           <li key={index}>

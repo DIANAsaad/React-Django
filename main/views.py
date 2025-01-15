@@ -13,6 +13,7 @@ from main.serializers import (
     CourseSerializer,
     RefreshTokenSerializer,
     ModuleSerializer,
+    FlashcardSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -113,24 +114,22 @@ class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        courses = Course.objects.prefetch_related("modules").all()
+        
+        courses = Course.objects.all()
         is_staff = request.user.is_staff
         can_delete_course = request.user.has_perm("main.delete_course")
         can_add_course = request.user.has_perm("main.add_course")
-        can_add_module = request.user.has_perms(
-            ["main.add_module"]
-        )  # Pass a list of permissions
-        can_delete_module = request.user.has_perm("main.delete_module")
         data = {
             "courses": CourseSerializer(courses, many=True).data,
             "isStaff": is_staff,
             "canDeleteCourse": can_delete_course,
             "canAddCourse": can_add_course,
-            "canAddModule": can_add_module,
-            "canDeleteModule": can_delete_module,
         }
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+# Course page is where we have the lessons of each course (modules)
 
 
 class CoursePageView(APIView):
@@ -138,12 +137,24 @@ class CoursePageView(APIView):
 
     def get(self, request, *args, **kwargs):
         course_id = kwargs.get("course_id")
+        is_staff = request.user.is_staff
+        can_add_module = request.user.has_perms(
+            ["main.add_module"]
+        ) 
+        can_delete_module = request.user.has_perm("main.delete_module")
         modules = Module.objects.filter(course_id=course_id).all()
-        data = {"modules": ModuleSerializer(modules, many=True).data}
+        data = {
+            "modules": ModuleSerializer(modules, many=True).data,
+            "isStaff": is_staff,
+            "canAddModule": can_add_module,
+            "canDeleteModule": can_delete_module,
+        }
         return Response(data, status=status.HTTP_200_OK)
 
 
 # Functionality
+
+# Course
 
 
 class AddCourseView(APIView):
@@ -176,15 +187,52 @@ class DeleteCourseView(APIView):
             raise NotFound(detail="Course not found.", code=status.HTTP_404_NOT_FOUND)
 
 
+# Module
+
+
 class AddModuleView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrHasAddModulePermission]
 
     def post(self, request, *args, **kwargs):
+
         serializer = ModuleSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             module = serializer.save()
 
             return Response(
                 ModuleSerializer(module).data, status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteModuleView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrHasDeleteModulePermission]
+
+    def delete(self, request, *args, **kwargs):
+        module_id = kwargs.get("module_id")
+        if not module_id:
+            return Response(
+                {"detail": "Module ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            return delete_object(
+                request, app_label="main", model_name="Module", object_id=module_id
+            )
+        except Module.DoesNotExist:
+            raise NotFound(detail="Module not found.", code=status.HTTP_404_NOT_FOUND)
+
+
+# Flashcards
+
+
+class AddFlashcardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kargs):
+        serializer = FlashcardSerializer(data=request.data)
+        if serializer.is_valid():
+            flashcard = serializer.save()
+            return Response(
+                FlashcardSerializer((flashcard).data, status=status.HTTP_201_CREATED)
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -16,7 +16,7 @@ interface Module {
   topic: string;
   module_image: File | string;
   course_id: number;
-  lesson_pdf: File | null;
+  lesson_pdf: File | string;
   module_creator: {
     first_name: string;
     last_name: string;
@@ -27,7 +27,7 @@ interface Module {
 
 interface ModuleContextProps {
   modules: Module[] | null;
-  fetchModules: (courseId:number)=> Promise<void>;
+  fetchModules: (courseId: number) => Promise<void>;
   deleteModule: (moduleId: number) => Promise<void>;
   addModule: (
     courseId: number,
@@ -38,7 +38,10 @@ interface ModuleContextProps {
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
-
+  isStaff:boolean;
+  canAddModule:boolean;
+  canDeleteModule:boolean;
+  
 }
 
 const ModuleContext = createContext<ModuleContextProps | undefined>(undefined);
@@ -50,6 +53,9 @@ const normalizeModule = (module: Module) => ({
   module_image: module.module_image
     ? `${ENDPOINT}${module.module_image}`
     : "/achieve_a_mark.png",
+  lesson_pdf:module.lesson_pdf
+    ? `${ENDPOINT}${module.lesson_pdf}`
+    : "/*"
 });
 
 const normalizeModules = (modules: Module[]) => {
@@ -62,28 +68,34 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isStaff, setIsStaff] = useState<boolean>(false);
+  const [canDeleteModule, setCanDeleteModule] = useState<boolean>(false);
+  const [canAddModule, setCanAddModule] = useState<boolean>(false); 
 
-  
-  const fetchModules = useCallback(async (courseId: number) => {
-    if (!accessToken) {
-      setError('No access token available');
-      return;
-    }
+  const fetchModules = useCallback(
+    async (courseId: number) => {
+      if (!accessToken) {
+        setError("No access token available");
+        return;
+      }
 
-    try {
-      setLoading(true);
-      console.log(accessToken);
-      const response = await axios.get(`${ENDPOINT}/modules/${courseId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
-      setModules(normalizeModules(response.data.modules ?? []));
-    } catch (err) {
-      setError('Failed to fetch modules');
-    } finally {
-      setLoading(false);
-    }
-  }, [accessToken]);
-
+      try {
+        setLoading(true);
+        const response = await axios.get(`${ENDPOINT}/modules/${courseId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setModules(normalizeModules(response.data.modules ?? []));
+        setIsStaff(response.data.isStaff);
+        setCanDeleteModule(response.data.canDeleteModule);
+        setCanAddModule(response.data.canAddModule);
+      } catch (err) {
+        setError("Failed to fetch modules");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken]
+  );
 
   const addModule = useCallback(
     async (
@@ -158,6 +170,9 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
         addModule,
         loading,
         error,
+        isStaff,
+        canAddModule,
+        canDeleteModule
       }}
     >
       {children}
