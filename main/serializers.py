@@ -73,7 +73,6 @@ class ModuleSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     course_image = serializers.ImageField(required=False, allow_null=True)
     creator = AchieveUserSerializer(read_only=True)
-    lesson_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Course
@@ -99,6 +98,8 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class FlashcardSerializer(serializers.ModelSerializer):
+    lesson_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Flashcard
         fields = ["id", "flashcard_question", "flashcard_answer", "lesson_id"]

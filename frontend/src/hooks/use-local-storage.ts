@@ -37,7 +37,7 @@ const useLocalStorage = (key: string, defaultValue: string | null) => {
       if (event.key === key) {
         try {
           // If event.newValue is null, it means the key was removed.
-          setStoredValue(event.newValue ? JSON.parse(event.newValue) : defaultValue);
+          setStoredValue(event.newValue ? event.newValue : defaultValue);
         } catch (error) {
           console.warn(`Error parsing localStorage key “${key}”:`, error);
         }

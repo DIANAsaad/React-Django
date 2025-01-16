@@ -1,11 +1,26 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useModuleContext } from "../../../context/ModuleContext";
+import { useFlashcardContext } from "../../../context/FlashcardContext";
 import "../../../styles/Course&LessonPage.css";
 
 const ModulePage: React.FC = () => {
   const { modules, loading, error, canAddModule, isStaff } = useModuleContext();
   const { moduleId } = useParams<{ moduleId: string }>();
+  const {
+    flashcards,
+    fetchFlashcards,
+    loading: flashcardLoading,
+  } = useFlashcardContext();
+
+ 
+  useEffect(() => {
+
+    fetchFlashcards(Number(moduleId));
+    console.log(flashcards, moduleId)
+  }, [moduleId, fetchFlashcards]);
+
+
 
   const module = useMemo(() => {
     return modules?.find((c) => c.id === parseInt(moduleId!, 10));
@@ -44,12 +59,13 @@ const ModulePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{module.module_title}</h1>
               <p className="text-muted ">{module.topic}</p>
-              {isStaff && canAddModule && ( <p className="text-muted ">
-                
-                {" "}
-                <strong>Created by: </strong>{" "}
-                {`${module.module_creator.first_name} ${module.module_creator.last_name}`}
-              </p>)}
+              {isStaff && canAddModule && (
+                <p className="text-muted ">
+                  {" "}
+                  <strong>Created by: </strong>{" "}
+                  {`${module.module_creator.first_name} ${module.module_creator.last_name}`}
+                </p>
+              )}
             </div>
           </div>
           {lessonPdfUrl && (
@@ -66,7 +82,24 @@ const ModulePage: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
+          {flashcardLoading ? (
+             console.log(flashcards),
+            <div className="flashcard-alert">
+              Loading lesson's flashcards...
+            </div>
+          ) : flashcards && flashcards.length > 0 ? (
+           
+            flashcards.map((flashcard) => (
+              <div key={flashcard.id}>
+                <div className="material-box p-4 shadow-sm rounded">
+                  <strong>Lesson Flashcards: </strong>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="flashcard-alert">No flashcards available.</div>
+          )}
+        </div> 
       </div>
     </>
   );

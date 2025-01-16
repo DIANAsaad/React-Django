@@ -59,7 +59,7 @@ export const FlashcardProvider = ({children}: {children: ReactNode}) => {
             setLoading(false);
           }
         },
-        [accessToken]
+        [accessToken, setFlashcards]
       );
 
 

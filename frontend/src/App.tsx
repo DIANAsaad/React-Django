@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext"; 
 import { ModuleProvider } from './context/ModuleContext';
+import {FlashcardProvider} from './context/FlashcardContext'
 
 const App: React.FC = () => {
 
@@ -62,7 +63,9 @@ const AppWrapper: React.FC = () => (
   <AuthProvider>
     <CourseProvider>
       <ModuleProvider >
+        <FlashcardProvider>
         <App />
+        </FlashcardProvider>
       </ModuleProvider>
     </CourseProvider>
   </AuthProvider>

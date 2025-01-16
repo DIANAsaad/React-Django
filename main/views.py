@@ -1,7 +1,7 @@
 import logging
 from django.contrib.auth import logout as logout
-from main.models import Course, Module
-
+from main.models import Course, Module, Flashcard
+from django.shortcuts import get_object_or_404
 from main.utils import delete_object
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -79,6 +79,7 @@ class GetUserView(APIView):
 
     def get(self, request, *args, **kwargs):
         serializer = AchieveUserSerializer(request.user)
+        
         return Response(serializer.data)
 
 
@@ -151,11 +152,25 @@ class CoursePageView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
+# Components of the Module (lesson) page
+
+class GetFlashcardView(APIView):
+    permission_classes= [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        lesson_id=kwargs.get("lesson_id")
+        flashcards=get_object_or_404(Flashcard,lesson_id=lesson_id)
+        data={
+            "flashcards": FlashcardSerializer(flashcards).data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
 
 # Functionality
 
 # Course
-
+ 
 
 class AddCourseView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrHasAddCoursePermission]
