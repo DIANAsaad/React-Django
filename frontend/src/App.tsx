@@ -4,15 +4,15 @@ import Welcome from "./components/Welcome";
 import Home from "./components/Home";
 import Base from "./components/base/Base";
 import CoursePage from "./components/coursePages/CoursePage";
-import ModulePage from "./components/coursePages/modules/ModulePage"
+import ModulePage from "./components/coursePages/modules/ModulePage";
+import FlashcardPage from './components/coursePages/modules/flashcard/FlashcardPage';
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
-import { CourseProvider } from "./context/CourseContext"; 
-import { ModuleProvider } from './context/ModuleContext';
-import {FlashcardProvider} from './context/FlashcardContext'
+import { CourseProvider } from "./context/CourseContext";
+import { ModuleProvider } from "./context/ModuleContext";
+import { FlashcardProvider } from "./context/FlashcardContext";
 
 const App: React.FC = () => {
-
   return (
     <Router>
       {/* Routes to handle different pages */}
@@ -54,6 +54,17 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/flashcardPage/:moduleId"
+          element={
+            <ProtectedRoute>
+              <Base>
+                <FlashcardPage />
+              </Base>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
@@ -62,14 +73,13 @@ const App: React.FC = () => {
 const AppWrapper: React.FC = () => (
   <AuthProvider>
     <CourseProvider>
-      <ModuleProvider >
+      <ModuleProvider>
         <FlashcardProvider>
-        <App />
+          <App />
         </FlashcardProvider>
       </ModuleProvider>
     </CourseProvider>
   </AuthProvider>
 );
-
 
 export default AppWrapper;

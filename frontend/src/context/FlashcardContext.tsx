@@ -14,6 +14,7 @@ import {
 
 interface Flashcard{
     id: number;
+    lesson_id:number;
     question: string;
     answer:string
 }
@@ -59,7 +60,7 @@ export const FlashcardProvider = ({children}: {children: ReactNode}) => {
             setLoading(false);
           }
         },
-        [accessToken, setFlashcards]
+        [accessToken]
       );
 
 

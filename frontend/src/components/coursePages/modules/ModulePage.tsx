@@ -1,11 +1,12 @@
 import React, { useMemo, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useModuleContext } from "../../../context/ModuleContext";
 import { useFlashcardContext } from "../../../context/FlashcardContext";
 import "../../../styles/Course&LessonPage.css";
 
 const ModulePage: React.FC = () => {
-  const { modules, loading, error, canAddModule, isStaff } = useModuleContext();
+  const { modules, loading, error, canAddModule, isStaff, fetchModulesById } =
+    useModuleContext();
   const { moduleId } = useParams<{ moduleId: string }>();
   const {
     flashcards,
@@ -13,19 +14,17 @@ const ModulePage: React.FC = () => {
     loading: flashcardLoading,
   } = useFlashcardContext();
 
- 
   useEffect(() => {
-
-    fetchFlashcards(Number(moduleId));
-    console.log(flashcards, moduleId)
-  }, [moduleId, fetchFlashcards]);
-
-
+    if (moduleId) {
+      fetchFlashcards(Number(moduleId));
+      fetchModulesById(Number(moduleId));
+    }
+  }, [moduleId, fetchFlashcards, fetchModulesById]);
 
   const module = useMemo(() => {
-    return modules?.find((c) => c.id === parseInt(moduleId!, 10));
+    return modules?.find((m) => m.id === parseInt(moduleId!, 10));
   }, [modules, moduleId]);
-
+  const navigate = useNavigate();
   if (loading) {
     return <div>Loading Lesson...</div>;
   }
@@ -83,23 +82,29 @@ const ModulePage: React.FC = () => {
             </div>
           )}
           {flashcardLoading ? (
-             console.log(flashcards),
-            <div className="flashcard-alert">
-              Loading lesson's flashcards...
-            </div>
+            (console.log(flashcards),
+            (
+              <div className="flashcard-alert">
+                Loading lesson's flashcards...
+              </div>
+            ))
           ) : flashcards && flashcards.length > 0 ? (
-           
             flashcards.map((flashcard) => (
-              <div key={flashcard.id}>
+              <div
+                key={flashcard.id}
+                onClick={() => {
+                  navigate(`/flashcardPage/${module.id}`);
+                }}
+              >
                 <div className="material-box p-4 shadow-sm rounded">
-                  <strong>Lesson Flashcards: </strong>
+                  <strong>Lesson Flashcards: </strong> Access your Flashcards
                 </div>
               </div>
             ))
           ) : (
             <div className="flashcard-alert">No flashcards available.</div>
           )}
-        </div> 
+        </div>
       </div>
     </>
   );

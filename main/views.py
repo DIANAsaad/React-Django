@@ -79,7 +79,7 @@ class GetUserView(APIView):
 
     def get(self, request, *args, **kwargs):
         serializer = AchieveUserSerializer(request.user)
-        
+
         return Response(serializer.data)
 
 
@@ -115,7 +115,7 @@ class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        
+
         courses = Course.objects.all()
         is_staff = request.user.is_staff
         can_delete_course = request.user.has_perm("main.delete_course")
@@ -139,9 +139,7 @@ class CoursePageView(APIView):
     def get(self, request, *args, **kwargs):
         course_id = kwargs.get("course_id")
         is_staff = request.user.is_staff
-        can_add_module = request.user.has_perms(
-            ["main.add_module"]
-        ) 
+        can_add_module = request.user.has_perms(["main.add_module"])
         can_delete_module = request.user.has_perm("main.delete_module")
         modules = Module.objects.filter(course_id=course_id).all()
         data = {
@@ -152,25 +150,43 @@ class CoursePageView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-# Components of the Module (lesson) page
 
-class GetFlashcardView(APIView):
-    permission_classes= [IsAuthenticated]
+# Components of the Module (lesson) page
+class GetModuleView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        lesson_id=kwargs.get("lesson_id")
-        flashcards=get_object_or_404(Flashcard,lesson_id=lesson_id)
-        data={
-            "flashcards": FlashcardSerializer(flashcards).data
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        module_id = kwargs.get("module_id")
+        try:
+            module = get_object_or_404(Module, id=module_id)
 
+            data = {
+                "module": ModuleSerializer(module).data,
+                "isStaff": request.user.is_staff,
+                "canAddModule": request.user.has_perm("add_module"),
+                "canDeleteModule": request.user.has_perm("delete_module"),
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except Module.DoesNotExist:
+            return Response(
+                {"error": "Module not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class GetFlashcardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        lesson_id = kwargs.get("lesson_id")
+        flashcards = Flashcard.objects.filter(lesson_id=lesson_id).all()
+        data = {"flashcards": FlashcardSerializer(flashcards, many=True).data}
+        return Response(data, status=status.HTTP_200_OK)
 
 
 # Functionality
 
 # Course
- 
+
 
 class AddCourseView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrHasAddCoursePermission]

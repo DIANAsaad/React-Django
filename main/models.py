@@ -125,8 +125,8 @@ class Flashcard(models.Model):
     lesson = models.ForeignKey(
         Module, on_delete=models.CASCADE, related_name="flashcards"
     )
-    flashcard_question = models.TextField()
-    flashcard_answer = models.TextField()
+    question = models.TextField()
+    answer = models.TextField()
 
 
 # QUIZ

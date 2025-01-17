@@ -29,6 +29,7 @@ interface ModuleContextProps {
   modules: Module[] | null;
   fetchModules: (courseId: number) => Promise<void>;
   deleteModule: (moduleId: number) => Promise<void>;
+  fetchModulesById: (moduleId: number) => Promise<void>;
   addModule: (
     courseId: number,
     Module_name: string,
@@ -38,10 +39,9 @@ interface ModuleContextProps {
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
-  isStaff:boolean;
-  canAddModule:boolean;
-  canDeleteModule:boolean;
-  
+  isStaff: boolean;
+  canAddModule: boolean;
+  canDeleteModule: boolean;
 }
 
 const ModuleContext = createContext<ModuleContextProps | undefined>(undefined);
@@ -53,9 +53,7 @@ const normalizeModule = (module: Module) => ({
   module_image: module.module_image
     ? `${ENDPOINT}${module.module_image}`
     : "/achieve_a_mark.png",
-  lesson_pdf:module.lesson_pdf
-    ? `${ENDPOINT}${module.lesson_pdf}`
-    : "/*"
+  lesson_pdf: module.lesson_pdf ? `${ENDPOINT}${module.lesson_pdf}` : "/*",
 });
 
 const normalizeModules = (modules: Module[]) => {
@@ -70,7 +68,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [canDeleteModule, setCanDeleteModule] = useState<boolean>(false);
-  const [canAddModule, setCanAddModule] = useState<boolean>(false); 
+  const [canAddModule, setCanAddModule] = useState<boolean>(false);
 
   const fetchModules = useCallback(
     async (courseId: number) => {
@@ -90,6 +88,37 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
         setCanAddModule(response.data.canAddModule);
       } catch (err) {
         setError("Failed to fetch modules");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken]
+  );
+
+  // This function will fetch modules using the ID's
+
+  const fetchModulesById = useCallback(
+    async (moduleId: number) => {
+      if (!accessToken) {
+        setError("No access token available");
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await axios.get(`${ENDPOINT}/module/${moduleId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const module = normalizeModule(response.data.module);
+        setModules((prevModules) => [
+          ...prevModules.filter((m) => m.id !== module.id),
+          module,
+        ]);
+        setIsStaff(response.data.isStaff);
+        setCanDeleteModule(response.data.canDeleteModule);
+        setCanAddModule(response.data.canAddModule);
+      } catch (err) {
+        setError("Failed to fetch module");
       } finally {
         setLoading(false);
       }
@@ -166,13 +195,14 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
       value={{
         modules,
         fetchModules,
+        fetchModulesById,
         deleteModule,
         addModule,
         loading,
         error,
         isStaff,
         canAddModule,
-        canDeleteModule
+        canDeleteModule,
       }}
     >
       {children}

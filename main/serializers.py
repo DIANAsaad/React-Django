@@ -105,7 +105,7 @@ class FlashcardSerializer(serializers.ModelSerializer):
         fields = ["id", "flashcard_question", "flashcard_answer", "lesson_id"]
 
     def create(self, validated_data):
-        lesson_id = validated_data.pop("module_id")
+        lesson_id = validated_data.pop("lesson_id")
         lesson = get_object_or_404(Module, id=lesson_id)
         flashcard = Flashcard.objects.create(lesson=lesson, **validated_data)
         return flashcard
