@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useModuleContext } from "../../../context/ModuleContext";
 import { useFlashcardContext } from "../../../context/FlashcardContext";
 import "../../../styles/Course&LessonPage.css";
-
+import DropdownMenu from "../../DropdownMenu";
 const ModulePage: React.FC = () => {
   const { modules, loading, error, canAddModule, isStaff, fetchModulesById } =
     useModuleContext();
@@ -65,6 +65,31 @@ const ModulePage: React.FC = () => {
                   {`${module.module_creator.first_name} ${module.module_creator.last_name}`}
                 </p>
               )}
+            </div>
+            <div className="ms-auto">
+              <DropdownMenu    buttonContent={<i className="fas fa-pen"></i>} options={[
+                          {
+                            label: "Add Flashards",
+                            action: () =>{},
+                          },
+                          {
+                            label: "Add Quizzes",
+                            action: () =>{},
+                          },
+                          {
+                            label: "Add External Links",
+                            action: () =>{},
+                            
+                          },
+                          {
+                            label: "Add Activities",
+                            action: () =>{},
+                          },
+                          {
+                            label: "Add Comment",
+                            action: () =>{},
+                          },
+                        ]} />
             </div>
           </div>
           {lessonPdfUrl && (

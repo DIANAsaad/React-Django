@@ -28,6 +28,7 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => {
         {(isStaff || canDeleteCourse) && (
           <div className="dropdown-container">
             <DropdownMenu
+              buttonContent={"⋮"}
               options={[
                 {
                   label: 'Delete',

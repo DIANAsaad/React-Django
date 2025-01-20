@@ -105,6 +105,7 @@ const CoursePage: React.FC = () => {
                     {isStaff || canDeleteModule &&(
                     <div className="dropdownmenu">
                       <DropdownMenu
+                      buttonContent={"..."}
                         options={[
                           {
                             label: "Delete",

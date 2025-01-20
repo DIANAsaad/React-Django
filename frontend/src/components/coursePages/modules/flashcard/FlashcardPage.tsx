@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect} from "react";
 import { useParams } from "react-router-dom";
 import { useFlashcardContext } from "../../../../context/FlashcardContext";
-import "../../../styles/flashcards.css";
+import "../../../../styles/flashcards.css"; 
+import Flashcard from "./Flashcard";
 
 const FlashcardPage: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
@@ -35,3 +36,4 @@ const FlashcardPage: React.FC = () => {
   );
 };
 
+export default FlashcardPage;

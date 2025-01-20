@@ -102,7 +102,7 @@ class FlashcardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flashcard
-        fields = ["id", "flashcard_question", "flashcard_answer", "lesson_id"]
+        fields = ["id", "question", "answer", "lesson_id"]
 
     def create(self, validated_data):
         lesson_id = validated_data.pop("lesson_id")

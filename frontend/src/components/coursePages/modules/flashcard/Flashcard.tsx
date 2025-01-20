@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useFlashcardContext } from "../../../../context/FlashcardContext";
-import "../../../styles/flashcards.css";
-
+import React, { useState } from "react";
+import "../../../../styles/flashcards.css"; // Import the CSS file for styling
 
 interface FlashcardProps {
   question: string;
@@ -20,15 +17,18 @@ const Flashcard: React.FC<FlashcardProps> = ({ question, answer }) => {
     <div className={`flashcard ${flipped ? "flipped" : ""}`} onClick={handleFlip}>
       <div className="flashcard-inner">
         <div className="flashcard-front">
-          <strong>Question:</strong> {question}
+          <div className="flashcard-content">
+            <p>{question}</p>
+          </div>
         </div>
         <div className="flashcard-back">
-          <strong>Answer:</strong> {answer}
+          <div className="flashcard-content">
+            <p>{answer}</p>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default FlashcardPage;
-
+export default Flashcard;
