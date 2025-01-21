@@ -64,43 +64,44 @@ export const FlashcardProvider = ({children}: {children: ReactNode}) => {
       );
 
 
-    const addFlashcard = useCallback(
-    async (
-      moduleId: number,
-      question: string,
-      answer:string
-     
-    ) => {
-      try {
-        const formData = new FormData();
-        formData.append("module_id", moduleId.toString());
-        formData.append("question", question);
-        formData.append("answer", answer);
-        const response = await axios.post(`${ENDPOINT}/add_flashcard`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        setFlashcards((prevFlashcards) => [
-          ...(prevFlashcards || []),
-         response.data,
-        ]);
-      } catch (error: any) {
-        console.error(
-          `Error adding flashcard:`,
-          error.response?.data || error.message
-        );
-        alert(
-          `An error occurred while adding the flashcard: ${
-            error.response?.data?.message || error.message
-          }`
-        );
-      }
-    },
-    [accessToken]
-  );
+      const addFlashcard = useCallback(
+        async (moduleId: number, question: string, answer: string) => {
+          if (!moduleId || !question || !answer) {
+            alert("All fields are required to add a flashcard.");
+            return;
+          }
+      
+          try {
+            const formData = new FormData();
+            formData.append("lesson_id", moduleId.toString());
+            formData.append("question", question);
+            formData.append("answer", answer);
+      
+            const response = await axios.post(
+              `${ENDPOINT}/add_flashcard`,
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              }
+            );
+      
+            setFlashcards((prevFlashcards) => [
+              ...(prevFlashcards || []),
+              response.data,
+            ]);
+          } catch (error: any) {
+            const errorMessage =
+              error.response?.data?.message || error.message || "Unknown error";
+            console.error(`Error adding flashcard: ${errorMessage}`);
+            alert(`An error occurred while adding the flashcard: ${errorMessage}`);
+          }
+        },
+        [accessToken]
+      );
+      
 
   const deleteFlashcard = useCallback(
     async (flashcardId: number) => {

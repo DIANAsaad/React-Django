@@ -1,5 +1,9 @@
+.row {
+  margin-top: 0;
+}
 .container-cstm-fluid {
   margin-left: 0;
+  margin-top:0;
 }
 
 .title {
@@ -37,25 +41,22 @@
 .details p {
   font-family: "Georgia", serif;
   color: #343a40;
-  font-weight: normal; 
-} 
+  font-weight: normal;
+}
 
 .modules-box {
   background-color: #fff5f0;
   border-radius: 5px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
-  padding:10px;
+  padding: 10px;
   padding-bottom: 0;
-
 }
 
 .modules-box:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
-
-
 
 .material-box {
   background-color: #ffe7d6;
@@ -69,7 +70,7 @@
   text-align: left;
 }
 
-.material-box a{
+.material-box a {
   text-decoration: none;
   color: black;
 }
@@ -118,16 +119,15 @@
   overflow-wrap: anywhere;
 }
 
-
 .btn-success {
-  background-color: #ff6000; 
-  border-color: #ff6000; 
-  color: white; 
+  background-color: #ff6000;
+  border-color: #ff6000;
+  color: white;
 }
 
 .btn-success:hover {
-  background-color: #ff6000; 
-  border-color: #ff6000; 
+  background-color: #ff6000;
+  border-color: #ff6000;
 }
 
 .form-container {
@@ -139,7 +139,6 @@
   width: 100px;
   height: 100px;
   margin-right: 20px;
-
 }
 
 .image-upload img {
@@ -147,7 +146,6 @@
   height: 100%;
   object-fit: cover;
   margin-top: -25px;
-
 }
 
 .form-fields {
@@ -156,17 +154,16 @@
 
 .module-details p {
   margin-top: 10px;
-  font-weight: normal; 
+  font-weight: normal;
 }
 
-.module-image{
+.module-image {
   width: 100px;
   height: 100px;
   margin-right: 20px;
-
 }
 
-.module-img{
+.module-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -178,7 +175,7 @@
 }
 
 .flashcard-alert {
-  margin-top: 20px; 
+  margin-top: 20px;
   padding: 10px;
   text-align: center;
 }

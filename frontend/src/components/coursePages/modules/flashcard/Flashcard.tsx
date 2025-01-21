@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../../../styles/flashcards.css"; // Import the CSS file for styling
+import "../../../../styles/Flashcards.css"; // Import the CSS file for styling
 
 interface FlashcardProps {
   question: string;

@@ -5,12 +5,13 @@ import Home from "./components/Home";
 import Base from "./components/base/Base";
 import CoursePage from "./components/coursePages/CoursePage";
 import ModulePage from "./components/coursePages/modules/ModulePage";
-import FlashcardPage from './components/coursePages/modules/flashcard/FlashcardPage';
+import FlashcardPage from "./components/coursePages/modules/flashcard/FlashcardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext";
 import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
+import AddFlashcard from "./components/coursePages/modules/flashcard/AddFlashcard";
 
 const App: React.FC = () => {
   return (
@@ -61,6 +62,17 @@ const App: React.FC = () => {
             <ProtectedRoute>
               <Base>
                 <FlashcardPage />
+              </Base>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/addFlashcard/:moduleId"
+          element={
+            <ProtectedRoute>
+              <Base>
+                <AddFlashcard />
               </Base>
             </ProtectedRoute>
           }

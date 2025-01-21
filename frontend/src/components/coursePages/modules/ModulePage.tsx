@@ -25,6 +25,7 @@ const ModulePage: React.FC = () => {
     return modules?.find((m) => m.id === parseInt(moduleId!, 10));
   }, [modules, moduleId]);
   const navigate = useNavigate();
+
   if (loading) {
     return <div>Loading Lesson...</div>;
   }
@@ -67,29 +68,31 @@ const ModulePage: React.FC = () => {
               )}
             </div>
             <div className="ms-auto">
-              <DropdownMenu    buttonContent={<i className="fas fa-pen"></i>} options={[
-                          {
-                            label: "Add Flashards",
-                            action: () =>{},
-                          },
-                          {
-                            label: "Add Quizzes",
-                            action: () =>{},
-                          },
-                          {
-                            label: "Add External Links",
-                            action: () =>{},
-                            
-                          },
-                          {
-                            label: "Add Activities",
-                            action: () =>{},
-                          },
-                          {
-                            label: "Add Comment",
-                            action: () =>{},
-                          },
-                        ]} />
+              <DropdownMenu    buttonContent={<i className="fas fa-pen"></i>} 
+                    options={[
+                      {
+                        label: "Add Flashcards",
+                        action: () => navigate(`/addFlashcard/${module.id}`),
+                      },
+                      {
+                        label: "Add Quizzes",
+                        action: () => {},
+                      },
+                      {
+                        label: "Add External Links",
+                        action: () => {},
+                      },
+                      {
+                        label: "Add Activities",
+                        action: () => {},
+                      },
+                      {
+                        label: "Add Comment",
+                        action: () => {},
+                      },
+                    ]}
+                  />
+    
             </div>
           </div>
           {lessonPdfUrl && (
@@ -107,16 +110,15 @@ const ModulePage: React.FC = () => {
             </div>
           )}
           {flashcardLoading ? (
-            (console.log(flashcards),
+    
             (
               <div className="flashcard-alert">
                 Loading lesson's flashcards...
               </div>
             ))
-          ) : flashcards && flashcards.length > 0 ? (
-            flashcards.map((flashcard) => (
+           : flashcards && flashcards.length > 0 ? (
+        
               <div
-                key={flashcard.id}
                 onClick={() => {
                   navigate(`/flashcardPage/${module.id}`);
                 }}
@@ -125,7 +127,7 @@ const ModulePage: React.FC = () => {
                   <strong>Lesson Flashcards: </strong> Access your Flashcards
                 </div>
               </div>
-            ))
+      
           ) : (
             <div className="flashcard-alert">No flashcards available.</div>
           )}

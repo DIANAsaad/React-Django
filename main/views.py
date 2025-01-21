@@ -260,10 +260,11 @@ class AddFlashcardView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kargs):
+        print(request.data)
         serializer = FlashcardSerializer(data=request.data)
         if serializer.is_valid():
             flashcard = serializer.save()
             return Response(
-                FlashcardSerializer((flashcard).data, status=status.HTTP_201_CREATED)
+                FlashcardSerializer(flashcard).data, status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

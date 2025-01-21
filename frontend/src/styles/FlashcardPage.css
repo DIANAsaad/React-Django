@@ -1,0 +1,45 @@
+.flashcard-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.navigation-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-circular {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.btn-previous {
+  border-color:  #332254;
+  color: #332254;
+}
+
+.btn-previous:hover {
+  background-color: #332254;
+  color: #fff;}
+
+.btn-next {
+  border-color: #ff6000;
+  color: #ff6000;
+}
+
+.btn-next:hover {
+  background-color: #ff6000;
+  color:white;
+}

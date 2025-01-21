@@ -1,10 +1,10 @@
 .navbar {
-  background-color: #bc98c5;
+  background-color:  #332254;
   box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+ 
   transition: box-shadow 0.3s ease;
   align-items: center;
-  margin-bottom: 15px;
+
 }
 
 .navbar .navbar-brand {

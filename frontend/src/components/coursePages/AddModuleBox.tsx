@@ -26,7 +26,7 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
       setLoading(true);
       try {
         await addModule(
-          (formData.course_id = courseId),
+          formData.course_id,
           formData.module_title,
           formData.topic,
           formData.module_image,
