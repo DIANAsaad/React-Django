@@ -3,6 +3,7 @@ import { useFlashcardContext } from "../../../../context/FlashcardContext";
 import { useParams } from "react-router-dom";
 import Flashcard from "./Flashcard"; // Assuming you have a Flashcard component
 import "../../../../styles/FlashcardPage.css"; // Import CSS for styling
+import BaseWrapper from "../../../base/BaseWrapper";
 
 const FlashcardPage: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
@@ -42,10 +43,10 @@ const FlashcardPage: React.FC = () => {
             answer={flashcards[currentIndex].answer}
           />
           <div className="navigation-buttons">
-            <button onClick={handlePrevious} className="btn-circular btn-previous"  disabled={flashcards.length <= 1}>
+            <button onClick={handlePrevious} className="btn-circular btn-previous"  disabled={currentIndex === 0}>
             &#8592; 
             </button>
-            <button onClick={handleNext} className="btn-circular btn-next" >
+            <button onClick={handleNext} className="btn-circular btn-next"  disabled={currentIndex === flashcards.length-1} >
             &#8594;
             </button>
           </div>
@@ -57,4 +58,19 @@ const FlashcardPage: React.FC = () => {
   );
 };
 
-export default FlashcardPage;
+
+const FlashcardPageWrapper: React.FC = () => {
+
+
+  return (
+    <BaseWrapper
+      options={[
+        { link: "/home", label: "Home" },
+   
+      ]}
+    >
+      <FlashcardPage />
+    </BaseWrapper>
+  );
+}; 
+export default FlashcardPageWrapper;

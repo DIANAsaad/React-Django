@@ -4,6 +4,8 @@ import { useModuleContext } from "../../../context/ModuleContext";
 import { useFlashcardContext } from "../../../context/FlashcardContext";
 import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
+import BaseWrapper from "../../base/BaseWrapper";
+
 const ModulePage: React.FC = () => {
   const { modules, loading, error, canAddModule, isStaff, fetchModulesById } =
     useModuleContext();
@@ -26,6 +28,37 @@ const ModulePage: React.FC = () => {
   }, [modules, moduleId]);
   const navigate = useNavigate();
 
+  if (!module) {
+    return <div>Lesson not found</div>;
+  }
+
+  const options = [
+    ...(isStaff && canAddModule
+      ? [
+          {
+            label: "Add Flashcards",
+            action: () => navigate(`/addFlashcard/${module.id}`),
+          },
+          {
+            label: "Add Quizzes",
+            action: () => {},
+          },
+          {
+            label: "Add External Links",
+            action: () => {},
+          },
+          {
+            label: "Add Activities",
+            action: () => {},
+          },
+        ]
+      : []),
+    {
+      label: "Add Comment",
+      action: () => {},
+    },
+  ];
+
   if (loading) {
     return <div>Loading Lesson...</div>;
   }
@@ -34,9 +67,6 @@ const ModulePage: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
-  if (!module) {
-    return <div>Lesson not found</div>;
-  }
   const lessonPdfUrl =
     module.lesson_pdf instanceof File
       ? URL.createObjectURL(module.lesson_pdf)
@@ -68,31 +98,10 @@ const ModulePage: React.FC = () => {
               )}
             </div>
             <div className="ms-auto">
-              <DropdownMenu    buttonContent={<i className="fas fa-pen"></i>} 
-                    options={[
-                      {
-                        label: "Add Flashcards",
-                        action: () => navigate(`/addFlashcard/${module.id}`),
-                      },
-                      {
-                        label: "Add Quizzes",
-                        action: () => {},
-                      },
-                      {
-                        label: "Add External Links",
-                        action: () => {},
-                      },
-                      {
-                        label: "Add Activities",
-                        action: () => {},
-                      },
-                      {
-                        label: "Add Comment",
-                        action: () => {},
-                      },
-                    ]}
-                  />
-    
+              <DropdownMenu
+                buttonContent={<i className="fas fa-pen"></i>}
+                options={options}
+              />
             </div>
           </div>
           {lessonPdfUrl && (
@@ -110,24 +119,19 @@ const ModulePage: React.FC = () => {
             </div>
           )}
           {flashcardLoading ? (
-    
-            (
-              <div className="flashcard-alert">
-                Loading lesson's flashcards...
+            <div className="flashcard-alert">
+              Loading lesson's flashcards...
+            </div>
+          ) : flashcards && flashcards.length > 0 ? (
+            <div
+              onClick={() => {
+                navigate(`/flashcardPage/${module.id}`);
+              }}
+            >
+              <div className="material-box p-4 shadow-sm rounded">
+                <strong>Lesson Flashcards: </strong> Access your Flashcards
               </div>
-            ))
-           : flashcards && flashcards.length > 0 ? (
-        
-              <div
-                onClick={() => {
-                  navigate(`/flashcardPage/${module.id}`);
-                }}
-              >
-                <div className="material-box p-4 shadow-sm rounded">
-                  <strong>Lesson Flashcards: </strong> Access your Flashcards
-                </div>
-              </div>
-      
+            </div>
           ) : (
             <div className="flashcard-alert">No flashcards available.</div>
           )}
@@ -137,4 +141,20 @@ const ModulePage: React.FC = () => {
   );
 };
 
-export default ModulePage;
+
+const ModulePageWrapper: React.FC = () => {
+  const { courseId } = useParams<{ courseId: string }>();
+
+  return (
+    <BaseWrapper
+      options={[
+        { link: "/home", label: "Home" },
+        { link: `/coursePage/${courseId}`, label: "Back to Course" },
+      ]}
+    >
+      <ModulePage />
+    </BaseWrapper>
+  );
+};
+
+export default ModulePageWrapper;

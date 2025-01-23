@@ -17,11 +17,13 @@ const Flashcard: React.FC<FlashcardProps> = ({ question, answer }) => {
     <div className={`flashcard ${flipped ? "flipped" : ""}`} onClick={handleFlip}>
       <div className="flashcard-inner">
         <div className="flashcard-front">
+        <img src="/achieve_a_mark.png"  className="watermark" />
           <div className="flashcard-content">
             <p>{question}</p>
           </div>
         </div>
         <div className="flashcard-back">
+        <img src="/achieve_a_mark.png"  className="watermark" />
           <div className="flashcard-content">
             <p>{answer}</p>
           </div>

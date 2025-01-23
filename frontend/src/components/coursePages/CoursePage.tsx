@@ -6,6 +6,7 @@ import "../../styles/Course&LessonPage.css";
 import DropdownMenu from "../DropdownMenu";
 import AddModuleBox from "./AddModuleBox";
 import { useNavigate } from "react-router-dom";
+import BaseWrapper from "../base/BaseWrapper";
 
 const CoursePage: React.FC = () => {
   const {
@@ -23,7 +24,7 @@ const CoursePage: React.FC = () => {
     loading: moduleLoading,
     error: moduleError,
     deleteModule,
-    canDeleteModule
+    canDeleteModule,
   } = useModuleContext();
 
   const navigate = useNavigate();
@@ -88,7 +89,7 @@ const CoursePage: React.FC = () => {
                       <div
                         className="module-image"
                         onClick={() => {
-                          navigate(`/modulePage/${module.id}`);
+                          navigate(`/${course.id}/modulePage/${module.id}`);
                         }}
                       >
                         <img
@@ -102,20 +103,21 @@ const CoursePage: React.FC = () => {
                         <p>{module.topic}</p>
                       </div>
                     </div>
-                    {isStaff || canDeleteModule &&(
-                    <div className="dropdownmenu">
-                      <DropdownMenu
-                      buttonContent={"..."}
-                        options={[
-                          {
-                            label: "Delete",
-                            action: () => {
-                              deleteModule(module.id);
+                    {(isStaff || canDeleteModule) && (
+                      <div className="dropdownmenu">
+                        <DropdownMenu
+                          buttonContent={"⋮"}
+                          options={[
+                            {
+                              label: "Delete",
+                              action: () => {
+                                deleteModule(module.id);
+                              },
                             },
-                          },
-                        ]}
-                      />
-                    </div>)}
+                          ]}
+                        />
+                      </div>
+                    )}
                   </li>
                 </ul>
               </div>
@@ -141,4 +143,11 @@ const CoursePage: React.FC = () => {
   );
 };
 
-export default CoursePage;
+const CoursePageWrapper: React.FC = () => {
+  return (
+    <BaseWrapper options={[{ link: "/home", label: "Home" }]}>
+      <CoursePage />
+    </BaseWrapper>
+  );
+};
+export default CoursePageWrapper;

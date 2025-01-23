@@ -25,6 +25,13 @@
   transition: background-color 0.3s;
 }
 
+.btn-circular:disabled,
+.btn-circular:disabled:hover {
+  cursor: not-allowed;
+  background-color: grey;
+  border-color: grey;
+  color: white;
+} 
 .btn-previous {
   border-color:  #332254;
   color: #332254;

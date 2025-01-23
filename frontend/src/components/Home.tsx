@@ -3,10 +3,10 @@ import CourseCard from "./homePage/CourseCard";
 import { useCourseContext } from "../context/CourseContext";
 import "../styles/Home.css";
 import AddCourseCard from "./homePage/AddCourseCard";
+import BaseWrapper from "./base/BaseWrapper";
 
 const Home: React.FC = () => {
-  const { courses, loading, error, isStaff, canAddCourse} = useCourseContext();
-
+  const { courses, loading, error, isStaff, canAddCourse } = useCourseContext();
 
   if (loading) {
     return <div>Loading courses...</div>;
@@ -20,14 +20,15 @@ const Home: React.FC = () => {
     return (
       <>
         <div>No courses available</div>
-        {(isStaff || canAddCourse) &&(
-        <div className="col-md-4">
-          <AddCourseCard />
-        </div>)}
+        {(isStaff || canAddCourse) && (
+          <div className="col-md-4">
+            <AddCourseCard />
+          </div>
+        )}
       </>
     );
   }
- 
+
   return (
     <>
       <div className="col-12 mb-4">
@@ -48,13 +49,21 @@ const Home: React.FC = () => {
               <CourseCard course={course} />
             </div>
           ))}
-          {(isStaff || canAddCourse) &&(
-        <div className="col-md-4">
-          <AddCourseCard />
-        </div>)}
+        {(isStaff || canAddCourse) && (
+          <div className="col-md-4">
+            <AddCourseCard />
+          </div>
+        )}
       </div>
     </>
   );
 };
 
-export default Home;
+const HomeWrapper: React.FC = () => {
+  return (
+    <BaseWrapper options={[{ link: "/*", label: "Dashboard" }]}>
+      <Home />
+    </BaseWrapper>
+  );
+};
+export default HomeWrapper;

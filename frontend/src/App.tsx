@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
-import Base from "./components/base/Base";
 import CoursePage from "./components/coursePages/CoursePage";
 import ModulePage from "./components/coursePages/modules/ModulePage";
 import FlashcardPage from "./components/coursePages/modules/flashcard/FlashcardPage";
@@ -27,31 +26,25 @@ const App: React.FC = () => {
           path="/home"
           element={
             <ProtectedRoute>
-              <Base>
-                <Home />
-              </Base>
+              <Home />
             </ProtectedRoute>
           }
         />
 
         <Route
-          path="/coursePage/:courseId"
+          path="/coursePage/:courseId/*"
           element={
             <ProtectedRoute>
-              <Base>
-                <CoursePage />
-              </Base>
+              <CoursePage />
             </ProtectedRoute>
           }
         />
 
         <Route
-          path="/modulePage/:moduleId"
+          path="/:courseId/modulePage/:moduleId"
           element={
             <ProtectedRoute>
-              <Base>
-                <ModulePage />
-              </Base>
+              <ModulePage />
             </ProtectedRoute>
           }
         />
@@ -60,9 +53,7 @@ const App: React.FC = () => {
           path="/flashcardPage/:moduleId"
           element={
             <ProtectedRoute>
-              <Base>
-                <FlashcardPage />
-              </Base>
+              <FlashcardPage />
             </ProtectedRoute>
           }
         />
@@ -71,9 +62,7 @@ const App: React.FC = () => {
           path="/addFlashcard/:moduleId"
           element={
             <ProtectedRoute>
-              <Base>
-                <AddFlashcard />
-              </Base>
+              <AddFlashcard />
             </ProtectedRoute>
           }
         />
