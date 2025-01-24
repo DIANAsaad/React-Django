@@ -13,7 +13,8 @@ from main.views import (
     AddFlashcardView,
     GetFlashcardView,
     GetModuleView,
-    DeleteFlashcardView
+    DeleteFlashcardView,
+    DeleteLessonFlashcardsView,
 )
 
 
@@ -44,5 +45,6 @@ urlpatterns = [
     ),
     path("add_flashcard", AddFlashcardView.as_view(), name="add_Flashcard"),
     path("delete_flashcard/<int:flashcard_id>", DeleteFlashcardView.as_view(), name="delete_Flashcard"),
+    path("delete_lesson_fashcards/<int:lesson_id>", DeleteLessonFlashcardsView.as_view(), name="delete_lesson_flaschards")
 
 ]

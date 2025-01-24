@@ -14,6 +14,7 @@ const ModulePage: React.FC = () => {
     flashcards,
     fetchFlashcards,
     loading: flashcardLoading,
+    deleteLessonFlashcards,
   } = useFlashcardContext();
 
   useEffect(() => {
@@ -157,7 +158,7 @@ const ModulePage: React.FC = () => {
                     options={[
                       {
                         label: "Delete",
-                        action: () => {},
+                        action: () => {deleteLessonFlashcards(Number(moduleId))},
                       },
                     ]}
                   />

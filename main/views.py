@@ -285,3 +285,20 @@ class DeleteFlashcardView(APIView):
             )
         except Flashcard.DoesNotExist:
             raise NotFound(detail="Flashcard not found.", code=status.HTTP_404_NOT_FOUND)
+
+class DeleteLessonFlashcardsView(APIView):
+    permission_classes= [IsAuthenticated]
+
+    def delete(self, request,*args, **kwargs):
+
+       lesson_id=kwargs.get("lesson_id")
+       if not lesson_id:
+            return Response(
+                {"detail": "Lesson ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+       try:
+            return delete_object(
+                request, app_label="main", model_name="Flashcard", object_id=lesson_id
+            )
+       except Flashcard.DoesNotExist:
+            raise NotFound(detail="Flashcard not found.", code=status.HTTP_404_NOT_FOUND)
