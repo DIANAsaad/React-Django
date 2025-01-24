@@ -59,6 +59,7 @@ const ModulePage: React.FC = () => {
     },
   ];
 
+
   if (loading) {
     return <div>Loading Lesson...</div>;
   }
@@ -67,6 +68,7 @@ const ModulePage: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
+
   const lessonPdfUrl =
     module.lesson_pdf instanceof File
       ? URL.createObjectURL(module.lesson_pdf)
@@ -74,6 +76,7 @@ const ModulePage: React.FC = () => {
       ? module.lesson_pdf
       : null;
 
+      
   return (
     <>
       <div className="row">
@@ -106,7 +109,9 @@ const ModulePage: React.FC = () => {
           </div>
           {lessonPdfUrl && (
             <div>
-              <div className="material-box p-4 shadow-sm rounded ">
+              <div className="material-box p-4 shadow-sm rounded  align-items-center justify-content-between ">
+                <div className="d-flex align-items-center justify-content-between">
+                <div className="material-box-details">
                 <strong>Lesson PDF: </strong>
                 <a
                   href={lessonPdfUrl}
@@ -115,7 +120,19 @@ const ModulePage: React.FC = () => {
                 >
                   Access and download your lesson
                 </a>
+                </div>
+                <DropdownMenu
+                    buttonContent={"..."}
+                    options={[
+                      {
+                        label: "Delete",
+                        action: () => {},
+                      },
+                    ]}
+                  />
+                  </div>
               </div>
+              
             </div>
           )}
           {flashcardLoading ? (
@@ -123,13 +140,28 @@ const ModulePage: React.FC = () => {
               Loading lesson's flashcards...
             </div>
           ) : flashcards && flashcards.length > 0 ? (
-            <div
-              onClick={() => {
-                navigate(`/flashcardPage/${module.id}`);
-              }}
-            >
-              <div className="material-box p-4 shadow-sm rounded">
-                <strong>Lesson Flashcards: </strong> Access your Flashcards
+            <div>
+              <div className="material-box p-4 shadow-sm rounded align-items-center">
+                <div className="d-flex align-items-center justify-content-between">
+                  <div
+                    className="material-box-details"
+                    onClick={() => {
+                      navigate(`/flashcardPage/${module.id}`);
+                    }}
+                  >
+                      <strong>Lesson Flashcards: </strong>
+                       Access your Flashcards
+                  </div>
+                  <DropdownMenu
+                    buttonContent={"..."}
+                    options={[
+                      {
+                        label: "Delete",
+                        action: () => {},
+                      },
+                    ]}
+                  />
+                </div>
               </div>
             </div>
           ) : (
@@ -140,7 +172,6 @@ const ModulePage: React.FC = () => {
     </>
   );
 };
-
 
 const ModulePageWrapper: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();

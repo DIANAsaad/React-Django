@@ -59,7 +59,7 @@
 }
 
 .material-box {
-  background-color: #ffe7d6;
+  background-color: #fff3e9;
   border-radius: 10px;
   font-size: 1rem;
   color: #333;
@@ -178,4 +178,9 @@
   margin-top: 20px;
   padding: 10px;
   text-align: center;
+}
+
+
+.material-box-details {
+  flex-grow: 1;
 }

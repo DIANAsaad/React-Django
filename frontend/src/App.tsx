@@ -32,7 +32,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/coursePage/:courseId/*"
+          path="/coursePage/:courseId/"
           element={
             <ProtectedRoute>
               <CoursePage />
@@ -48,7 +48,14 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="modulePage/:moduleId"
+          element={
+            <ProtectedRoute>
+              <ModulePage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/flashcardPage/:moduleId"
           element={

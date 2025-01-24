@@ -105,6 +105,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 
   const logout = useCallback(async () => {
+    setAccessToken(null);
+    setRefreshToken(null);
+    setUser(null);
     try {
       // Attempt to logout on the server side
       if (accessToken && refreshToken) {
@@ -116,11 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Logout failed', error);
-    } finally {
-      setAccessToken(null);
-      setRefreshToken(null);
-      setUser(null);
-    }
+    } 
   }, [accessToken, refreshToken, setAccessToken, setRefreshToken]);
 
   useEffect(() => {

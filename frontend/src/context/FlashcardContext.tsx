@@ -17,6 +17,7 @@ interface Flashcard{
     lesson_id:number;
     question: string;
     answer:string
+    module_id:number;
 }
 
 
@@ -105,6 +106,7 @@ export const FlashcardProvider = ({children}: {children: ReactNode}) => {
 
   const deleteFlashcard = useCallback(
     async (flashcardId: number) => {
+     
       const flashcard = flashcards.find((f) => f.id === flashcardId);
 
       if (!flashcard) {
@@ -126,6 +128,27 @@ export const FlashcardProvider = ({children}: {children: ReactNode}) => {
     [flashcards, accessToken]
   );
 
+
+const deleteLessonFlashcards = useCallback(
+
+  async(moduleId:number)=>{
+    const module_flashcards =flashcards.find((f)=> f.module_id===moduleId);
+    if (!module_flashcards) {
+      alert("Flashcards not found");
+      return;
+    }
+    try{
+      await axios.delete(`${ENDPOINT}/delete_lesson_flashcards/${moduleId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setFlashcards(flashcards.filter((f) => f.module_id !== moduleId));
+    } catch (error) {
+      console.error(`Error deleting flashcard:`, error);
+      alert(`An error occurred while deleting the flashcard. Please try again.`);
+    }
+    }, [flashcards, accessToken]
+    
+)
   return (
     <FlashcardContext.Provider
       value={{

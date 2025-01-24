@@ -268,3 +268,20 @@ class AddFlashcardView(APIView):
                 FlashcardSerializer(flashcard).data, status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DeleteFlashcardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request,*args,**kwargs):
+        flashcard_id = kwargs.get("flashcard_id")
+
+        if not flashcard_id:
+            return Response(
+                {"detail": "Flashcard ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            return delete_object(
+                request, app_label="main", model_name="Flashcard", object_id=flashcard_id
+            )
+        except Flashcard.DoesNotExist:
+            raise NotFound(detail="Flashcard not found.", code=status.HTTP_404_NOT_FOUND)

@@ -6,6 +6,17 @@
   padding: 20px;
 }
 
+.flashcard-container {
+  display: flex;
+  justify-content: space-between; /* Ensures the options are at the right */
+  align-items: center;
+  width: 100%;
+}
+
+.flashcard-options {
+  margin-left: auto; /* Pushes the options to the extreme right */
+}
+
 .navigation-buttons {
   margin-top: 20px;
   display: flex;
@@ -49,4 +60,9 @@
 .btn-next:hover {
   background-color: #ff6000;
   color:white;
+}
+
+
+.flashcard-options {
+  margin-right: auto; 
 }
