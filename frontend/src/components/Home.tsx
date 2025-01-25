@@ -6,7 +6,7 @@ import AddCourseCard from "./homePage/AddCourseCard";
 import BaseWrapper from "./base/BaseWrapper";
 
 const Home: React.FC = () => {
-  const { courses, loading, error, isStaff, canAddCourse } = useCourseContext();
+  const { courses, loading, error, isStaff, isInstructor } = useCourseContext();
 
   if (loading) {
     return <div>Loading courses...</div>;
@@ -20,7 +20,7 @@ const Home: React.FC = () => {
     return (
       <>
         <div>No courses available</div>
-        {(isStaff || canAddCourse) && (
+        {(isStaff || isInstructor) && (
           <div className="col-md-4">
             <AddCourseCard />
           </div>
@@ -49,7 +49,7 @@ const Home: React.FC = () => {
               <CourseCard course={course} />
             </div>
           ))}
-        {(isStaff || canAddCourse) && (
+        {(isStaff || isInstructor) && (
           <div className="col-md-4">
             <AddCourseCard />
           </div>

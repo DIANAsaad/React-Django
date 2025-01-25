@@ -19,12 +19,11 @@ const CoursePage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const {
     modules,
-    canAddModule,
+    isInstructor,
     fetchModules,
     loading: moduleLoading,
     error: moduleError,
     deleteModule,
-    canDeleteModule,
   } = useModuleContext();
 
   const navigate = useNavigate();
@@ -103,7 +102,7 @@ const CoursePage: React.FC = () => {
                         <p>{module.topic}</p>
                       </div>
                     </div>
-                    {(isStaff || canDeleteModule) && (
+                    {(isStaff || isInstructor) && (
                       <div className="dropdownmenu">
                         <DropdownMenu
                           buttonContent={"⋮"}
@@ -125,7 +124,7 @@ const CoursePage: React.FC = () => {
           ) : (
             <p>No lessons available for this course.</p>
           )}
-          {(isStaff || canAddModule) && courseId !== undefined && (
+          {(isStaff || isInstructor) && courseId !== undefined && (
             <AddModuleBox courseId={Number(courseId)} />
           )}
           {course.study_guide && (

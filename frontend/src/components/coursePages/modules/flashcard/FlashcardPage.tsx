@@ -40,50 +40,52 @@ const FlashcardPage: React.FC = () => {
 
   return (
     <div className="flashcard-page">
-    {flashcards && flashcards.length > 0 ? (
-      <>
-        <div className="flashcard-container">
-          <Flashcard
-            key={flashcards[currentIndex].id}
-            question={flashcards[currentIndex].question}
-            answer={flashcards[currentIndex].answer}
-          />
-          <div className="flashcard-options">
-            <DropdownMenu
-              buttonContent={<i className="fas fa-pen"></i>}
-              options={[
-                {
-                  label: "Delete",
-                  action: () => {
-                    deleteFlashcard(flashcards[currentIndex].id);
-                  },
-                },
-              ]}
+      {flashcards && flashcards.length > 0 ? (
+        <>
+          <div className="flashcard-container">
+            <Flashcard
+              key={flashcards[currentIndex].id}
+              question={flashcards[currentIndex].question}
+              answer={flashcards[currentIndex].answer}
             />
           </div>
-        </div>
-        <div className="navigation-buttons">
-          <button
-            onClick={handlePrevious}
-            className="btn-circular btn-previous"
-            disabled={currentIndex === 0}
-          >
-            &#8592;
-          </button>
-          <button
-            onClick={handleNext}
-            className="btn-circular btn-next"
-            disabled={currentIndex === flashcards.length - 1}
-          >
-            &#8594;
-          </button>
-        </div>
-      </>
-    ) : (
-      <div>No flashcards available.</div>
-    )}
-  </div>
-  );
+          <div className="navigation-container">
+            <div className="navigation-buttons">
+              <button
+                onClick={handlePrevious}
+                className="btn-circular btn-previous"
+                disabled={currentIndex === 0}
+              >
+                &#8592;
+              </button>
+              <button
+                onClick={handleNext}
+                className="btn-circular btn-next"
+                disabled={currentIndex === flashcards.length - 1}
+              >
+                &#8594;
+              </button>
+            </div>
+            <div className="flashcard-options">
+              <DropdownMenu
+                buttonContent={<i className="fas fa-pen"></i>}
+                options={[
+                  {
+                    label: "Delete",
+                    action: () => {
+                      deleteFlashcard(flashcards[currentIndex].id);
+                    },
+                  },
+                ]}
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        <div>No flashcards available.</div>
+      )}
+    </div>
+  );  
 };
 
 const FlashcardPageWrapper: React.FC = () => {

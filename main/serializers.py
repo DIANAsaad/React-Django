@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import AchieveUser, Course, Module, Flashcard
+from .models import AchieveUser, Course, Module, Flashcard, ExternalLink
 from django.shortcuts import get_object_or_404
 
 
@@ -98,7 +98,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
 
 class FlashcardSerializer(serializers.ModelSerializer):
-    lesson_id = serializers.IntegerField(write_only=True)
+    lesson_id = serializers.IntegerField()
 
     class Meta:
         model = Flashcard
@@ -109,3 +109,17 @@ class FlashcardSerializer(serializers.ModelSerializer):
         lesson = get_object_or_404(Module, id=lesson_id)
         flashcard = Flashcard.objects.create(lesson=lesson, **validated_data)
         return flashcard
+
+
+class ExternalLinkSerializer(serializers.Serializer):
+    link = serializers.URLField(required=True)
+
+    class Meta:
+        model = ExternalLink
+        field = ["id", "title", "link", "lesson_id"]
+
+    def create(self, validated_data):
+        lesson_id = validated_data.pop("lesson_id")
+        lesson = get_object_or_404(Module, id=lesson_id)
+        external_link = ExternalLink.objects.create(lesson=lesson, **validated_data)
+        return external_link

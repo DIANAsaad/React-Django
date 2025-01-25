@@ -15,7 +15,6 @@ interface Flashcard {
   lesson_id: number;
   question: string;
   answer: string;
-  module_id: number;
 }
 
 // Define the context structure
@@ -25,13 +24,19 @@ interface FlashcardContextProps {
   fetchFlashcards: (moduleId: number) => Promise<void>;
   deleteFlashcard: (flashcardId: number) => Promise<void>;
   deleteLessonFlashcards: (moduleId: number) => Promise<void>;
-  addFlashcard: (
-    moduleId: number,
-    question: string,
-    answer: string
-  ) => Promise<void>;
+  addFlashcard: ({
+    lesson_id,
+    question,
+    answer,
+  }: {
+    lesson_id: number;
+    question: string;
+    answer: string;
+  }) => Promise<void>;
   loading: boolean;
   error: string | null;
+  isStaff: boolean;
+  isInstructor: boolean;
 }
 
 const FlashcardContext = createContext<FlashcardContextProps | undefined>(
@@ -45,6 +50,8 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isStaff, setIsStaff] = useState<boolean>(false);
+  const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
   const fetchFlashcards = useCallback(
     async (moduleId: number) => {
@@ -59,6 +66,8 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setFlashcards(response.data.flashcards ?? []);
+        setIsStaff(response.data.isStaff);
+        setIsInstructor(response.data.isInstructor);
       } catch (err) {
         setError("Failed to fetch flashcards");
       } finally {
@@ -69,15 +78,23 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const addFlashcard = useCallback(
-    async (moduleId: number, question: string, answer: string) => {
-      if (!moduleId || !question || !answer) {
+    async ({
+      lesson_id,
+      question,
+      answer,
+    }: {
+      lesson_id: number;
+      question: string;
+      answer: string;
+    }) => {
+      if (!lesson_id || !question || !answer) {
         alert("All fields are required to add a flashcard.");
         return;
       }
-
+                            
       try {
         const formData = new FormData();
-        formData.append("lesson_id", moduleId.toString());
+        formData.append("lesson_id", lesson_id.toString());
         formData.append("question", question);
         formData.append("answer", answer);
 
@@ -134,8 +151,9 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
   const deleteLessonFlashcards = useCallback(
     async (moduleId: number) => {
       const module_flashcards = flashcards.find(
-        (f) => f.module_id === moduleId
+        (f) => f.lesson_id === moduleId
       );
+
       if (!module_flashcards) {
         alert("Flashcards not found");
         return;
@@ -144,7 +162,7 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
         await axios.delete(`${ENDPOINT}/delete_lesson_flashcards/${moduleId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        setFlashcards(flashcards.filter((f) => f.module_id !== moduleId));
+        setFlashcards(flashcards.filter((f) => f.lesson_id !== moduleId));
       } catch (error) {
         console.error(`Error deleting flashcard:`, error);
         alert(
@@ -164,6 +182,8 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
         addFlashcard,
         loading,
         error,
+        isStaff,
+        isInstructor,
       }}
     >
       {children}

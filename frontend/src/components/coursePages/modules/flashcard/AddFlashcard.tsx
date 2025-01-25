@@ -27,9 +27,7 @@ const AddFlashcard: React.FC = () => {
       setLoading(true);
       try {
         await addFlashcard(
-          formData.lesson_id,
-          formData.question,
-          formData.answer
+               formData,
         );
         setFormData({
           lesson_id: Number(moduleId),
@@ -37,7 +35,7 @@ const AddFlashcard: React.FC = () => {
           answer: "",
         });
         setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
+        setTimeout(() => setSuccess(false), 7000);
       } catch (error) {
         console.error("Failed to add flashcard", error);
       } finally {
@@ -76,7 +74,7 @@ const AddFlashcard: React.FC = () => {
         </div>
         {success && (
           <div className="alert alert-cstm-success">
-            Flashcard added successfully, you can add a new one.
+            Flashcard added successfully, you can add a new one and view them in the lesson page!
           </div>
         )}
         <button type="submit" disabled={loading} className="btn btn-cstm">

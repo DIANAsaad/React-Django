@@ -40,8 +40,7 @@ interface ModuleContextProps {
   loading: boolean;
   error: string | null;
   isStaff: boolean;
-  canAddModule: boolean;
-  canDeleteModule: boolean;
+  isInstructor: boolean;
 }
 
 const ModuleContext = createContext<ModuleContextProps | undefined>(undefined);
@@ -67,8 +66,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [canDeleteModule, setCanDeleteModule] = useState<boolean>(false);
-  const [canAddModule, setCanAddModule] = useState<boolean>(false);
+  const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
   const fetchModules = useCallback(
     async (courseId: number) => {
@@ -84,8 +82,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
         });
         setModules(normalizeModules(response.data.modules ?? []));
         setIsStaff(response.data.isStaff);
-        setCanDeleteModule(response.data.canDeleteModule);
-        setCanAddModule(response.data.canAddModule);
+        setIsInstructor(response.data.isInstructor);
       } catch (err) {
         setError("Failed to fetch modules");
       } finally {
@@ -115,8 +112,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
           module,
         ]);
         setIsStaff(response.data.isStaff);
-        setCanDeleteModule(response.data.canDeleteModule);
-        setCanAddModule(response.data.canAddModule);
+        setIsInstructor(response.data.isInstructor);
       } catch (err) {
         setError("Failed to fetch module");
       } finally {
@@ -201,8 +197,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
         loading,
         error,
         isStaff,
-        canAddModule,
-        canDeleteModule,
+        isInstructor,
       }}
     >
       {children}

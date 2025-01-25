@@ -8,19 +8,30 @@
 
 .flashcard-container {
   display: flex;
-  justify-content: space-between; /* Ensures the options are at the right */
+  justify-content: center;
   align-items: center;
   width: 100%;
+  margin-bottom: 20px;
 }
 
-.flashcard-options {
-  margin-left: auto; /* Pushes the options to the extreme right */
+.navigation-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative; 
 }
 
 .navigation-buttons {
-  margin-top: 20px;
   display: flex;
   gap: 10px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); 
+}
+
+.flashcard-options {
+  margin-left: auto; 
+  margin-right: 80px;
 }
 
 .btn-circular {
@@ -42,15 +53,17 @@
   background-color: grey;
   border-color: grey;
   color: white;
-} 
+}
+
 .btn-previous {
-  border-color:  #332254;
+  border-color: #332254;
   color: #332254;
 }
 
 .btn-previous:hover {
   background-color: #332254;
-  color: #fff;}
+  color: #fff;
+}
 
 .btn-next {
   border-color: #ff6000;
@@ -59,10 +72,5 @@
 
 .btn-next:hover {
   background-color: #ff6000;
-  color:white;
-}
-
-
-.flashcard-options {
-  margin-right: auto; 
+  color: white;
 }

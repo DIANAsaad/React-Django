@@ -15,6 +15,8 @@ from main.views import (
     GetModuleView,
     DeleteFlashcardView,
     DeleteLessonFlashcardsView,
+    AddExternalLinkView,
+    GetExternalLinkView
 )
 
 
@@ -26,6 +28,7 @@ urlpatterns = [
     path("flashcards/<int:lesson_id>", GetFlashcardView.as_view(), name="flashcard"),
     path("modules/<int:course_id>", CoursePageView.as_view(), name="course_modules"),
     path("module/<int:module_id>", GetModuleView.as_view(), name="module"),
+    path("external_links/<int:lesson_id>", GetExternalLinkView.as_view(), name="external links"),
     path("add_course", AddCourseView.as_view(), name="add_Course"),
     path(
         "refresh_access_token",
@@ -45,6 +48,7 @@ urlpatterns = [
     ),
     path("add_flashcard", AddFlashcardView.as_view(), name="add_Flashcard"),
     path("delete_flashcard/<int:flashcard_id>", DeleteFlashcardView.as_view(), name="delete_Flashcard"),
-    path("delete_lesson_fashcards/<int:lesson_id>", DeleteLessonFlashcardsView.as_view(), name="delete_lesson_flaschards")
+    path("delete_lesson_flashcards/<int:lesson_id>", DeleteLessonFlashcardsView.as_view(), name="delete_lesson_flaschards"),
+    path("add_external_link", AddExternalLinkView.as_view(), name="add_external_link"),
 
 ]

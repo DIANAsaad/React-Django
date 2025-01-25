@@ -7,7 +7,7 @@ import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
 const ModulePage: React.FC = () => {
-  const { modules, loading, error, canAddModule, isStaff, fetchModulesById } =
+  const { modules, loading, error, isInstructor, isStaff, fetchModulesById } =
     useModuleContext();
   const { moduleId } = useParams<{ moduleId: string }>();
   const {
@@ -34,7 +34,7 @@ const ModulePage: React.FC = () => {
   }
 
   const options = [
-    ...(isStaff && canAddModule
+    ...(isStaff || isInstructor
       ? [
           {
             label: "Add Flashcards",
@@ -60,7 +60,6 @@ const ModulePage: React.FC = () => {
     },
   ];
 
-
   if (loading) {
     return <div>Loading Lesson...</div>;
   }
@@ -69,7 +68,6 @@ const ModulePage: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
-
   const lessonPdfUrl =
     module.lesson_pdf instanceof File
       ? URL.createObjectURL(module.lesson_pdf)
@@ -77,7 +75,6 @@ const ModulePage: React.FC = () => {
       ? module.lesson_pdf
       : null;
 
-      
   return (
     <>
       <div className="row">
@@ -93,7 +90,7 @@ const ModulePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{module.module_title}</h1>
               <p className="text-muted ">{module.topic}</p>
-              {isStaff && canAddModule && (
+              {isStaff && isInstructor && (
                 <p className="text-muted ">
                   {" "}
                   <strong>Created by: </strong>{" "}
@@ -112,28 +109,29 @@ const ModulePage: React.FC = () => {
             <div>
               <div className="material-box p-4 shadow-sm rounded  align-items-center justify-content-between ">
                 <div className="d-flex align-items-center justify-content-between">
-                <div className="material-box-details">
-                <strong>Lesson PDF: </strong>
-                <a
-                  href={lessonPdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Access and download your lesson
-                </a>
-                </div>
-                <DropdownMenu
-                    buttonContent={"..."}
-                    options={[
-                      {
-                        label: "Delete",
-                        action: () => {},
-                      },
-                    ]}
-                  />
+                  <div className="material-box-details">
+                    <strong>Lesson PDF: </strong>
+                    <a
+                      href={lessonPdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Access and download your lesson
+                    </a>
                   </div>
+                  {(isStaff || isInstructor) && (
+                    <DropdownMenu
+                      buttonContent={"..."}
+                      options={[
+                        {
+                          label: "Delete",
+                          action: () => {},
+                        },
+                      ]}
+                    />
+                  )}
+                </div>
               </div>
-              
             </div>
           )}
           {flashcardLoading ? (
@@ -150,18 +148,22 @@ const ModulePage: React.FC = () => {
                       navigate(`/flashcardPage/${module.id}`);
                     }}
                   >
-                      <strong>Lesson Flashcards: </strong>
-                       Access your Flashcards
+                    <strong>Lesson Flashcards: </strong>
+                    Access your Flashcards
                   </div>
-                  <DropdownMenu
-                    buttonContent={"..."}
-                    options={[
-                      {
-                        label: "Delete",
-                        action: () => {deleteLessonFlashcards(Number(moduleId))},
-                      },
-                    ]}
-                  />
+                  {(isStaff || isInstructor) && (
+                    <DropdownMenu
+                      buttonContent={"..."}
+                      options={[
+                        {
+                          label: "Delete",
+                          action: () => {
+                            deleteLessonFlashcards(Number(moduleId));
+                          },
+                        },
+                      ]}
+                    />
+                  )}
                 </div>
               </div>
             </div>

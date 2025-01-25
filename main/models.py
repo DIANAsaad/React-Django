@@ -70,7 +70,7 @@ class Course(models.Model):
             self.course_slug = "placeholder"  # Had to save first to get the ID
             super().save(*args, **kwargs)
             self.course_slug = f"{slug}-{self.id}"
-            super().save(update_fields=['course_slug'])
+            super().save(update_fields=["course_slug"])
 
     def delete(self, *args, **kwargs):
         if self.course_image:
@@ -106,7 +106,7 @@ class Module(models.Model):
             self.module_slug = "placeholder"
             super().save(*args, **kwargs)  # Save to get the ID
             self.module_slug = f"{slug}-{self.id}"
-            super().save(update_fields=['module_slug'])
+            super().save(update_fields=["module_slug"])
 
     def delete(self, *args, **kwargs):
         if self.module_image:
@@ -181,3 +181,14 @@ class QuizAttempt(models.Model):
     taken_at = models.DateTimeField(default=timezone.now)
     attempts_taken = models.IntegerField(null=True)
     score = models.PositiveIntegerField(default=0)
+
+
+# External Links
+
+
+class ExternalLink(models.Model):
+    lesson = models.ForeignKey(
+        Module, on_delete=models.CASCADE, related_name="external_links"
+    )
+    title = models.CharField(max_length=100)
+    link = models.URLField(max_length=2083)

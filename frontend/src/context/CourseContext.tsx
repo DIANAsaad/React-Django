@@ -35,8 +35,7 @@ interface CourseContextProps {
   loading: boolean;
   error: string | null;
   isStaff: boolean;
-  canDeleteCourse: boolean;
-  canAddCourse: boolean;
+  isInstructor: boolean;
 }
 
 // Create the context
@@ -62,8 +61,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [canDeleteCourse, setCanDeleteCourse] = useState<boolean>(false);
-  const [canAddCourse, setCanAddCourse] = useState<boolean>(false);
+  const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
   useEffect(() => {
     // Fetch courses from your API
@@ -75,8 +73,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         });
         setCourses(normalizeCourses(response.data.courses ?? []));
         setIsStaff(response.data.isStaff);
-        setCanDeleteCourse(response.data.canDeleteCourse);
-        setCanAddCourse(response.data.canAddCourse);
+        setIsInstructor(response.data.isInstructor);
       } catch {
         setError("Failed to fetch courses.");
       } finally {
@@ -160,8 +157,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         loading,
         error,
         isStaff,
-        canDeleteCourse,
-        canAddCourse,
+        isInstructor,       
       }}
     >
       {children}

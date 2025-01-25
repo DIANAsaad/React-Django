@@ -4,11 +4,12 @@ import "../../../../styles/Flashcards.css"; // Import the CSS file for styling
 interface FlashcardProps {
   question: string;
   answer: string;
+
 }
 
 const Flashcard: React.FC<FlashcardProps> = ({ question, answer }) => {
   const [flipped, setFlipped] = useState(false);
-
+  
   const handleFlip = () => {
     setFlipped(!flipped);
   };
