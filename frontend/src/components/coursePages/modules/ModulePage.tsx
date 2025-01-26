@@ -2,6 +2,7 @@ import React, { useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useModuleContext } from "../../../context/ModuleContext";
 import { useFlashcardContext } from "../../../context/FlashcardContext";
+import { useExternalLinkContext } from "../../../context/ExternalLinkContext";
 import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
@@ -9,9 +10,8 @@ import BaseWrapper from "../../base/BaseWrapper";
 const ModulePage: React.FC = () => {
   const { modules, loading, error, isInstructor, isStaff, fetchModulesById } =
     useModuleContext();
-  const { moduleId} = useParams<{ moduleId: string , courseId:string}>();
+  const { moduleId } = useParams<{ moduleId: string; courseId: string }>();
 
-  
   const {
     flashcards,
     fetchFlashcards,
@@ -19,12 +19,20 @@ const ModulePage: React.FC = () => {
     deleteLessonFlashcards,
   } = useFlashcardContext();
 
+  const {
+    links,
+    fetchLinks,
+    loading: linkLoading,
+    deleteLink,
+  } = useExternalLinkContext();
+
   useEffect(() => {
     if (moduleId) {
       fetchFlashcards(Number(moduleId));
+      fetchLinks(Number(moduleId));
       fetchModulesById(Number(moduleId));
     }
-  }, [moduleId, fetchFlashcards, fetchModulesById]);
+  }, [moduleId, fetchFlashcards, fetchModulesById, fetchLinks]);
 
   const module = useMemo(() => {
     return modules?.find((m) => m.id === parseInt(moduleId!, 10));
@@ -92,7 +100,7 @@ const ModulePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{module.module_title}</h1>
               <p className="text-muted ">{module.topic}</p>
-              {isStaff && isInstructor && (
+              {(isStaff || isInstructor) && (
                 <p className="text-muted ">
                   {" "}
                   <strong>Created by: </strong>{" "}
@@ -171,6 +179,45 @@ const ModulePage: React.FC = () => {
             </div>
           ) : (
             <div className="flashcard-alert">No flashcards available.</div>
+          )}
+          {linkLoading ? (
+            <div className="flashcard-alert">
+              Loading lesson's External Links...
+            </div>
+          ) : links && links.length > 0 ? (
+            links.map((link) => (
+              <div key={link.id}>
+                <div className="material-box p-4 shadow-sm rounded align-items-center">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="material-box-details">
+                      <strong>Helpful External Link: </strong>
+                      <a
+                        href={link.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {link.description}
+                      </a>
+                    </div>
+                    {(isStaff || isInstructor) && (
+                      <DropdownMenu
+                        buttonContent={"..."}
+                        options={[
+                          {
+                            label: "Delete",
+                            action: () => {
+                              deleteLink(link.id);
+                            },
+                          },
+                        ]}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="flashcard-alert">No external links available.</div>
           )}
         </div>
       </div>

@@ -49,9 +49,8 @@ class ModuleSerializer(serializers.ModelSerializer):
             "module_creator",
             "lesson_pdf",
             "course_id",
-            "module_slug",
         ]
-        read_only_fields = ["id", "module_slug"]
+        read_only_fields = ["id"]
 
     def create(self, validated_data):
 
@@ -83,12 +82,10 @@ class CourseSerializer(serializers.ModelSerializer):
             "course_image",
             "study_guide",
             "creator",
-            "course_slug",
         ]
-        read_only_fields = ["id", "course_slug"]
+        read_only_fields = ["id"]
 
     def create(self, validated_data):
-
         request = self.context["request"]
         course_image = validated_data.pop("course_image", None)
         course = Course.objects.create(
@@ -111,14 +108,15 @@ class FlashcardSerializer(serializers.ModelSerializer):
         return flashcard
 
 
-class ExternalLinkSerializer(serializers.Serializer):
+class ExternalLinkSerializer(serializers.ModelSerializer):
     lesson_id = serializers.IntegerField()
-    
+
     class Meta:
         model = ExternalLink
-        field = ["id", "description", "link", "lesson_id"]
+        fields = ["id", "description", "link", "lesson_id"]
 
     def create(self, validated_data):
+        print("Validated Data:", validated_data)
         lesson_id = validated_data.pop("lesson_id")
         lesson = get_object_or_404(Module, id=lesson_id)
         external_link = ExternalLink.objects.create(lesson=lesson, **validated_data)

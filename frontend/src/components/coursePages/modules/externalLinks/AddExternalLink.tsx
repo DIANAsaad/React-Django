@@ -12,7 +12,7 @@ const AddExternalLink: React.FC = () => {
     const [formData,setFormData]= useState({
         lesson_id:Number(moduleId),
         link:"",
-        description:""
+        description:""                                                           
     });
       const [loading, setLoading] = useState(false);
       const [success, setSuccess] = useState(false);
@@ -38,7 +38,6 @@ const handleSubmit = useCallback(
           link: "",
           description: "",
         });
-       
         setSuccess(true);
         setTimeout(() => setSuccess(false), 7000)
       } catch (error) {
@@ -50,10 +49,11 @@ const handleSubmit = useCallback(
     [addLink, formData, moduleId]
   );
 
+
   return (
     <>
       <p>Add the lesson's external links one by one</p>
-      <form onSubmit={handleSubmit} className="add-flashcard-form">
+      <form onSubmit={handleSubmit} className="add-flashcard-link-form">
         <div className="form-group">
           <label htmlFor="description">Link's Description:</label>
           <input

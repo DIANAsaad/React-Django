@@ -1,6 +1,4 @@
-.row {
-  margin-top: 0;
-}
+
 .container-cstm-fluid {
   margin-left: 0;
   margin-top:0;
@@ -16,7 +14,6 @@
 
 .info-box {
   background: linear-gradient(120deg, #f8f9fa, #ffffff);
-
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -59,7 +56,8 @@
 }
 
 .material-box {
-  background-color: #fff3e9;
+  background-color:transparent;
+  border: 2px dotted #ffd8c3;
   border-radius: 10px;
   font-size: 1rem;
   color: #333;
@@ -73,7 +71,9 @@
 .material-box a {
   text-decoration: none;
   color: black;
+  font-weight: normal;
 }
+
 
 .study-guide-box:hover {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
@@ -181,6 +181,3 @@
 }
 
 
-.material-box-details {
-  flex-grow: 1;
-}

@@ -16,7 +16,8 @@ from main.views import (
     DeleteFlashcardView,
     DeleteLessonFlashcardsView,
     AddExternalLinkView,
-    GetExternalLinkView
+    GetExternalLinkView,
+    DeleteExternalLinkView
 )
 
 
@@ -50,5 +51,5 @@ urlpatterns = [
     path("delete_flashcard/<int:flashcard_id>", DeleteFlashcardView.as_view(), name="delete_Flashcard"),
     path("delete_lesson_flashcards/<int:lesson_id>", DeleteLessonFlashcardsView.as_view(), name="delete_lesson_flaschards"),
     path("add_external_link", AddExternalLinkView.as_view(), name="add_external_link"),
-
+    path("delete_external_link/<int:link_id>", DeleteExternalLinkView.as_view(), name="delete_external_link")
 ]

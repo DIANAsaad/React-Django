@@ -49,7 +49,7 @@ const AddFlashcard: React.FC = () => {
   return (
     <>
       <p>Add the lesson's flashcards one by one</p>
-      <form onSubmit={handleSubmit} className="add-flashcard-form">
+      <form onSubmit={handleSubmit} className="add-flashcard-link-form">
         <div className="form-group">
           <label htmlFor="question">Question:</label>
           <input

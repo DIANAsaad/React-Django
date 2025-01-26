@@ -21,6 +21,7 @@ interface ExternalLinkContextProps {
   links: ExternalLink[] | null;
   fetchLinks: (lessonId: number) => Promise<void>;
   deleteLink: (linkId: number) => Promise<void>;
+  editLink: (linkId: number, data: { lesson_id: number; link: string; description: string }) => Promise<void>;
   addLink: ({
     lesson_id,
     link,
@@ -56,7 +57,6 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
         setError("No access token available");
         return;
       }
-
       try {
         setLoading(true);
         const response = await axios.get(
@@ -65,10 +65,9 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
             headers: { Authorization: `Bearer ${accessToken}` },
           }
         );
-
         setLinks(response.data.external_links ?? []);
         setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor);
+        setIsInstructor(response.data.isInstructor); 
       } catch (err) {
         setError("Failed to fetch External Links");
       } finally {
@@ -122,6 +121,21 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
     [accessToken]
   );
 
+  const editLink = useCallback(async (linkId:number, data:{ lesson_id: number; link: string; description: string }) => {
+    try {
+      const response = await axios.put(`/edit_external_link/${linkId}/`, data, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setLinks((prevLinks) =>
+        prevLinks.map((link) => (link.id === linkId ? response.data : link))
+      );
+      return;
+    } catch (error) {
+      console.error('Error editing external link:', error);
+      throw error;
+    }
+  }, [accessToken]);
+
   const deleteLink = useCallback(
     async (linkId: number) => {
       const Link = links.find((l) => l.id === linkId);
@@ -147,6 +161,7 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
     <ExternalLinkContext.Provider
       value={{
         links,
+        editLink,
         fetchLinks,
         deleteLink,
         addLink,

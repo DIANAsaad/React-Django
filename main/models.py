@@ -62,16 +62,7 @@ class Course(models.Model):
         null=True,
     )
     study_guide = models.URLField(null=True, blank=True, max_length=2083)
-    course_slug = models.SlugField(unique=True, blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        if not self.course_slug:
-            slug = slugify(self.course_title)
-            self.course_slug = "placeholder"  # Had to save first to get the ID
-            super().save(*args, **kwargs)
-            self.course_slug = f"{slug}-{self.id}"
-            super().save(update_fields=["course_slug"])
-
+  
     def delete(self, *args, **kwargs):
         if self.course_image:
             course_image_path = self.course_image.path
@@ -98,15 +89,7 @@ class Module(models.Model):
     lesson_pdf = models.FileField(
         upload_to="module_lesson_pdfs/", blank=True, null=True
     )
-    module_slug = models.SlugField(unique=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.module_slug:
-            slug = slugify(self.module_title)
-            self.module_slug = "placeholder"
-            super().save(*args, **kwargs)  # Save to get the ID
-            self.module_slug = f"{slug}-{self.id}"
-            super().save(update_fields=["module_slug"])
 
     def delete(self, *args, **kwargs):
         if self.module_image:

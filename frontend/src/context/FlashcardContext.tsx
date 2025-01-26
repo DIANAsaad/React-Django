@@ -119,7 +119,7 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
         console.error(`Error adding flashcard: ${errorMessage}`);
         alert(`An error occurred while adding the flashcard: ${errorMessage}`);
       }
-    },
+        },
     [accessToken]
   );
 

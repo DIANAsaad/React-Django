@@ -9,6 +9,8 @@
 }
 
 .content-base {
+  position: relative;
+  top: -15px;
   flex: 1;
   padding: 30px;
 }

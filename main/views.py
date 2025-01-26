@@ -14,13 +14,11 @@ from main.serializers import (
     RefreshTokenSerializer,
     ModuleSerializer,
     FlashcardSerializer,
-    ExternalLinkSerializer
+    ExternalLinkSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from .permissions import (
-   IsStaffOrIsInstructor
-)
+from .permissions import IsStaffOrIsInstructor
 
 # Authentication & Authorization
 
@@ -35,7 +33,6 @@ class CustomLoginView(APIView):
 
         if serializer.is_valid():
             user = serializer.validated_data["user"]
-            # Generates the JWT Tokens
             refresh_token = RefreshToken.for_user(user)
             access_token = str(refresh_token.access_token)
             data = {
@@ -121,7 +118,7 @@ class HomePageView(APIView):
         data = {
             "courses": CourseSerializer(courses, many=True).data,
             "isStaff": is_staff,
-            "isInstructor": request.user.groups.filter(name='Instructors').exists()
+            "isInstructor": request.user.groups.filter(name="Instructors").exists(),
         }
 
         return Response(data, status=status.HTTP_200_OK)
@@ -142,7 +139,7 @@ class CoursePageView(APIView):
         data = {
             "modules": ModuleSerializer(modules, many=True).data,
             "isStaff": is_staff,
-            "isInstructor": request.user.groups.filter(name='Instructors').exists()
+            "isInstructor": request.user.groups.filter(name="Instructors").exists(),
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -159,7 +156,7 @@ class GetModuleView(APIView):
             data = {
                 "module": ModuleSerializer(module).data,
                 "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name='Instructors').exists()
+                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
         except Module.DoesNotExist:
@@ -179,7 +176,7 @@ class GetFlashcardView(APIView):
             data = {
                 "flashcards": FlashcardSerializer(flashcards, many=True).data,
                 "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name='Instructors').exists()
+                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
         except Flashcard.DoesNotExist:
@@ -187,24 +184,41 @@ class GetFlashcardView(APIView):
                 {"error": "Flashcard not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+
 class GetExternalLinkView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-       lesson_id=kwargs.get("lesson_id")
-       try:
+        lesson_id = kwargs.get("lesson_id")
+        try:
 
             external_links = ExternalLink.objects.filter(lesson_id=lesson_id).all()
             data = {
-                "external_link": FlashcardSerializer(external_links, many=True).data,
+                "external_links": ExternalLinkSerializer(
+                    external_links, many=True
+                ).data,
                 "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name='Instructors').exists()
+                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
-       except Flashcard.DoesNotExist:
+        except ExternalLink.DoesNotExist:
             return Response(
                 {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
+    def put(self, request, link_id, *args, **kwargs):
+        try:
+            external_link = ExternalLink.objects.get(id=link_id)
+            serializer = ExternalLinkSerializer(external_link, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ExternalLink.DoesNotExist:
+            return Response(
+                {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
 
 # Functionality
 
@@ -260,7 +274,7 @@ class AddModuleView(APIView):
 
 
 class DeleteModuleView(APIView):
-    permission_classes = [IsAuthenticated,IsStaffOrIsInstructor]
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def delete(self, request, *args, **kwargs):
         module_id = kwargs.get("module_id")
@@ -280,10 +294,10 @@ class DeleteModuleView(APIView):
 
 
 class AddFlashcardView(APIView):
-    permission_classes = [IsAuthenticated,IsStaffOrIsInstructor]
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kargs):
-       
+
         serializer = FlashcardSerializer(data=request.data)
         if serializer.is_valid():
             flashcard = serializer.save()
@@ -336,17 +350,43 @@ class DeleteLessonFlashcardsView(APIView):
                 detail="Flashcard not found.", code=status.HTTP_404_NOT_FOUND
             )
 
+
 # Exernal Links
 
+
 class AddExternalLinkView(APIView):
-    permission_classes=   [IsAuthenticated, IsStaffOrIsInstructor]
-    print(IsStaffOrIsInstructor)
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kargs):
+        print(request.data)
         serializer = ExternalLinkSerializer(data=request.data)
         if serializer.is_valid():
             external_link = serializer.save()
+            print(serializer.validated_data)
             return Response(
-                ExternalLinkSerializer(external_link).data, status=status.HTTP_201_CREATED
+                ExternalLinkSerializer(external_link).data,
+                status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteExternalLinkView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def delete(self, request, *args, **kwargs):
+        link_id = kwargs.get("external_link_id")
+
+        if not link_id:
+            return Response(
+                {"detail": "Link ID is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            return delete_object(
+                request,
+                app_label="main",
+                model_name="ExternalLink",
+                object_id=link_id,
+            )
+        except ExternalLink.DoesNotExist:
+            raise NotFound(detail="Link not found.", code=status.HTTP_404_NOT_FOUND)
