@@ -9,7 +9,9 @@ import BaseWrapper from "../../base/BaseWrapper";
 const ModulePage: React.FC = () => {
   const { modules, loading, error, isInstructor, isStaff, fetchModulesById } =
     useModuleContext();
-  const { moduleId } = useParams<{ moduleId: string }>();
+  const { moduleId} = useParams<{ moduleId: string , courseId:string}>();
+
+  
   const {
     flashcards,
     fetchFlashcards,
@@ -46,7 +48,7 @@ const ModulePage: React.FC = () => {
           },
           {
             label: "Add External Links",
-            action: () => {},
+            action: () => navigate(`/addExternalLink/${module.id}`),
           },
           {
             label: "Add Activities",

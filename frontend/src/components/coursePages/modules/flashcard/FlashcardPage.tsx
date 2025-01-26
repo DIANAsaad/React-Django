@@ -89,7 +89,7 @@ const FlashcardPage: React.FC = () => {
 };
 
 const FlashcardPageWrapper: React.FC = () => {
-  const { moduleId } = useParams<{ moduleId: string }>();
+  const { moduleId } = useParams<{ moduleId: string}>();
   return (
     <BaseWrapper
       options={[

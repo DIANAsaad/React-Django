@@ -10,7 +10,9 @@ import { AuthProvider } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext";
 import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
+import { ExternalLinkProvider } from "./context/ExternalLinkContext";
 import AddFlashcard from "./components/coursePages/modules/flashcard/AddFlashcard";
+import AddExtrenalLink from "./components/coursePages/modules/externalLinks/AddExternalLink"
 
 const App: React.FC = () => {
   return (
@@ -73,6 +75,15 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/addExternalLink/:moduleId"
+          element={
+            <ProtectedRoute>
+              <AddExtrenalLink />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
@@ -83,7 +94,9 @@ const AppWrapper: React.FC = () => (
     <CourseProvider>
       <ModuleProvider>
         <FlashcardProvider>
-          <App />
+          <ExternalLinkProvider>
+            <App />
+          </ExternalLinkProvider>
         </FlashcardProvider>
       </ModuleProvider>
     </CourseProvider>

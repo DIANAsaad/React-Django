@@ -112,11 +112,11 @@ class FlashcardSerializer(serializers.ModelSerializer):
 
 
 class ExternalLinkSerializer(serializers.Serializer):
-    link = serializers.URLField(required=True)
-
+    lesson_id = serializers.IntegerField()
+    
     class Meta:
         model = ExternalLink
-        field = ["id", "title", "link", "lesson_id"]
+        field = ["id", "description", "link", "lesson_id"]
 
     def create(self, validated_data):
         lesson_id = validated_data.pop("lesson_id")

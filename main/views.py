@@ -188,15 +188,15 @@ class GetFlashcardView(APIView):
             )
 
 class GetExternalLinkView(APIView):
-    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
        lesson_id=kwargs.get("lesson_id")
        try:
 
-            external_link = ExternalLink.objects.filter(lesson_id=lesson_id).all()
+            external_links = ExternalLink.objects.filter(lesson_id=lesson_id).all()
             data = {
-                "external_link": FlashcardSerializer(external_link, many=True).data,
+                "external_link": FlashcardSerializer(external_links, many=True).data,
                 "isStaff": request.user.is_staff,
                 "isInstructor": request.user.groups.filter(name='Instructors').exists()
             }
@@ -340,6 +340,7 @@ class DeleteLessonFlashcardsView(APIView):
 
 class AddExternalLinkView(APIView):
     permission_classes=   [IsAuthenticated, IsStaffOrIsInstructor]
+    print(IsStaffOrIsInstructor)
 
     def post(self, request, *args, **kargs):
         serializer = ExternalLinkSerializer(data=request.data)

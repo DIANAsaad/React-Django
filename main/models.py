@@ -190,5 +190,6 @@ class ExternalLink(models.Model):
     lesson = models.ForeignKey(
         Module, on_delete=models.CASCADE, related_name="external_links"
     )
-    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)
     link = models.URLField(max_length=2083)
+  
