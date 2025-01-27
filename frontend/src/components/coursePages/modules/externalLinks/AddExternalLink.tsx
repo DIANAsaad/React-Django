@@ -4,19 +4,16 @@ import { useParams } from "react-router-dom";
 import "../../../../styles/AddFlashcard&Link.css";
 import BaseWrapper from "../../../base/BaseWrapper";
 
-
-
 const AddExternalLink: React.FC = () => {
-    const {addLink}=useExternalLinkContext();
-    const {moduleId}=useParams<{moduleId:string}>();
-    const [formData,setFormData]= useState({
-        lesson_id:Number(moduleId),
-        link:"",
-        description:""                                                           
-    });
-      const [loading, setLoading] = useState(false);
-      const [success, setSuccess] = useState(false);
-
+  const { addLink } = useExternalLinkContext();
+  const { moduleId } = useParams<{ moduleId: string }>();
+  const [formData, setFormData] = useState({
+    lesson_id: Number(moduleId),
+    link: "",
+    description: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -24,22 +21,19 @@ const AddExternalLink: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-
-const handleSubmit = useCallback(
+  const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setLoading(true); 
+      setLoading(true);
       try {
-        await addLink(
-               formData,
-        );
+        await addLink(formData);
         setFormData({
           lesson_id: Number(moduleId),
           link: "",
           description: "",
         });
         setSuccess(true);
-        setTimeout(() => setSuccess(false), 7000)
+        setTimeout(() => setSuccess(false), 7000);
       } catch (error) {
         console.error("Failed to add link", error);
       } finally {
@@ -48,7 +42,6 @@ const handleSubmit = useCallback(
     },
     [addLink, formData, moduleId]
   );
-
 
   return (
     <>
@@ -79,7 +72,8 @@ const handleSubmit = useCallback(
         </div>
         {success && (
           <div className="alert alert-cstm-success">
-            Link added successfully, you can add a new one and view them in the lesson page!
+            Link added successfully, you can add a new one and view them in the
+            lesson page!
           </div>
         )}
         <button type="submit" disabled={loading} className="btn btn-cstm">
@@ -91,13 +85,19 @@ const handleSubmit = useCallback(
 };
 
 const AddExternalLinkWrapper: React.FC = () => {
-  const { moduleId } = useParams<{ moduleId: string }>();
+  const { moduleId, courseId } = useParams<{
+    moduleId: string;
+    courseId: string;
+  }>();
 
   return (
     <BaseWrapper
       options={[
         { link: "/home", label: "Home" },
-        { link: `/modulePage/${moduleId}`, label: "Back to Lesson" },
+        {
+          link: `/${courseId}/modulePage/${moduleId}`,
+          label: "Back to Lesson",
+        },
       ]}
     >
       <AddExternalLink />
@@ -106,10 +106,3 @@ const AddExternalLinkWrapper: React.FC = () => {
 };
 
 export default AddExternalLinkWrapper;
-
-
-
-
-
-
-

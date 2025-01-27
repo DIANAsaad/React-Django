@@ -87,13 +87,13 @@ const AddFlashcard: React.FC = () => {
 };
 
 const AddFlashcardWrapper: React.FC = () => {
-  const { moduleId } = useParams<{ moduleId: string }>();
+  const { moduleId,courseId} = useParams<{ moduleId: string; courseId: string }>();
 
   return (
     <BaseWrapper
       options={[
         { link: "/home", label: "Home" },
-        { link: `/modulePage/${moduleId}`, label: "Back to Lesson" },
+        { link: `/${courseId}}/modulePage/${moduleId}`, label: "Back to Lesson" },
       ]}
     >
       <AddFlashcard />

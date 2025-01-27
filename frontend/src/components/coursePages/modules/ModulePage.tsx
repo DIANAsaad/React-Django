@@ -10,7 +10,10 @@ import BaseWrapper from "../../base/BaseWrapper";
 const ModulePage: React.FC = () => {
   const { modules, loading, error, isInstructor, isStaff, fetchModulesById } =
     useModuleContext();
-  const { moduleId } = useParams<{ moduleId: string; courseId: string }>();
+  const { moduleId, courseId } = useParams<{
+    moduleId: string;
+    courseId: string;
+  }>();
 
   const {
     flashcards,
@@ -24,6 +27,7 @@ const ModulePage: React.FC = () => {
     fetchLinks,
     loading: linkLoading,
     deleteLink,
+
   } = useExternalLinkContext();
 
   useEffect(() => {
@@ -48,7 +52,7 @@ const ModulePage: React.FC = () => {
       ? [
           {
             label: "Add Flashcards",
-            action: () => navigate(`/addFlashcard/${module.id}`),
+            action: () => navigate(`/${courseId}/addFlashcard/${module.id}`),
           },
           {
             label: "Add Quizzes",
@@ -56,7 +60,7 @@ const ModulePage: React.FC = () => {
           },
           {
             label: "Add External Links",
-            action: () => navigate(`/addExternalLink/${module.id}`),
+            action: () => navigate(`/${courseId}/addExternalLink/${module.id}`),
           },
           {
             label: "Add Activities",
@@ -120,12 +124,12 @@ const ModulePage: React.FC = () => {
               <div className="material-box p-4 shadow-sm rounded  align-items-center justify-content-between ">
                 <div className="d-flex align-items-center justify-content-between">
                   <div className="material-box-details">
-                    <strong>Lesson PDF: </strong>
                     <a
                       href={lessonPdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
+                      <strong>Lesson PDF: </strong>
                       Access and download your lesson
                     </a>
                   </div>
@@ -155,7 +159,7 @@ const ModulePage: React.FC = () => {
                   <div
                     className="material-box-details"
                     onClick={() => {
-                      navigate(`/flashcardPage/${module.id}`);
+                      navigate(`/${courseId}/flashcardPage/${module.id}`);
                     }}
                   >
                     <strong>Lesson Flashcards: </strong>
@@ -190,12 +194,12 @@ const ModulePage: React.FC = () => {
                 <div className="material-box p-4 shadow-sm rounded align-items-center">
                   <div className="d-flex align-items-center justify-content-between">
                     <div className="material-box-details">
-                      <strong>Helpful External Link: </strong>
                       <a
                         href={link.link}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
+                        <strong>Helpful External Link: </strong>
                         {link.description}
                       </a>
                     </div>
@@ -207,6 +211,12 @@ const ModulePage: React.FC = () => {
                             label: "Delete",
                             action: () => {
                               deleteLink(link.id);
+                            },
+                          },
+                          {
+                            label: "Edit",
+                            action: () => { navigate(`/${moduleId}/editExternalLink/${link.id}`);
+                            
                             },
                           },
                         ]}

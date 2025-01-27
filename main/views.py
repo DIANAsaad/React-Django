@@ -113,8 +113,6 @@ class HomePageView(APIView):
 
         courses = Course.objects.all()
         is_staff = request.user.is_staff
-        can_delete_course = request.user.has_perm("main.delete_course")
-        can_add_course = request.user.has_perm("main.add_course")
         data = {
             "courses": CourseSerializer(courses, many=True).data,
             "isStaff": is_staff,
@@ -133,8 +131,6 @@ class CoursePageView(APIView):
     def get(self, request, *args, **kwargs):
         course_id = kwargs.get("course_id")
         is_staff = request.user.is_staff
-        can_add_module = request.user.has_perms(["main.add_module"])
-        can_delete_module = request.user.has_perm("main.delete_module")
         modules = Module.objects.filter(course_id=course_id).all()
         data = {
             "modules": ModuleSerializer(modules, many=True).data,
@@ -206,14 +202,17 @@ class GetExternalLinkView(APIView):
                 {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
-    def put(self, request, link_id, *args, **kwargs):
+
+class GetExternalLinkByIdView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def get(self, request, *args, **kwargs):
+        link_id = kwargs.get("link_id")
         try:
-            external_link = ExternalLink.objects.get(id=link_id)
-            serializer = ExternalLinkSerializer(external_link, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            external_link = get_object_or_404(ExternalLink, id=link_id)
+            data = {"external_link": ExternalLinkSerializer(external_link).data}
+            print(data)
+            return Response(data, status=status.HTTP_200_OK)
         except ExternalLink.DoesNotExist:
             return Response(
                 {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
@@ -370,6 +369,24 @@ class AddExternalLinkView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class EditExternalLinkView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def put(self, request, *args, **kwargs):
+        try:
+            link_id = kwargs.get("link_id")
+            external_link = ExternalLink.objects.get(id=link_id)
+            serializer = ExternalLinkSerializer(external_link, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ExternalLink.DoesNotExist:
+            return Response(
+                {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+
 class DeleteExternalLinkView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
@@ -390,3 +407,10 @@ class DeleteExternalLinkView(APIView):
             )
         except ExternalLink.DoesNotExist:
             raise NotFound(detail="Link not found.", code=status.HTTP_404_NOT_FOUND)
+
+
+# Quizzes
+
+
+class AddQuizView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]

@@ -12,7 +12,8 @@ import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
 import { ExternalLinkProvider } from "./context/ExternalLinkContext";
 import AddFlashcard from "./components/coursePages/modules/flashcard/AddFlashcard";
-import AddExtrenalLink from "./components/coursePages/modules/externalLinks/AddExternalLink"
+import AddExtrenalLink from "./components/coursePages/modules/externalLinks/AddExternalLink";
+import EditExtrenalLink from "./components/coursePages/modules/externalLinks/EditExternalLink";
 
 const App: React.FC = () => {
   return (
@@ -50,16 +51,9 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
         <Route
-          path="modulePage/:moduleId"
-          element={
-            <ProtectedRoute>
-              <ModulePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/flashcardPage/:moduleId"
+          path="/:courseId/flashcardPage/:moduleId"
           element={
             <ProtectedRoute>
               <FlashcardPage />
@@ -68,7 +62,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/addFlashcard/:moduleId"
+          path="/:courseId/addFlashcard/:moduleId"
           element={
             <ProtectedRoute>
               <AddFlashcard />
@@ -77,10 +71,19 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/addExternalLink/:moduleId"
+          path="/:courseId/addExternalLink/:moduleId"
           element={
             <ProtectedRoute>
               <AddExtrenalLink />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/:moduleId/editExternalLink/:linkId"
+          element={
+            <ProtectedRoute>
+              <EditExtrenalLink />
             </ProtectedRoute>
           }
         />

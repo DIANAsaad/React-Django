@@ -5,8 +5,9 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import axios from "axios";
+
 import { useAuth } from "./AuthContext";
+import axios from 'axios';
 
 // Define the context structure
 
@@ -20,6 +21,7 @@ interface ExternalLink {
 interface ExternalLinkContextProps {
   links: ExternalLink[] | null;
   fetchLinks: (lessonId: number) => Promise<void>;
+  fetchLinkById: (linkId:number)=>Promise<ExternalLink>;
   deleteLink: (linkId: number) => Promise<void>;
   editLink: (linkId: number, data: { lesson_id: number; link: string; description: string }) => Promise<void>;
   addLink: ({
@@ -77,6 +79,29 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
     [accessToken]
   );
 
+ 
+  const fetchLinkById = useCallback(
+    async (linkId: number): Promise<ExternalLink> => {
+      setLoading(true);
+      try {
+        const response = await axios.get<ExternalLink>(`${ENDPOINT}/external_link/${linkId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        console.log(response.data);
+        return response.data; 
+      } catch (err) {
+        setError('Failed to fetch link');
+        console.error(err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken]
+  );
+  
+
+  
   const addLink = useCallback(
     async ({
       lesson_id,
@@ -123,7 +148,7 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
 
   const editLink = useCallback(async (linkId:number, data:{ lesson_id: number; link: string; description: string }) => {
     try {
-      const response = await axios.put(`/edit_external_link/${linkId}/`, data, {
+      const response = await axios.put(`${ENDPOINT}/edit_external_link/${linkId}`, data, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setLinks((prevLinks) =>
@@ -162,6 +187,7 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
       value={{
         links,
         editLink,
+        fetchLinkById,
         fetchLinks,
         deleteLink,
         addLink,
