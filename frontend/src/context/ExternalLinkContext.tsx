@@ -84,15 +84,16 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
     async (linkId: number): Promise<ExternalLink> => {
       setLoading(true);
       try {
-        const response = await axios.get<ExternalLink>(`${ENDPOINT}/external_link/${linkId}`, {
+        const response = await axios.get<{external_link:ExternalLink}>(`${ENDPOINT}/external_link/${linkId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        console.log(response.data);
-        return response.data; 
+  
+        return response.data.external_link;
       } catch (err) {
         setError('Failed to fetch link');
         console.error(err);
         throw err;
+
       } finally {
         setLoading(false);
       }

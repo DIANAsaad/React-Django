@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useExternalLinkContext } from "../../../../context/ExternalLinkContext";
 import { useParams } from "react-router-dom";
-import "../../../../styles/AddFlashcard&Link.css";
+import "../../../../styles/AddLessonProps.css";
 import BaseWrapper from "../../../base/BaseWrapper";
 
 const AddExternalLink: React.FC = () => {
@@ -14,6 +14,7 @@ const AddExternalLink: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null); 
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -25,6 +26,7 @@ const AddExternalLink: React.FC = () => {
     async (e: React.FormEvent) => {
       e.preventDefault();
       setLoading(true);
+      setError(null);
       try {
         await addLink(formData);
         setFormData({
@@ -36,6 +38,7 @@ const AddExternalLink: React.FC = () => {
         setTimeout(() => setSuccess(false), 7000);
       } catch (error) {
         console.error("Failed to add link", error);
+        setError("Failed to add external link.");
       } finally {
         setLoading(false);
       }
@@ -46,7 +49,7 @@ const AddExternalLink: React.FC = () => {
   return (
     <>
       <p>Add the lesson's external links one by one</p>
-      <form onSubmit={handleSubmit} className="add-flashcard-link-form">
+      <form onSubmit={handleSubmit} className="add-lesson-props-form">
         <div className="form-group">
           <label htmlFor="description">Link's Description:</label>
           <input
@@ -70,6 +73,7 @@ const AddExternalLink: React.FC = () => {
             className="form-control"
           />
         </div>
+        {error && <p className="error text-danger">{error}</p>}
         {success && (
           <div className="alert alert-cstm-success">
             Link added successfully, you can add a new one and view them in the

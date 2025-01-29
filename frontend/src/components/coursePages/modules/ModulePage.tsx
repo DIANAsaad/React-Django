@@ -7,6 +7,7 @@ import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
+
 const ModulePage: React.FC = () => {
   const { modules, loading, error, isInstructor, isStaff, fetchModulesById } =
     useModuleContext();
@@ -27,7 +28,6 @@ const ModulePage: React.FC = () => {
     fetchLinks,
     loading: linkLoading,
     deleteLink,
-
   } = useExternalLinkContext();
 
   useEffect(() => {
@@ -50,6 +50,10 @@ const ModulePage: React.FC = () => {
   const options = [
     ...(isStaff || isInstructor
       ? [
+          {
+            label: "Add Session Recording",
+            action: () => navigate(`/${courseId}/addFlashcard/${module.id}`),
+          },
           {
             label: "Add Flashcards",
             action: () => navigate(`/${courseId}/addFlashcard/${module.id}`),
@@ -215,8 +219,10 @@ const ModulePage: React.FC = () => {
                           },
                           {
                             label: "Edit",
-                            action: () => { navigate(`/${moduleId}/editExternalLink/${link.id}`);
-                            
+                            action: () => {
+                              navigate(
+                                `/${courseId}/${moduleId}/editExternalLink/${link.id}`
+                              );
                             },
                           },
                         ]}

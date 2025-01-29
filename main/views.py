@@ -15,6 +15,7 @@ from main.serializers import (
     ModuleSerializer,
     FlashcardSerializer,
     ExternalLinkSerializer,
+    QuizSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -211,7 +212,7 @@ class GetExternalLinkByIdView(APIView):
         try:
             external_link = get_object_or_404(ExternalLink, id=link_id)
             data = {"external_link": ExternalLinkSerializer(external_link).data}
-            print(data)
+
             return Response(data, status=status.HTTP_200_OK)
         except ExternalLink.DoesNotExist:
             return Response(
@@ -414,3 +415,10 @@ class DeleteExternalLinkView(APIView):
 
 class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+    
+    def post(self, request, *args, **kargs):
+        serializer =QuizSerializer(data=request.data, context={"request": request})
+
+        if serializer.is_valid():
+            quiz=serializer.save()
+            return Response(QuizSerializer(quiz).data, status=status.HTTP_201_CREATED)

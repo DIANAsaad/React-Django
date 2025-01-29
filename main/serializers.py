@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import AchieveUser, Course, Module, Flashcard, ExternalLink
+from .models import AchieveUser, Course, Module, Flashcard, ExternalLink, Quiz, Question
 from django.shortcuts import get_object_or_404
 
 
@@ -31,6 +31,36 @@ class RefreshTokenSerializer(serializers.Serializer):
 
 
 #  WEB CONTENT
+
+# Course
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    course_image = serializers.ImageField(required=False, allow_null=True)
+    creator = AchieveUserSerializer(read_only=True)
+
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "course_title",
+            "description",
+            "course_image",
+            "study_guide",
+            "creator",
+        ]
+        read_only_fields = ["id"]
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        course_image = validated_data.pop("course_image", None)
+        course = Course.objects.create(
+            creator=request.user, course_image=course_image, **validated_data
+        )
+        return course
+
+
+# Module
 
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -69,29 +99,7 @@ class ModuleSerializer(serializers.ModelSerializer):
         return module
 
 
-class CourseSerializer(serializers.ModelSerializer):
-    course_image = serializers.ImageField(required=False, allow_null=True)
-    creator = AchieveUserSerializer(read_only=True)
-
-    class Meta:
-        model = Course
-        fields = [
-            "id",
-            "course_title",
-            "description",
-            "course_image",
-            "study_guide",
-            "creator",
-        ]
-        read_only_fields = ["id"]
-
-    def create(self, validated_data):
-        request = self.context["request"]
-        course_image = validated_data.pop("course_image", None)
-        course = Course.objects.create(
-            creator=request.user, course_image=course_image, **validated_data
-        )
-        return course
+# Flashcards
 
 
 class FlashcardSerializer(serializers.ModelSerializer):
@@ -108,6 +116,9 @@ class FlashcardSerializer(serializers.ModelSerializer):
         return flashcard
 
 
+# External Links (Resourses)
+
+
 class ExternalLinkSerializer(serializers.ModelSerializer):
     lesson_id = serializers.IntegerField()
 
@@ -121,3 +132,53 @@ class ExternalLinkSerializer(serializers.ModelSerializer):
         lesson = get_object_or_404(Module, id=lesson_id)
         external_link = ExternalLink.objects.create(lesson=lesson, **validated_data)
         return external_link
+
+
+# Quizz
+class QuestionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Question
+        fields = [
+            "question_point",
+            "question_time_limit",
+            "question_text",
+            "question_type",
+            "correct_answer",
+            "choices",
+        ]
+
+
+class QuizSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True)
+    quiz_creator = AchieveUserLoginSerializer(read_only=True)
+    lesson_id = serializers.IntegerField()
+
+    class Meta:
+        model = Quiz
+        fields = [
+            "id",
+            "quiz_title",
+            "quiz_description",
+            "total_mark",
+            "time_limit",
+            "question",
+            "lesson_id",
+            "quiz_creator",
+            "attempts_allowed",
+        ]
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        questions = validated_data.pop("questions")
+        lesson_id = validated_data.pop("lesson_id")
+        quiz_creator = request.user
+
+        lesson = get_object_or_404(Module, id=lesson_id)
+        quiz = Quiz.objects.create(
+            quiz_creator=quiz_creator, lesson=lesson, **validated_data
+        )
+        for question in questions:
+            Question.objects.create(quiz=quiz, **question)
+        return quiz
+

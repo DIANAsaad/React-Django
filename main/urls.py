@@ -20,6 +20,7 @@ from main.views import (
     GetExternalLinkByIdView,
     DeleteExternalLinkView,
     EditExternalLinkView,
+    AddQuizView
 )
 
 
@@ -80,4 +81,5 @@ urlpatterns = [
         DeleteExternalLinkView.as_view(),
         name="delete_external_link",
     ),
+    path("add_quiz", AddQuizView.as_view(), nsame="add_quiz")
 ]

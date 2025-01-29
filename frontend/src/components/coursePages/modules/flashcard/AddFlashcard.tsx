@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useFlashcardContext } from "../../../../context/FlashcardContext";
 import { useParams } from "react-router-dom";
-import "../../../../styles/AddFlashcard&Link.css";
+import "../../../../styles/AddLessonProps.css";
 import BaseWrapper from "../../../base/BaseWrapper";
 
 const AddFlashcard: React.FC = () => {
@@ -49,7 +49,7 @@ const AddFlashcard: React.FC = () => {
   return (
     <>
       <p>Add the lesson's flashcards one by one</p>
-      <form onSubmit={handleSubmit} className="add-flashcard-link-form">
+      <form onSubmit={handleSubmit} className="add-lesson-props-form">
         <div className="form-group">
           <label htmlFor="question">Question:</label>
           <input

@@ -80,7 +80,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/:moduleId/editExternalLink/:linkId"
+          path="/:courseId/:moduleId/editExternalLink/:linkId"
           element={
             <ProtectedRoute>
               <EditExtrenalLink />

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useExternalLinkContext } from "../../../../context/ExternalLinkContext";
 import { useParams } from "react-router-dom";
+import BaseWrapper from "../../../base/BaseWrapper";
+import "../../../../styles/AddLessonProps.css";
+
 
 const EditExternalLink: React.FC = () => {
   const { moduleId, linkId } = useParams<{
@@ -18,32 +21,28 @@ const EditExternalLink: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch data on mount and pre-fill the form
+
   useEffect(() => {
     const fetchData = async () => {
-      if (!linkId) return; // Ensure `linkId` exists
+      if (!linkId) return; 
 
       try {
         const response = await fetchLinkById(Number(linkId));
-        console.log(response);
-     
         // Pre-fill the form data
         setFormData((prevState) => ({
           ...prevState,
           link: response.link || "",
           description: response.description || "",
         }));
-        console.log(formData);
       } catch (error) {
         console.error("Failed to fetch external link data", error);
         setError("Unable to fetch external link data.");
       }
     };
-
     fetchData();
   }, [linkId, fetchLinkById]);
 
-  // Handle input changes
+ 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -75,14 +74,14 @@ const EditExternalLink: React.FC = () => {
   return (
     <div>
       <p>Edit the lesson's external link</p>
-      <form onSubmit={handleSubmit} className="edit-external-link-form">
+      <form onSubmit={handleSubmit} className="add-lesson-props-form">
         <div className="form-group">
           <label htmlFor="description">Link's Description:</label>
           <input
             type="text"
             id="description"
             name="description"
-            value={formData.description} // Pre-filled from the backend
+            value={formData.description} 
             onChange={handleChange}
             placeholder="Enter the description"
             className="form-control"
@@ -93,7 +92,7 @@ const EditExternalLink: React.FC = () => {
           <textarea
             id="link"
             name="link"
-            value={formData.link} // Pre-filled from the backend
+            value={formData.link}
             onChange={handleChange}
             placeholder="Enter the link"
             className="form-control"
@@ -101,12 +100,15 @@ const EditExternalLink: React.FC = () => {
         </div>
         {error && <p className="error text-danger">{error}</p>}
         {success && (
-          <p className="text-success">External link updated successfully!</p>
+           <div className="alert alert-cstm-success">
+           Link changed successfully, you can view it in the
+           lesson page!
+         </div>
         )}
         <button
           type="submit"
           disabled={loading}
-          className="btn btn-primary mt-3"
+          className="btn btn-cstm"
         >
           {loading ? "Updating..." : "Update External Link"}
         </button>
@@ -115,4 +117,18 @@ const EditExternalLink: React.FC = () => {
   );
 };
 
-export default EditExternalLink;
+const EditExternalLinkWrapper: React.FC = () => {
+  const {courseId,moduleId} = useParams<{courseId:string, moduleId:string}>();
+  return (
+    <BaseWrapper
+      options={[
+        { link: "/home", label: "Home" },
+        { link: `/${courseId}/modulePage/${moduleId}`, label: "Back to Lesson" },
+      ]}
+    >
+      <EditExternalLink />
+    </BaseWrapper>
+  );
+};
+
+export default EditExternalLinkWrapper;
