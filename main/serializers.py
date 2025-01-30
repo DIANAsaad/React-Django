@@ -136,23 +136,30 @@ class ExternalLinkSerializer(serializers.ModelSerializer):
 
 # Quizz
 class QuestionSerializer(serializers.ModelSerializer):
+    question_time_limit=serializers.IntegerField()
+    question_point=serializers.IntegerField()
+    choices = serializers.ListField(child=serializers.CharField())
 
     class Meta:
         model = Question
         fields = [
+            "id",
             "question_point",
             "question_time_limit",
             "question_text",
             "question_type",
             "correct_answer",
             "choices",
+            "quiz"
         ]
 
 
 class QuizSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True)
     quiz_creator = AchieveUserLoginSerializer(read_only=True)
-    lesson_id = serializers.IntegerField()
+    module_id = serializers.IntegerField()
+    time_limit=serializers.IntegerField()
+    total_mark=serializers.IntegerField()
+    questions=QuestionSerializer(many=True, required=False)
 
     class Meta:
         model = Quiz
@@ -162,23 +169,26 @@ class QuizSerializer(serializers.ModelSerializer):
             "quiz_description",
             "total_mark",
             "time_limit",
-            "question",
-            "lesson_id",
+            "module_id",
             "quiz_creator",
             "attempts_allowed",
+            "questions"
         ]
 
     def create(self, validated_data):
         request = self.context["request"]
-        questions = validated_data.pop("questions")
-        lesson_id = validated_data.pop("lesson_id")
+        questions=validated_data.pop("questions", [])
+        module_id = validated_data.pop("module_id")
         quiz_creator = request.user
 
-        lesson = get_object_or_404(Module, id=lesson_id)
+        module = get_object_or_404(Module, id=module_id)
         quiz = Quiz.objects.create(
-            quiz_creator=quiz_creator, lesson=lesson, **validated_data
+            quiz_creator=quiz_creator, module=module, **validated_data
         )
+        question_list=[]
         for question in questions:
-            Question.objects.create(quiz=quiz, **question)
+            question_instance=Question(quiz=quiz,**question)
+            question_list.append(question_instance)
+        Question.objects.bulk_create(question_list)
         return quiz
 

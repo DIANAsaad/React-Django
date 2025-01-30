@@ -59,8 +59,8 @@ const ModulePage: React.FC = () => {
             action: () => navigate(`/${courseId}/addFlashcard/${module.id}`),
           },
           {
-            label: "Add Quizzes",
-            action: () => {},
+            label: "Add Quiz",
+            action: () => navigate(`/${courseId}/addQuiz/${module.id}`),
           },
           {
             label: "Add External Links",

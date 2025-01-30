@@ -20,6 +20,8 @@ from main.serializers import (
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from .permissions import IsStaffOrIsInstructor
+import json
+import traceback
 
 # Authentication & Authorization
 
@@ -358,11 +360,10 @@ class AddExternalLinkView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kargs):
-        print(request.data)
+      
         serializer = ExternalLinkSerializer(data=request.data)
         if serializer.is_valid():
             external_link = serializer.save()
-            print(serializer.validated_data)
             return Response(
                 ExternalLinkSerializer(external_link).data,
                 status=status.HTTP_201_CREATED,
@@ -417,8 +418,25 @@ class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
     
     def post(self, request, *args, **kargs):
-        serializer =QuizSerializer(data=request.data, context={"request": request})
+        data=request.data.copy()
+        print(data)
+        if "questions" in data and isinstance(data["questions"], str):
+            print(data['questions'])
+            try:
+                data["questions"] = json.loads(data["questions"])
+            except json.JSONDecodeError:
+                return Response({"error": "Invalid JSON format for questions"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if serializer.is_valid():
-            quiz=serializer.save()
-            return Response(QuizSerializer(quiz).data, status=status.HTTP_201_CREATED)
+        serializer = QuizSerializer(data=data, context={"request": request})
+        print(serializer)
+        try:
+           if serializer.is_valid():
+              print(serializer.validated_data)
+              quiz=serializer.save()
+              return Response(QuizSerializer(quiz).data, status=status.HTTP_201_CREATED)
+           print("s.error:",serializer.errors)
+           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print("error:",e)
+            traceback.print_exc()
+            return Response({"error":str(e)}, status=status.HTTP_400_BAD_REQUEST)

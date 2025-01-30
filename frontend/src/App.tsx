@@ -14,6 +14,8 @@ import { ExternalLinkProvider } from "./context/ExternalLinkContext";
 import AddFlashcard from "./components/coursePages/modules/flashcard/AddFlashcard";
 import AddExtrenalLink from "./components/coursePages/modules/externalLinks/AddExternalLink";
 import EditExtrenalLink from "./components/coursePages/modules/externalLinks/EditExternalLink";
+import AddQuiz from "./components/coursePages/modules/quiz/AddQuiz";
+import { QuizProvider } from "./context/QuizContext";
 
 const App: React.FC = () => {
   return (
@@ -78,6 +80,14 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/:courseId/addQuiz/:moduleId"
+          element={
+            <ProtectedRoute>
+              <AddQuiz/>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/:courseId/:moduleId/editExternalLink/:linkId"
@@ -98,7 +108,9 @@ const AppWrapper: React.FC = () => (
       <ModuleProvider>
         <FlashcardProvider>
           <ExternalLinkProvider>
+            <QuizProvider>
             <App />
+            </QuizProvider>
           </ExternalLinkProvider>
         </FlashcardProvider>
       </ModuleProvider>

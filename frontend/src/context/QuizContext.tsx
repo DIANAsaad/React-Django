@@ -21,14 +21,15 @@ interface Quiz {
     first_name: string;
     last_name: string;
   };
-  questions: Question[];
+
 }
 
-interface Question {
-  id: number;
+
+export interface Question {
   question_point: number;
   question_text: string;
   question_type: string;
+  question_time_limit:number;
   correct_answer: string;
   choices: string[];
 }
@@ -43,7 +44,7 @@ interface QuizContextProps {
     quiz_description: string;
     total_mark: number;
     time_limit: number;
-    lesson_id: number;
+    module_id: number;
     attempts_allowed: number;
     questions: Question[];
   }) => Promise<void>;
@@ -97,7 +98,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       quiz_description,
       total_mark,
       time_limit,
-      lesson_id,
+      module_id,
       attempts_allowed,
       questions,
     }: {
@@ -105,14 +106,14 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       quiz_description: string;
       total_mark: number;
       time_limit: number;
-      lesson_id: number;
+      module_id: number;
       attempts_allowed: number;
       questions: Question[];
     }) => {
       setLoading(true);
       try {
         const formData = new FormData();
-        formData.append("lesson_id", lesson_id.toString());
+        formData.append("module_id", module_id.toString());
         formData.append("quiz_title", quiz_title);
         formData.append("quiz_description", quiz_description);
         formData.append("total_mark", total_mark.toString());
@@ -140,7 +141,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     [accessToken]
   );
 
- 
   const deleteQuiz = useCallback(
     async (quizId: number) => {
       const quiz = quizzes.find((q) => q.id === quizId);
