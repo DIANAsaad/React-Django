@@ -39,6 +39,7 @@ interface QuizContextProps {
   quizzes: Quiz[] | null;
   questions: Question[] | null;
   fetchQuizzes: (lessonId: number) => Promise<void>;
+  fetchQuizbyId:(quizId:number)=>Promise<void>;
   addQuiz: (data: {
     quiz_title: string;
     quiz_description: string;
@@ -91,6 +92,26 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     [accessToken]
   );
 
+  // Fetch quiz and questions when entering to quiz page
+  const fetchQuizbyId = useCallback(
+    async(quizId:number)=>{
+
+    setLoading(true);
+    try{
+      const response= await axios.get(`${ENDPOINT}/quiz/${quizId}`
+        ,{headers: { Authorization: `Bearer ${accessToken}` }});
+       setQuizzes(response.data.quiz??[]);
+       setQuestions(response.data.questions??[]);
+       setIsStaff(response.data.isStaff);
+       setIsInstructor(response.data.isInstructor);
+    }catch{
+      setError("Failed to fetch quiz");
+    }finally{
+      setLoading(false);
+    }
+    }, [accessToken]);
+
+
   // Add quiz
   const addQuiz = useCallback(
     async ({
@@ -123,7 +144,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
 
         const response = await axios.post(`${ENDPOINT}/add_quiz`, formData, {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         });

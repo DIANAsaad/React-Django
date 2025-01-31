@@ -150,7 +150,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             "question_type",
             "correct_answer",
             "choices",
-            "quiz"
         ]
 
 

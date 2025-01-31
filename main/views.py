@@ -417,7 +417,7 @@ class DeleteExternalLinkView(APIView):
 class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
     
-    def post(self, request, *args, **kargs):
+    def post(self, request, *args, **kwargs):
         data=request.data.copy()
         print(data)
         if "questions" in data and isinstance(data["questions"], str):
@@ -433,7 +433,7 @@ class AddQuizView(APIView):
            if serializer.is_valid():
               print(serializer.validated_data)
               quiz=serializer.save()
-              return Response(QuizSerializer(quiz).data, status=status.HTTP_201_CREATED)
+              return Response(QuizSerializer(quiz ,context={"request": request}).data, status=status.HTTP_201_CREATED)
            print("s.error:",serializer.errors)
            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
