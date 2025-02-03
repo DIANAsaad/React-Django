@@ -92,8 +92,8 @@ const AddFlashcardWrapper: React.FC = () => {
   return (
     <BaseWrapper
       options={[
-        { link: "/home", label: "Home" },
-        { link: `/${courseId}}/modulePage/${moduleId}`, label: "Back to Lesson" },
+        { link: "/courses", label: "Home" },
+        { link: `/course/${courseId}/module/${moduleId}`, label: "Back to Lesson" },
       ]}
     >
       <AddFlashcard />

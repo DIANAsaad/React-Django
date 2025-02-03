@@ -19,7 +19,7 @@ const Welcome: React.FC = () => {
 
     try {
       await login(email, password);
-      navigate("/home");
+      navigate("/courses");
     } catch (error) {
       setErrorMessage("Invalid username or password.)");
     }
@@ -27,7 +27,7 @@ const Welcome: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/home');
+      navigate('/courses');
     }
   }, [isAuthenticated, navigate]);
 

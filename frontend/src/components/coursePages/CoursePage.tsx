@@ -88,7 +88,7 @@ const CoursePage: React.FC = () => {
                       <div
                         className="module-image"
                         onClick={() => {
-                          navigate(`/${course.id}/modulePage/${module.id}`);
+                          navigate(`/course/${course.id}/module/${module.id}`);
                         }}
                       >
                         <img
@@ -144,7 +144,7 @@ const CoursePage: React.FC = () => {
 
 const CoursePageWrapper: React.FC = () => {
   return (
-    <BaseWrapper options={[{ link: "/home", label: "Home" }]}>
+    <BaseWrapper options={[{ link: "/courses", label: "Home" }]}>
       <CoursePage />
     </BaseWrapper>
   );

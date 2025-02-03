@@ -1,6 +1,6 @@
 import logging
 from django.contrib.auth import logout as logout
-from main.models import Course, Module, Flashcard, ExternalLink
+from main.models import Course, Module, Flashcard, ExternalLink, Quiz
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
 from rest_framework.views import APIView
@@ -221,6 +221,18 @@ class GetExternalLinkByIdView(APIView):
                 {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+class GetQuizView(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def get(self, request, *args,**kwargs):
+        module_id=kwargs.get("module_id")
+        try:
+            quizzes=Quiz.objects.filter(module_id=module_id).all()
+
+            data={"quizzes": QuizSerializer(quizzes, many=True).data}
+            return Response(data, status=status.HTTP_200_OK)
+        except Quiz.DoesNotExist:
+            return Response({"error":"Quiz not found"}, status=status.HTTP_404_NOT_FOUND)
 
 # Functionality
 
@@ -360,7 +372,7 @@ class AddExternalLinkView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kargs):
-      
+
         serializer = ExternalLinkSerializer(data=request.data)
         if serializer.is_valid():
             external_link = serializer.save()
@@ -416,27 +428,32 @@ class DeleteExternalLinkView(APIView):
 
 class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
-    
+
     def post(self, request, *args, **kwargs):
-        data=request.data.copy()
-        print(data)
+        data = request.data.copy()
+
         if "questions" in data and isinstance(data["questions"], str):
-            print(data['questions'])
+
             try:
                 data["questions"] = json.loads(data["questions"])
             except json.JSONDecodeError:
-                return Response({"error": "Invalid JSON format for questions"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Invalid JSON format for questions"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         serializer = QuizSerializer(data=data, context={"request": request})
-        print(serializer)
+
         try:
-           if serializer.is_valid():
-              print(serializer.validated_data)
-              quiz=serializer.save()
-              return Response(QuizSerializer(quiz ,context={"request": request}).data, status=status.HTTP_201_CREATED)
-           print("s.error:",serializer.errors)
-           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+
+                quiz = serializer.save()
+                return Response(
+                    QuizSerializer(quiz, context={"request": request}).data,
+                    status=status.HTTP_201_CREATED,
+                )
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print("error:",e)
-            traceback.print_exc()
-            return Response({"error":str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

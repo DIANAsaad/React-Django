@@ -28,7 +28,7 @@ const App: React.FC = () => {
         {/* Protected route for the home page and what follows after login */}
 
         <Route
-          path="/home"
+          path="/courses"
           element={
             <ProtectedRoute>
               <Home />
@@ -37,7 +37,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/coursePage/:courseId/"
+          path="/course/:courseId/"
           element={
             <ProtectedRoute>
               <CoursePage />
@@ -46,7 +46,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/:courseId/modulePage/:moduleId"
+          path="/course/:courseId/module/:moduleId"
           element={
             <ProtectedRoute>
               <ModulePage />
@@ -55,7 +55,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/:courseId/flashcardPage/:moduleId"
+          path="/course/:courseId/module/:moduleId/flashcards"
           element={
             <ProtectedRoute>
               <FlashcardPage />
@@ -64,7 +64,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/:courseId/addFlashcard/:moduleId"
+          path="/course/:courseId/module/:moduleId/add-flashcard"
           element={
             <ProtectedRoute>
               <AddFlashcard />
@@ -73,7 +73,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/:courseId/addExternalLink/:moduleId"
+          path="/course/:courseId/module/:moduleId/add-external-link"
           element={
             <ProtectedRoute>
               <AddExtrenalLink />
@@ -81,7 +81,7 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="/:courseId/addQuiz/:moduleId"
+          path="/course/:courseId/module/:moduleId/add-quiz"
           element={
             <ProtectedRoute>
               <AddQuiz/>
@@ -90,7 +90,7 @@ const App: React.FC = () => {
         />
 
         <Route
-          path="/:courseId/:moduleId/editExternalLink/:linkId"
+          path="/course/:courseId/module/:moduleId/external-link/:linkId/edit"
           element={
             <ProtectedRoute>
               <EditExtrenalLink />

@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Question, useQuizContext } from "../../../../context/QuizContext";
 import BaseWrapper from "../../../base/BaseWrapper";
-import "../../../../styles/AddQuiz.css"
+import "../../../../styles/AddQuiz.css";
 
 const AddQuiz: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
@@ -26,7 +26,7 @@ const AddQuiz: React.FC = () => {
     questions: [
       {
         question_text: "",
-        question_type: "",
+        question_type: "MCQ",
         correct_answer: "",
         question_point: 0,
         question_time_limit: 0,
@@ -63,13 +63,7 @@ const AddQuiz: React.FC = () => {
     } else {
       newQuestions[index] = { ...newQuestions[index], [key]: value };
     }
-    if (key === "question_type") {
-      if (value === "TF") {
-        newQuestions[index].question_type = "TF";
-      } else if (value === "MCQ") {
-        newQuestions[index].question_type = "MCQ";
-      }
-    }
+
     setFormData({ ...formData, questions: newQuestions });
   };
 
@@ -132,83 +126,96 @@ const AddQuiz: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="container mt-4">
-      <div className="mb-3">
-        <label htmlFor="quiz_title" className="form-label">
-          Quiz Title:
-        </label>
-      
-        <input
-          type="text"
-          id="quiz_title"
-          name="quiz_title"
-          value={formData.quiz_title}
-          onChange={handleChange}
-          placeholder="Enter the quiz title"
-          className="form-control"
-        />
+      <div className="row">
+        <div className="col-md-6">
+          <div className="form-group">
+            <label htmlFor="quiz_title" className="form-label">
+              Quiz Title:
+            </label>
+            <input
+              type="text"
+              id="quiz_title"
+              name="quiz_title"
+              value={formData.quiz_title}
+              onChange={handleChange}
+              placeholder="Enter the quiz title"
+              className="form-control"
+            />
+          </div>
         </div>
+        <div className="col-md-6">
+          <div className="form-group">
+            <label htmlFor="quiz_description" className="form-label">
+              Quiz Description:
+            </label>
+            <textarea
+              id="quiz_description"
+              name="quiz_description"
+              value={formData.quiz_description}
+              onChange={handleChange}
+              placeholder="Enter the quiz description"
+              className="form-control"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-md-4">
+          <div className="form-group">
+            <label htmlFor="time_limit" className="form-label">
+              Time Limit:
+            </label>
+            <input
+              type="number"
+              id="time_limit"
+              name="time_limit"
+              value={formData.time_limit}
+              onChange={handleChange}
+              placeholder="Enter the quiz time limit"
+              className="form-control"
+                 min='0'
+            />
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="form-group">
+            <label htmlFor="total_mark" className="form-label">
+              Total Mark:
+            </label>
+            <input
+              type="number"
+              id="total_mark"
+              name="total_mark"
+              value={formData.total_mark}
+              onChange={handleChange}
+              placeholder="Enter the quiz total mark"
+              className="form-control"
+              min='0'
+            />
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="form-group">
+            <label htmlFor="attempts_allowed" className="form-label">
+              Attempts Allowed:
+            </label>
+            <input
+              type="number"
+              id="attempts_allowed"
+              name="attempts_allowed"
+              value={formData.attempts_allowed}
+              onChange={handleChange}
+              placeholder="Enter the attempts allowed for this quiz"
+              className="form-control"
+              min="0"
+            />
+          </div>
+        </div>
+      </div>
 
-      <div className="mb-3">
-        <label htmlFor="quiz_description" className="form-label">
-          Quiz Description:
-        </label>
-        <textarea
-          id="quiz_description"
-          name="quiz_description"
-          value={formData.quiz_description}
-          onChange={handleChange}
-          placeholder="Enter the quiz description"
-          className="form-control"
-        />
-      </div>
-   
-      <div className="mb-3">
-        <label htmlFor="time_limit" className="form-label">
-          Time Limit:
-        </label>
-        <input
-          type="number"
-          id="time_limit"
-          name="time_limit"
-          value={formData.time_limit}
-          onChange={handleChange}
-          placeholder="Enter the quiz time limit"
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="total_mark" className="form-label">
-          Total Mark:
-        </label>
-        <input
-          type="number"
-          id="total_mark"
-          name="total_mark"
-          value={formData.total_mark}
-          onChange={handleChange}
-          placeholder="Enter the quiz total mark"
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="attempts_allowed" className="form-label">
-          Attempts Allowed:
-        </label>
-        <input
-          type="number"
-          id="attempts_allowed"
-          name="attempts_allowed"
-          value={formData.attempts_allowed}
-          onChange={handleChange}
-          placeholder="Enter the attempts allowed for this quiz"
-          className="form-control"
-        />
-      </div>
-
-      <h3>Questions</h3>
       {formData.questions.map((question, index) => (
-        <div key={index} className="mb-4 p-3 border rounded">
-          <div className="mb-3">
+        <div key={index} className="question-container">
+          <div className="form-group">
             <label htmlFor={`question_text_${index}`} className="form-label">
               Question Text:
             </label>
@@ -223,7 +230,7 @@ const AddQuiz: React.FC = () => {
               required
             />
           </div>
-          <div className="mb-3">
+          <div className="form-group">
             <label htmlFor={`question_type_${index}`} className="form-label">
               Question Type:
             </label>
@@ -239,7 +246,7 @@ const AddQuiz: React.FC = () => {
               <option value="TF">True/False</option>
             </select>
           </div>
-          <div className="mb-3">
+          <div className="form-group">
             <label htmlFor={`choices_${index}`} className="form-label">
               Choices:
             </label>
@@ -254,22 +261,27 @@ const AddQuiz: React.FC = () => {
               required
             />
           </div>
-          <div className="mb-3">
+          <div className="form-group">
             <label htmlFor={`correct_answer_${index}`} className="form-label">
               Correct Answer:
             </label>
-            <input
-              type="text"
+            <select
               id={`correct_answer_${index}`}
               name="correct_answer"
               value={question.correct_answer}
               onChange={(e) => handleQuestionChange(index, e)}
-              placeholder="Enter the correct answer"
               className="form-control"
               required
-            />
+            >
+             
+              {question.choices.map((choice, i) => (
+                <option value={choice} key={i}>
+                  {choice}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="mb-3">
+          <div className="form-group">
             <label htmlFor={`question_point_${index}`} className="form-label">
               Question Point:
             </label>
@@ -281,10 +293,11 @@ const AddQuiz: React.FC = () => {
               onChange={(e) => handleQuestionChange(index, e)}
               placeholder="Enter the question point"
               className="form-control"
+                 min='0'
               required
             />
           </div>
-          <div className="mb-3">
+          <div className="form-group">
             <label
               htmlFor={`question_time_limit_${index}`}
               className="form-label"
@@ -302,19 +315,26 @@ const AddQuiz: React.FC = () => {
               required
             />
           </div>
-          <button
-            type="button"
-            className="btn btn-danger"
-            onClick={() => removeQuestion(index)}
-          >
-            Remove Question
-          </button>
+          <div className="d-flex">
+            <button
+              type="button"
+              className="btn btn-cstm"
+              onClick={() => removeQuestion(index)}
+            >
+              Remove
+            </button>
+            <button
+              type="button"
+              className="btn btn-cstm"
+              onClick={addQuestion}
+            >
+              Add
+            </button>
+          </div>
         </div>
       ))}
-      <button type="button" className="btn btn-primary" onClick={addQuestion}>
-        Add Question
-      </button>
-      <button type="submit" className="btn btn-success mt-3" disabled={loading}>
+
+      <button type="submit" className="btn btn-cstm-submit" disabled={loading}>
         {loading ? "Adding..." : "Add Quiz"}
       </button>
       {error && <p className="text-danger mt-3">{error}</p>}
@@ -323,8 +343,9 @@ const AddQuiz: React.FC = () => {
 };
 
 const AddQuizWrapper: React.FC = () => {
+  const {moduleId,courseId}=useParams<{moduleId:string, courseId:string}>();
   return (
-    <BaseWrapper options={[{ link: "/home", label: "Home" }]}>
+    <BaseWrapper options={[{ link: "/courses", label: "Home" }, {link:`/course/${courseId}/module/${moduleId}`,label:"Back to Lesson"}]}>
       <AddQuiz />
     </BaseWrapper>
   );

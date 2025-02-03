@@ -39,7 +39,7 @@ interface QuizContextProps {
   quizzes: Quiz[] | null;
   questions: Question[] | null;
   fetchQuizzes: (lessonId: number) => Promise<void>;
-  fetchQuizbyId:(quizId:number)=>Promise<void>;
+  fetchQuizById:(quizId:number)=>Promise<void>;
   addQuiz: (data: {
     quiz_title: string;
     quiz_description: string;
@@ -69,14 +69,14 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
   const fetchQuizzes = useCallback(
-    async (lessonId: number) => {
+    async (moduleId: number) => {
       if (!accessToken) {
         setError("No access token available");
         return;
       }
       try {
         setLoading(true);
-        const response = await axios.get(`${ENDPOINT}/quizzes/${lessonId}`, {
+        const response = await axios.get(`${ENDPOINT}/quizzes/${moduleId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setQuizzes(response.data.quizzes ?? []);
@@ -93,7 +93,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   );
 
   // Fetch quiz and questions when entering to quiz page
-  const fetchQuizbyId = useCallback(
+  const fetchQuizById = useCallback(
     async(quizId:number)=>{
 
     setLoading(true);
@@ -185,6 +185,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   return (
     <QuizContext.Provider
       value={{
+        fetchQuizById,
         quizzes,
         questions,
         fetchQuizzes,

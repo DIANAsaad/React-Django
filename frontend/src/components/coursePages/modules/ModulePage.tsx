@@ -3,10 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useModuleContext } from "../../../context/ModuleContext";
 import { useFlashcardContext } from "../../../context/FlashcardContext";
 import { useExternalLinkContext } from "../../../context/ExternalLinkContext";
+import { useQuizContext } from "../../../context/QuizContext";
 import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
-
 
 const ModulePage: React.FC = () => {
   const { modules, loading, error, isInstructor, isStaff, fetchModulesById } =
@@ -30,11 +30,19 @@ const ModulePage: React.FC = () => {
     deleteLink,
   } = useExternalLinkContext();
 
+  const {
+    quizzes,
+    fetchQuizzes,
+    loading: quizLoading,
+    deleteQuiz,
+  } = useQuizContext();
+
   useEffect(() => {
     if (moduleId) {
       fetchFlashcards(Number(moduleId));
       fetchLinks(Number(moduleId));
       fetchModulesById(Number(moduleId));
+      fetchQuizzes(Number(moduleId));
     }
   }, [moduleId, fetchFlashcards, fetchModulesById, fetchLinks]);
 
@@ -52,19 +60,25 @@ const ModulePage: React.FC = () => {
       ? [
           {
             label: "Add Session Recording",
-            action: () => navigate(`/${courseId}/addFlashcard/${module.id}`),
+            action: () =>
+              navigate(`/course/${courseId}/module/${module.id}/add-flashcard`),
           },
           {
             label: "Add Flashcards",
-            action: () => navigate(`/${courseId}/addFlashcard/${module.id}`),
+            action: () =>
+              navigate(`/course/${courseId}/module/${module.id}/add-flashcard`),
           },
           {
             label: "Add Quiz",
-            action: () => navigate(`/${courseId}/addQuiz/${module.id}`),
+            action: () =>
+              navigate(`/course/${courseId}/module/${module.id}/add-quiz`),
           },
           {
             label: "Add External Links",
-            action: () => navigate(`/${courseId}/addExternalLink/${module.id}`),
+            action: () =>
+              navigate(
+                `/course/${courseId}/module/${module.id}/add-external-link`
+              ),
           },
           {
             label: "Add Activities",
@@ -163,7 +177,9 @@ const ModulePage: React.FC = () => {
                   <div
                     className="material-box-details"
                     onClick={() => {
-                      navigate(`/${courseId}/flashcardPage/${module.id}`);
+                      navigate(
+                        `/course/${courseId}/module/${module.id}/flashcards`
+                      );
                     }}
                   >
                     <strong>Lesson Flashcards: </strong>
@@ -221,7 +237,7 @@ const ModulePage: React.FC = () => {
                             label: "Edit",
                             action: () => {
                               navigate(
-                                `/${courseId}/${moduleId}/editExternalLink/${link.id}`
+                                `/course/${courseId}/module/${moduleId}/external-link/${link.id}/edit`
                               );
                             },
                           },
@@ -235,6 +251,49 @@ const ModulePage: React.FC = () => {
           ) : (
             <div className="flashcard-alert">No external links available.</div>
           )}
+
+          {quizLoading ? (
+            <div className="flashcard-alert">
+              Loading lesson's External Links...
+            </div>
+          ) : quizzes && quizzes.length > 0 ? (
+            quizzes.map((quiz) => (
+              <div key={quiz.id}>
+                <div className="material-box p-4 shadow-sm rounded align-items-center">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="material-box-details">
+              
+                       
+                       Lesson Quiz: {quiz.quiz_title}: {quiz.quiz_description}
+                      
+                    </div>
+                    {(isStaff || isInstructor) && (
+                      <DropdownMenu
+                        buttonContent={"..."}
+                        options={[
+                          {
+                            label: "Delete",
+                            action: () => {
+                              deleteQuiz(quiz.id);
+                            },
+                          },
+                          {
+                            label: "Edit",
+                            action: () => {
+                              {
+                              }
+                            },
+                          },
+                        ]}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="flashcard-alert">No quizzes available.</div>
+          )}
         </div>
       </div>
     </>
@@ -247,8 +306,8 @@ const ModulePageWrapper: React.FC = () => {
   return (
     <BaseWrapper
       options={[
-        { link: "/home", label: "Home" },
-        { link: `/coursePage/${courseId}`, label: "Back to Course" },
+        { link: "/courses", label: "Home" },
+        { link: `/course/${courseId}`, label: "Back to Course" },
       ]}
     >
       <ModulePage />

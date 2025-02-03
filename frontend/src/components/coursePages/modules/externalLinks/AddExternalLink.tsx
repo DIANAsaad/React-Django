@@ -97,9 +97,9 @@ const AddExternalLinkWrapper: React.FC = () => {
   return (
     <BaseWrapper
       options={[
-        { link: "/home", label: "Home" },
+        { link: "/courses", label: "Home" },
         {
-          link: `/${courseId}/modulePage/${moduleId}`,
+          link: `/course/${courseId}/module/${moduleId}`,
           label: "Back to Lesson",
         },
       ]}
