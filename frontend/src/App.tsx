@@ -16,6 +16,7 @@ import AddExtrenalLink from "./components/coursePages/modules/externalLinks/AddE
 import EditExtrenalLink from "./components/coursePages/modules/externalLinks/EditExternalLink";
 import AddQuiz from "./components/coursePages/modules/quiz/AddQuiz";
 import { QuizProvider } from "./context/QuizContext";
+import QuizPage from "./components/coursePages/modules/quiz/QuizPage";
 
 const App: React.FC = () => {
   return (
@@ -94,6 +95,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <EditExtrenalLink />
+            </ProtectedRoute>
+          }
+        />
+          <Route
+          path="/course/:courseId/module/:moduleId/quiz/:quizId"
+          element={
+            <ProtectedRoute>
+              <QuizPage />
             </ProtectedRoute>
           }
         />

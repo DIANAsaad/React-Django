@@ -24,8 +24,9 @@ interface Quiz {
 
 }
 
-
-export interface Question {
+// Define the shape of a Question
+interface Question {
+  id:number;
   question_point: number;
   question_text: string;
   question_type: string;
@@ -34,7 +35,9 @@ export interface Question {
   choices: string[];
 }
 
+export type QuestionWithoutId = Omit<Question, 'id'>;
 // Define the context structure
+
 interface QuizContextProps {
   quizzes: Quiz[] | null;
   questions: Question[] | null;
@@ -47,7 +50,7 @@ interface QuizContextProps {
     time_limit: number;
     module_id: number;
     attempts_allowed: number;
-    questions: Question[];
+    questions: QuestionWithoutId[];
   }) => Promise<void>;
   deleteQuiz: (quizId: number) => Promise<void>;
   loading: boolean;
@@ -80,7 +83,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setQuizzes(response.data.quizzes ?? []);
-        setQuestions(response.data.questions ?? []);
         setIsStaff(response.data.isStaff);
         setIsInstructor(response.data.isInstructor);
       } catch (err) {
@@ -95,12 +97,19 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   // Fetch quiz and questions when entering to quiz page
   const fetchQuizById = useCallback(
     async(quizId:number)=>{
-
+      if (!accessToken) {
+        setError("No access token available");
+        return;
+      }
     setLoading(true);
     try{
       const response= await axios.get(`${ENDPOINT}/quiz/${quizId}`
         ,{headers: { Authorization: `Bearer ${accessToken}` }});
-       setQuizzes(response.data.quiz??[]);
+        const quiz=response.data.quiz
+        setQuizzes((prevQuizzes) => [
+          ...prevQuizzes.filter((q) => q.id !== quiz.id),
+          quiz,
+        ]);
        setQuestions(response.data.questions??[]);
        setIsStaff(response.data.isStaff);
        setIsInstructor(response.data.isInstructor);
@@ -129,7 +138,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       time_limit: number;
       module_id: number;
       attempts_allowed: number;
-      questions: Question[];
+      questions: QuestionWithoutId[];
     }) => {
       setLoading(true);
       try {
@@ -186,6 +195,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     <QuizContext.Provider
       value={{
         fetchQuizById,
+    
         quizzes,
         questions,
         fetchQuizzes,

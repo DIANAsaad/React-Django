@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { Question, useQuizContext } from "../../../../context/QuizContext";
+import { QuestionWithoutId, useQuizContext } from "../../../../context/QuizContext";
 import BaseWrapper from "../../../base/BaseWrapper";
 import "../../../../styles/AddQuiz.css";
 
@@ -15,7 +15,7 @@ const AddQuiz: React.FC = () => {
     total_mark: number;
     time_limit: number;
     attempts_allowed: number;
-    questions: Question[];
+    questions: QuestionWithoutId[];
   }>({
     module_id: Number(moduleId),
     quiz_title: "",
@@ -50,7 +50,7 @@ const AddQuiz: React.FC = () => {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    type QuestionKey = keyof Question;
+    type QuestionKey = keyof QuestionWithoutId;
     const key = e.target.name as QuestionKey;
     const value = e.target.value;
 

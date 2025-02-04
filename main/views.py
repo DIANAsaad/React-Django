@@ -1,6 +1,6 @@
 import logging
 from django.contrib.auth import logout as logout
-from main.models import Course, Module, Flashcard, ExternalLink, Quiz
+from main.models import Course, Module, Flashcard, ExternalLink, Quiz, Question
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
 from rest_framework.views import APIView
@@ -16,6 +16,7 @@ from main.serializers import (
     FlashcardSerializer,
     ExternalLinkSerializer,
     QuizSerializer,
+    QuestionSerializer
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -221,18 +222,39 @@ class GetExternalLinkByIdView(APIView):
                 {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
-class GetQuizView(APIView):
-    permission_classes=[IsAuthenticated]
 
-    def get(self, request, *args,**kwargs):
-        module_id=kwargs.get("module_id")
+
+class GetQuizzesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        module_id = kwargs.get("module_id")
         try:
-            quizzes=Quiz.objects.filter(module_id=module_id).all()
+            quizzes = Quiz.objects.filter(module_id=module_id).all()
 
-            data={"quizzes": QuizSerializer(quizzes, many=True).data}
+            data = {"quizzes": QuizSerializer(quizzes, many=True).data}
             return Response(data, status=status.HTTP_200_OK)
         except Quiz.DoesNotExist:
-            return Response({"error":"Quiz not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+class GetQuizByIdView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        quiz_id = kwargs.get("quiz_id")
+        try:
+            quiz = get_object_or_404(Quiz, id=quiz_id)
+            questions=Question.objects.filter(quiz=quiz)
+            data = {"quiz": QuizSerializer(quiz).data,
+                    "questions":QuestionSerializer(questions,many=True).data}
+            return Response(data, status=status.HTTP_200_OK)
+        except Quiz.DoesNotExist or Question.DoesNotExist:
+            return Response(
+                {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
 
 # Functionality
 

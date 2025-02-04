@@ -8,6 +8,7 @@ import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
+
 const ModulePage: React.FC = () => {
   const { modules, loading, error, isInstructor, isStaff, fetchModulesById } =
     useModuleContext();
@@ -147,6 +148,7 @@ const ModulePage: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
+                      
                       <strong>Lesson PDF: </strong>
                       Access and download your lesson
                     </a>
@@ -254,14 +256,14 @@ const ModulePage: React.FC = () => {
 
           {quizLoading ? (
             <div className="flashcard-alert">
-              Loading lesson's External Links...
+              Loading lesson's Quizzes...
             </div>
           ) : quizzes && quizzes.length > 0 ? (
             quizzes.map((quiz) => (
               <div key={quiz.id}>
                 <div className="material-box p-4 shadow-sm rounded align-items-center">
                   <div className="d-flex align-items-center justify-content-between">
-                    <div className="material-box-details">
+                    <div className="material-box-details" onClick={()=>navigate(`/course/${courseId}/module/${moduleId}/quiz/${quiz.id}`)}>
               
                        
                        Lesson Quiz: {quiz.quiz_title}: {quiz.quiz_description}

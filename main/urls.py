@@ -21,7 +21,8 @@ from main.views import (
     DeleteExternalLinkView,
     EditExternalLinkView,
     AddQuizView,
-    GetQuizView
+    GetQuizzesView,
+    GetQuizByIdView
 )
 
 
@@ -43,7 +44,8 @@ urlpatterns = [
         GetExternalLinkByIdView.as_view(),
         name="external link",
     ),
-    path("quizzes/<int:module_id>", GetQuizView.as_view(), name="quizzes"),
+    path("quizzes/<int:module_id>", GetQuizzesView.as_view(), name="quizzes"),
+    path("quiz/<int:quiz_id>", GetQuizByIdView.as_view(), name="quiz"),
     path("add_course", AddCourseView.as_view(), name="add_Course"),
     path(
         "refresh_access_token",
