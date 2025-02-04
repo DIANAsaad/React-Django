@@ -61,7 +61,7 @@ class Course(models.Model):
         null=True,
     )
     study_guide = models.URLField(null=True, blank=True, max_length=2083)
-  
+
     def delete(self, *args, **kwargs):
         if self.course_image:
             course_image_path = self.course_image.path
@@ -88,7 +88,6 @@ class Module(models.Model):
     lesson_pdf = models.FileField(
         upload_to="module_lesson_pdfs/", blank=True, null=True
     )
-
 
     def delete(self, *args, **kwargs):
         if self.module_image:
@@ -144,19 +143,15 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name="answers"
     )
-    answered_by = models.ForeignKey(AchieveUser, on_delete=models.SET_NULL, null=True)
-    answered_at = models.DateTimeField(default=timezone.now)
     answer_text = models.TextField(blank=True, null=True)
     is_correct = models.BooleanField(null=True)
-
-    def __str__(self):
-        return f"Answer for {self.question} by {self.answered_by}"
 
 
 class QuizAttempt(models.Model):
     quiz = models.ForeignKey(
         Quiz, on_delete=models.CASCADE, related_name="quiz_attempts"
     )
+    answers = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True)
     taken_by = models.ForeignKey(
         AchieveUser, on_delete=models.CASCADE, related_name="taken_by"
     )
@@ -174,4 +169,3 @@ class ExternalLink(models.Model):
     )
     description = models.CharField(max_length=100)
     link = models.URLField(max_length=2083)
-  

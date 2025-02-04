@@ -452,6 +452,7 @@ class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kwargs):
+        # Copy the data to manually parse the nested objects since DRF does not natively support them
         data = request.data.copy()
 
         if "questions" in data and isinstance(data["questions"], str):
@@ -479,3 +480,15 @@ class AddQuizView(APIView):
         except Exception as e:
 
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SubmitAnsweresView(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def post(self,request, *args,**kwargs):
+         serializer = QuizSerializer(data=request.data, context={"request": request})
+         if serializer.is_valid():
+             attempt=serializer.validated_data["answeres"]
+
+     
+        

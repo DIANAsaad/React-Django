@@ -35,12 +35,23 @@ interface Question {
   choices: string[];
 }
 
-export type QuestionWithoutId = Omit<Question, 'id'>;
-// Define the context structure
+// Define the shape of the answer
+interface Answer{
+  id:number;
+  answer_text:string;
+  is_correct:boolean;
+  question_id:number;
+}
 
+
+
+export type QuestionWithoutId = Omit<Question, 'id'>;
+
+// Define the context structure
 interface QuizContextProps {
   quizzes: Quiz[] | null;
   questions: Question[] | null;
+  answeres:Answer[]|null;
   fetchQuizzes: (lessonId: number) => Promise<void>;
   fetchQuizById:(quizId:number)=>Promise<void>;
   addQuiz: (data: {
@@ -57,6 +68,7 @@ interface QuizContextProps {
   error: string | null;
   isStaff: boolean;
   isInstructor: boolean;
+  submitAnsweres:(data:{answer_text:string; question_id:number})=>Promise<void>;
 }
 
 const QuizContext = createContext<QuizContextProps | undefined>(undefined);
@@ -66,6 +78,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuth();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [answeres, setAnsweres]=useState<Answer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
@@ -171,6 +184,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     [accessToken]
   );
 
+  //Delete quiz
   const deleteQuiz = useCallback(
     async (quizId: number) => {
       const quiz = quizzes.find((q) => q.id === quizId);
@@ -191,16 +205,47 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     [quizzes, accessToken]
   );
 
+  //Submit the answeres
+const submitAnsweres=useCallback(
+
+  async({
+    answer_text,
+    question_id,
+  }: {
+    answer_text:string;
+    question_id:number;
+  }) => {
+    setLoading(true);
+    try{
+      const formData=new FormData();
+      formData.append("answer_text",answer_text);
+      formData.append("question_id", question_id.toString());
+
+      const response=await axios.post(`${ENDPOINT}/submit_answer`,formData, {
+        headers:{
+        "Content-Type":"application/json",
+        Authorization:`Bearer ${accessToken}`,
+        }});
+        setAnsweres((prevAnsweres)=>[...(prevAnsweres||[]), response.data])
+    }catch{
+      setError("Failed to submit answer");
+    }finally{
+      setLoading(false);
+    }
+  }, [accessToken])
+
+
   return (
     <QuizContext.Provider
       value={{
         fetchQuizById,
-    
+        answeres,
         quizzes,
         questions,
         fetchQuizzes,
         addQuiz,
         deleteQuiz,
+        submitAnsweres,
         loading,
         error,
         isStaff,
@@ -211,6 +256,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     </QuizContext.Provider>
   );
 };
+
 
 export const useQuizContext = () => {
   const context = useContext(QuizContext);
