@@ -39,7 +39,6 @@ interface Question {
 interface Answer{
   id:number;
   answer_text:string;
-  is_correct:boolean;
   question_id:number;
 }
 
@@ -68,7 +67,7 @@ interface QuizContextProps {
   error: string | null;
   isStaff: boolean;
   isInstructor: boolean;
-  submitAnsweres:(data:{answer_text:string; question_id:number})=>Promise<void>;
+  submitAnswers:(answers:Answer[], quizId:number)=>Promise<void>;
 }
 
 const QuizContext = createContext<QuizContextProps | undefined>(undefined);
@@ -78,7 +77,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuth();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [answeres, setAnsweres]=useState<Answer[]>([]);
+  const [answeres, setAnswers]=useState<Answer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
@@ -206,35 +205,30 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   );
 
   //Submit the answeres
-const submitAnsweres=useCallback(
 
-  async({
-    answer_text,
-    question_id,
-  }: {
-    answer_text:string;
-    question_id:number;
-  }) => {
-    setLoading(true);
-    try{
-      const formData=new FormData();
-      formData.append("answer_text",answer_text);
-      formData.append("question_id", question_id.toString());
-
-      const response=await axios.post(`${ENDPOINT}/submit_answer`,formData, {
-        headers:{
-        "Content-Type":"application/json",
-        Authorization:`Bearer ${accessToken}`,
-        }});
-        setAnsweres((prevAnsweres)=>[...(prevAnsweres||[]), response.data])
-    }catch{
-      setError("Failed to submit answer");
-    }finally{
-      setLoading(false);
-    }
-  }, [accessToken])
-
-
+  const submitAnswers = useCallback(
+    async (answers: Answer[], quizId:number) => {
+      setLoading(true);
+      try {
+        const response = await axios.post(
+          `${ENDPOINT}/submit_answer/${quizId}`,
+          { answers },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        setAnswers((prevAnswers) => [...(prevAnswers || []), ...response.data]);
+      } catch {
+        setError('Failed to submit answers');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken, ENDPOINT]
+  );
   return (
     <QuizContext.Provider
       value={{
@@ -245,7 +239,7 @@ const submitAnsweres=useCallback(
         fetchQuizzes,
         addQuiz,
         deleteQuiz,
-        submitAnsweres,
+        submitAnswers,
         loading,
         error,
         isStaff,

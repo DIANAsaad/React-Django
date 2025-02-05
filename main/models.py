@@ -151,12 +151,11 @@ class QuizAttempt(models.Model):
     quiz = models.ForeignKey(
         Quiz, on_delete=models.CASCADE, related_name="quiz_attempts"
     )
-    answers = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True)
     taken_by = models.ForeignKey(
         AchieveUser, on_delete=models.CASCADE, related_name="taken_by"
     )
     taken_at = models.DateTimeField(default=timezone.now)
-    attempts_taken = models.IntegerField(null=True)
+    total_attempts = models.IntegerField(default=0)
     score = models.PositiveIntegerField(default=0)
 
 

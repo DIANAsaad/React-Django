@@ -1,7 +1,17 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import AchieveUser, Course, Module, Flashcard, ExternalLink, Quiz, Question
+from .models import (
+    AchieveUser,
+    Course,
+    Module,
+    Flashcard,
+    ExternalLink,
+    Quiz,
+    Question,
+    Answer,
+    QuizAttempt,
+)
 from django.shortcuts import get_object_or_404
 
 
@@ -136,8 +146,8 @@ class ExternalLinkSerializer(serializers.ModelSerializer):
 
 # Quizz
 class QuestionSerializer(serializers.ModelSerializer):
-    question_time_limit=serializers.IntegerField()
-    question_point=serializers.IntegerField()
+    question_time_limit = serializers.IntegerField()
+    question_point = serializers.IntegerField()
     choices = serializers.ListField(child=serializers.CharField())
 
     class Meta:
@@ -153,12 +163,18 @@ class QuestionSerializer(serializers.ModelSerializer):
         ]
 
 
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ["answer_text", "is_correct"]
+
+
 class QuizSerializer(serializers.ModelSerializer):
     quiz_creator = AchieveUserLoginSerializer(read_only=True)
     module_id = serializers.IntegerField()
-    time_limit=serializers.IntegerField()
-    total_mark=serializers.IntegerField()
-    questions=QuestionSerializer(many=True, required=False)
+    time_limit = serializers.IntegerField()
+    total_mark = serializers.IntegerField()
+    questions = QuestionSerializer(many=True, required=False)
 
     class Meta:
         model = Quiz
@@ -171,12 +187,12 @@ class QuizSerializer(serializers.ModelSerializer):
             "module_id",
             "quiz_creator",
             "attempts_allowed",
-            "questions"
+            "questions",
         ]
 
     def create(self, validated_data):
         request = self.context["request"]
-        questions=validated_data.pop("questions", [])
+        questions = validated_data.pop("questions", [])
         module_id = validated_data.pop("module_id")
         quiz_creator = request.user
 
@@ -184,10 +200,70 @@ class QuizSerializer(serializers.ModelSerializer):
         quiz = Quiz.objects.create(
             quiz_creator=quiz_creator, module=module, **validated_data
         )
-        question_list=[]
+        question_list = []
         for question in questions:
-            question_instance=Question(quiz=quiz,**question)
+            question_instance = Question(quiz=quiz, **question)
             question_list.append(question_instance)
         Question.objects.bulk_create(question_list)
         return quiz
 
+
+class QuizAttemptSerializer(serializers.ModelSerializer):
+    quiz_id = serializers.IntegerField()
+    question_id = serializers.IntegerField()
+    question = QuestionSerializer(read_only=True)
+    answers = AnswerSerializer(many=True)
+    taken_by = AchieveUserLoginSerializer(read_only=True)
+
+    class Meta:
+        model= QuizAttempt
+        fields = [
+            "id",
+            "quiz_id",
+            "question_id",
+            "taken_by",
+            "taken_at",
+            "attempt_taken",
+            "score",
+            "answers"
+        ]
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        quiz_id = self.context["view"].kwargs.get("quiz_id")
+        answers = validated_data.pop("answers", [])
+
+        taken_by = request.user
+        answers_list = []
+        score = 0
+        for answer in answers:
+            question_id = answer.pop("question_id")
+            answer_text = answer.pop("answer_text")
+            question_data = (
+                Question.objects.filter(id=question_id)
+                .values("correct_answer", "question_point")
+                .first()
+            )
+            if not question_data:
+                raise serializers.ValidationError("Invalid question id")
+            correct_answer = question_data["correct_answer"]
+            question_point = question_data["question_point"]
+            if answer_text == correct_answer:
+                is_correct = True
+                score = score + question_point
+            else:
+                is_correct = False
+            answer_instance = Answer(answer_text=answer_text, is_correct=is_correct, question_id=question_id)
+            answers_list.append(answer_instance)
+        Answer.objects.bulk_create(answers_list)
+        prev_attempt = QuizAttempt.objects.filter(
+            taken_by=taken_by, quiz_id=quiz_id
+        ).count()
+        total_attempt = prev_attempt + 1
+        attempt=QuizAttempt.objects.create(
+            quiz_id=quiz_id,
+            taken_by=taken_by,
+            total_attempts=total_attempt,
+            score=score,
+        )
+        return  attempt
