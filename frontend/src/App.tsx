@@ -2,21 +2,21 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
-import CoursePage from "./components/coursePages/CoursePage";
-import ModulePage from "./components/coursePages/modules/ModulePage";
-import FlashcardPage from "./components/coursePages/modules/flashcard/FlashcardPage";
+import CoursePage from "./components/coursePage/CoursePage";
+import ModulePage from "./components/coursePage/modules/ModulePage";
+import FlashcardPage from "./components/coursePage/modules/flashcard/FlashcardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext";
 import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
 import { ExternalLinkProvider } from "./context/ExternalLinkContext";
-import AddFlashcard from "./components/coursePages/modules/flashcard/AddFlashcard";
-import AddExtrenalLink from "./components/coursePages/modules/externalLinks/AddExternalLink";
-import EditExtrenalLink from "./components/coursePages/modules/externalLinks/EditExternalLink";
-import AddQuiz from "./components/coursePages/modules/quiz/AddQuiz";
+import AddFlashcard from "./components/coursePage/modules/flashcard/AddFlashcard";
+import AddExtrenalLink from "./components/coursePage/modules/externalLinks/AddExternalLink";
+import EditExtrenalLink from "./components/coursePage/modules/externalLinks/EditExternalLink";
+import AddQuiz from "./components/coursePage/modules/quiz/AddQuiz";
 import { QuizProvider } from "./context/QuizContext";
-import QuizPage from "./components/coursePages/modules/quiz/QuizPage";
+import QuizPage from "./components/coursePage/modules/quiz/QuizPage";
 
 const App: React.FC = () => {
   return (

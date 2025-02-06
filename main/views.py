@@ -16,17 +16,16 @@ from main.serializers import (
     FlashcardSerializer,
     ExternalLinkSerializer,
     QuizSerializer,
-    QuestionSerializer
+    QuestionSerializer,
+    QuizAttemptSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from .permissions import IsStaffOrIsInstructor
 import json
-import traceback
+
 
 # Authentication & Authorization
-
-logger = logging.getLogger(__name__)
 
 
 class CustomLoginView(APIView):
@@ -214,14 +213,15 @@ class GetExternalLinkByIdView(APIView):
         link_id = kwargs.get("link_id")
         try:
             external_link = get_object_or_404(ExternalLink, id=link_id)
-            data = {"external_link": ExternalLinkSerializer(external_link).data}
+            data = {
+                "external_link": ExternalLinkSerializer(external_link).data,
+            }
 
             return Response(data, status=status.HTTP_200_OK)
         except ExternalLink.DoesNotExist:
             return Response(
                 {"error": "External link not found"}, status=status.HTTP_404_NOT_FOUND
             )
-
 
 
 class GetQuizzesView(APIView):
@@ -232,12 +232,17 @@ class GetQuizzesView(APIView):
         try:
             quizzes = Quiz.objects.filter(module_id=module_id).all()
 
-            data = {"quizzes": QuizSerializer(quizzes, many=True).data}
+            data = {
+                "quizzes": QuizSerializer(quizzes, many=True).data,
+                "isStaff": request.user.is_staff,
+                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
+            }
             return Response(data, status=status.HTTP_200_OK)
         except Quiz.DoesNotExist:
             return Response(
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
 
 class GetQuizByIdView(APIView):
     permission_classes = [IsAuthenticated]
@@ -246,9 +251,11 @@ class GetQuizByIdView(APIView):
         quiz_id = kwargs.get("quiz_id")
         try:
             quiz = get_object_or_404(Quiz, id=quiz_id)
-            questions=Question.objects.filter(quiz=quiz)
-            data = {"quiz": QuizSerializer(quiz).data,
-                    "questions":QuestionSerializer(questions,many=True).data}
+            questions = Question.objects.filter(quiz=quiz)
+            data = {
+                "quiz": QuizSerializer(quiz).data,
+                "questions": QuestionSerializer(questions, many=True).data,
+            }
             return Response(data, status=status.HTTP_200_OK)
         except Quiz.DoesNotExist or Question.DoesNotExist:
             return Response(
@@ -267,10 +274,8 @@ class AddCourseView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CourseSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            course = serializer.save()
-            return Response(
-                CourseSerializer(course).data, status=status.HTTP_201_CREATED
-            )
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -301,11 +306,9 @@ class AddModuleView(APIView):
 
         serializer = ModuleSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            module = serializer.save()
+            serializer.save()
 
-            return Response(
-                ModuleSerializer(module).data, status=status.HTTP_201_CREATED
-            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -336,10 +339,8 @@ class AddFlashcardView(APIView):
 
         serializer = FlashcardSerializer(data=request.data)
         if serializer.is_valid():
-            flashcard = serializer.save()
-            return Response(
-                FlashcardSerializer(flashcard).data, status=status.HTTP_201_CREATED
-            )
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -397,9 +398,9 @@ class AddExternalLinkView(APIView):
 
         serializer = ExternalLinkSerializer(data=request.data)
         if serializer.is_valid():
-            external_link = serializer.save()
+            serializer.save()
             return Response(
-                ExternalLinkSerializer(external_link).data,
+                serializer.data,
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -478,17 +479,27 @@ class AddQuizView(APIView):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SubmitAnsweresView(APIView):
-    permission_classes=[IsAuthenticated]
+class SubmitAnswersView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def post(self,request, *args,**kwargs):
-         serializer = QuizSerializer(data=request.data, context={"request": request})
-         if serializer.is_valid():
-             attempt=serializer.validated_data["answeres"]
-
-     
-        
+    def post(self, request, *args, **kwargs):
+        print(request.data)
+        quiz_id=kwargs.get("quiz_id")
+        serializer = QuizAttemptSerializer(
+            data=request.data, context={"request": request, "quiz_id":quiz_id},
+        )
+    
+        try:
+            if serializer.is_valid():
+                print("data;",serializer.validated_data)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Quiz.DoesNotExist:
+            return Response(
+                {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
+            )

@@ -164,9 +164,11 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
+    question_id = serializers.IntegerField()
+
     class Meta:
         model = Answer
-        fields = ["answer_text", "is_correct"]
+        fields = ["answer_text", "is_correct", "question_id"]
 
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -210,27 +212,24 @@ class QuizSerializer(serializers.ModelSerializer):
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
     quiz_id = serializers.IntegerField()
-    question_id = serializers.IntegerField()
-    question = QuestionSerializer(read_only=True)
     answers = AnswerSerializer(many=True)
     taken_by = AchieveUserLoginSerializer(read_only=True)
 
     class Meta:
-        model= QuizAttempt
+        model = QuizAttempt
         fields = [
             "id",
             "quiz_id",
-            "question_id",
             "taken_by",
             "taken_at",
-            "attempt_taken",
+            "total_attempts",
             "score",
-            "answers"
+            "answers",
         ]
 
     def create(self, validated_data):
         request = self.context["request"]
-        quiz_id = self.context["view"].kwargs.get("quiz_id")
+        quiz_id = self.context["quiz_id"]
         answers = validated_data.pop("answers", [])
 
         taken_by = request.user
@@ -253,17 +252,19 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
                 score = score + question_point
             else:
                 is_correct = False
-            answer_instance = Answer(answer_text=answer_text, is_correct=is_correct, question_id=question_id)
+            answer_instance = Answer(
+                answer_text=answer_text, is_correct=is_correct, question_id=question_id
+            )
             answers_list.append(answer_instance)
         Answer.objects.bulk_create(answers_list)
         prev_attempt = QuizAttempt.objects.filter(
             taken_by=taken_by, quiz_id=quiz_id
         ).count()
         total_attempt = prev_attempt + 1
-        attempt=QuizAttempt.objects.create(
+        attempt = QuizAttempt.objects.create(
             quiz_id=quiz_id,
             taken_by=taken_by,
             total_attempts=total_attempt,
             score=score,
         )
-        return  attempt
+        return attempt

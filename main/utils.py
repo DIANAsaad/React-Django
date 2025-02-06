@@ -1,6 +1,6 @@
 from django.apps import apps
 from django.http import JsonResponse
-import json
+
 
 
 def delete_object(request, app_label, model_name, object_id):

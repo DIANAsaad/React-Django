@@ -36,8 +36,7 @@ interface Question {
 }
 
 // Define the shape of the answer
-interface Answer{
-  id:number;
+export interface Answer{
   answer_text:string;
   question_id:number;
 }
@@ -50,7 +49,7 @@ export type QuestionWithoutId = Omit<Question, 'id'>;
 interface QuizContextProps {
   quizzes: Quiz[] | null;
   questions: Question[] | null;
-  answeres:Answer[]|null;
+  answers:Answer[]|null;
   fetchQuizzes: (lessonId: number) => Promise<void>;
   fetchQuizById:(quizId:number)=>Promise<void>;
   addQuiz: (data: {
@@ -77,7 +76,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuth();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [answeres, setAnswers]=useState<Answer[]>([]);
+  const [answers, setAnswers]=useState<Answer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
@@ -204,14 +203,14 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     [quizzes, accessToken]
   );
 
-  //Submit the answeres
+  //Submit the answers
 
   const submitAnswers = useCallback(
     async (answers: Answer[], quizId:number) => {
       setLoading(true);
       try {
         const response = await axios.post(
-          `${ENDPOINT}/submit_answer/${quizId}`,
+          `${ENDPOINT}/submit_answers/${quizId}`,
           { answers },
           {
             headers: {
@@ -233,7 +232,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     <QuizContext.Provider
       value={{
         fetchQuizById,
-        answeres,
+        answers,
         quizzes,
         questions,
         fetchQuizzes,

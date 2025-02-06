@@ -22,7 +22,8 @@ from main.views import (
     EditExternalLinkView,
     AddQuizView,
     GetQuizzesView,
-    GetQuizByIdView
+    GetQuizByIdView,
+    SubmitAnswersView
 )
 
 
@@ -85,5 +86,6 @@ urlpatterns = [
         DeleteExternalLinkView.as_view(),
         name="delete_external_link",
     ),
-    path("add_quiz", AddQuizView.as_view(), name="add_quiz")
+    path("add_quiz", AddQuizView.as_view(), name="add_quiz"),
+    path("submit_answers/<int:quiz_id>", SubmitAnswersView.as_view(), name="submit_answers")
 ]

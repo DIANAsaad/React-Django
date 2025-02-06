@@ -47,7 +47,7 @@ const AddQuiz: React.FC = () => {
   const handleQuestionChange = (
     index: number,
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement |HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     type QuestionKey = keyof QuestionWithoutId;

@@ -143,7 +143,7 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, on_delete=models.CASCADE, related_name="answers"
     )
-    answer_text = models.TextField(blank=True, null=True)
+    answer_text = models.TextField(blank=True, null=True)               
     is_correct = models.BooleanField(null=True)
 
 
@@ -154,6 +154,7 @@ class QuizAttempt(models.Model):
     taken_by = models.ForeignKey(
         AchieveUser, on_delete=models.CASCADE, related_name="taken_by"
     )
+    answers=models.ForeignKey(Answer, on_delete=models.SET_NULL, null=True)
     taken_at = models.DateTimeField(default=timezone.now)
     total_attempts = models.IntegerField(default=0)
     score = models.PositiveIntegerField(default=0)
