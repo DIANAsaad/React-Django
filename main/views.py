@@ -1,6 +1,6 @@
 import logging
 from django.contrib.auth import logout as logout
-from main.models import Course, Module, Flashcard, ExternalLink, Quiz, Question
+from main.models import Course, Module, Flashcard, ExternalLink, Quiz, Question, Answer, QuizAttempt
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
 from rest_framework.views import APIView
@@ -18,6 +18,7 @@ from main.serializers import (
     QuizSerializer,
     QuestionSerializer,
     QuizAttemptSerializer,
+    AnswerSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -262,6 +263,23 @@ class GetQuizByIdView(APIView):
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+class GetQuizResultsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,*args,**kwargs):
+        attempt_id=kwargs.get("attempt_id")
+        try:
+            attempt=QuizAttempt.objects.get(id=attempt_id)
+            answers=Answer.objects.filter(attempt=attempt)
+            data={
+                "attempt":QuizAttemptSerializer(attempt).data,
+                "answers":AnswerSerializer(answers,many=True).data
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except QuizAttempt.DoesNotExist or Answer.DoesNotExist:
+            return Response(
+                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 # Functionality
 
@@ -486,18 +504,21 @@ class SubmitAnswersView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
-        quiz_id=kwargs.get("quiz_id")
+
+        quiz_id = kwargs.get("quiz_id")
+
         serializer = QuizAttemptSerializer(
-            data=request.data, context={"request": request, "quiz_id":quiz_id},
+            data=request.data,
+            context={"request": request, "quiz_id": quiz_id},
         )
-    
+
         try:
             if serializer.is_valid():
-                print("data;",serializer.validated_data)
+
                 serializer.save()
+                print(serializer.data)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-            print(serializer.errors)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Quiz.DoesNotExist:
             return Response(

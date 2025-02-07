@@ -85,7 +85,7 @@ const App: React.FC = () => {
           path="/course/:courseId/module/:moduleId/add-quiz"
           element={
             <ProtectedRoute>
-              <AddQuiz/>
+              <AddQuiz />
             </ProtectedRoute>
           }
         />
@@ -98,7 +98,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-          <Route
+        <Route
           path="/course/:courseId/module/:moduleId/quiz/:quizId"
           element={
             <ProtectedRoute>
@@ -118,7 +118,7 @@ const AppWrapper: React.FC = () => (
         <FlashcardProvider>
           <ExternalLinkProvider>
             <QuizProvider>
-            <App />
+              <App />
             </QuizProvider>
           </ExternalLinkProvider>
         </FlashcardProvider>

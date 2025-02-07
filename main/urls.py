@@ -23,7 +23,8 @@ from main.views import (
     AddQuizView,
     GetQuizzesView,
     GetQuizByIdView,
-    SubmitAnswersView
+    SubmitAnswersView,
+    GetQuizResultsView
 )
 
 
@@ -47,6 +48,7 @@ urlpatterns = [
     ),
     path("quizzes/<int:module_id>", GetQuizzesView.as_view(), name="quizzes"),
     path("quiz/<int:quiz_id>", GetQuizByIdView.as_view(), name="quiz"),
+    path("quiz_results/<int:attempt_id>", GetQuizResultsView.as_view(), name="quiz_results"),
     path("add_course", AddCourseView.as_view(), name="add_Course"),
     path(
         "refresh_access_token",

@@ -211,7 +211,6 @@ class QuizSerializer(serializers.ModelSerializer):
 
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
-    quiz_id = serializers.IntegerField()
     answers = AnswerSerializer(many=True)
     taken_by = AchieveUserLoginSerializer(read_only=True)
 
@@ -219,7 +218,6 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
         model = QuizAttempt
         fields = [
             "id",
-            "quiz_id",
             "taken_by",
             "taken_at",
             "total_attempts",

@@ -21,37 +21,52 @@ interface Quiz {
     first_name: string;
     last_name: string;
   };
-
 }
 
 // Define the shape of a Question
 interface Question {
-  id:number;
+  id: number;
   question_point: number;
   question_text: string;
   question_type: string;
-  question_time_limit:number;
+  question_time_limit: number;
   correct_answer: string;
   choices: string[];
 }
 
 // Define the shape of the answer
-export interface Answer{
-  answer_text:string;
-  question_id:number;
+interface Answer {
+  id: number;
+  is_correct: boolean;
+  answer_text: string;
+  question_id: number;
 }
 
+// Define the shape of the submit answer
+export type SubmittedAnswer = Omit<Answer, "id" | "is_correct">;
 
+// Define the shape of the attempt
+interface Attempt {
+  id: number;
+  taken_at: Date;
+  taken_by: {
+    first_name: string;
+    last_name: string;
+  };
+  score: number;
+}
 
-export type QuestionWithoutId = Omit<Question, 'id'>;
+export type QuestionWithoutId = Omit<Question, "id">;
 
 // Define the context structure
 interface QuizContextProps {
   quizzes: Quiz[] | null;
   questions: Question[] | null;
-  answers:Answer[]|null;
+  answers: Answer[] | null;
+  attempts: Attempt[] | null;
   fetchQuizzes: (lessonId: number) => Promise<void>;
-  fetchQuizById:(quizId:number)=>Promise<void>;
+  fetchQuizById: (quizId: number) => Promise<void>;
+  fetchAnswers: (attemptId: number) => Promise<void>;
   addQuiz: (data: {
     quiz_title: string;
     quiz_description: string;
@@ -66,7 +81,10 @@ interface QuizContextProps {
   error: string | null;
   isStaff: boolean;
   isInstructor: boolean;
-  submitAnswers:(answers:Answer[], quizId:number)=>Promise<void>;
+  submitAnswers: (
+    answers: SubmittedAnswer[],
+    quizId: number
+  ) => Promise<Attempt>;
 }
 
 const QuizContext = createContext<QuizContextProps | undefined>(undefined);
@@ -76,12 +94,14 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuth();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers]=useState<Answer[]>([]);
+  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
+  // Fetch quizzes when entering into the lesson's (module's) page
   const fetchQuizzes = useCallback(
     async (moduleId: number) => {
       if (!accessToken) {
@@ -107,30 +127,32 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch quiz and questions when entering to quiz page
   const fetchQuizById = useCallback(
-    async(quizId:number)=>{
+    async (quizId: number) => {
       if (!accessToken) {
         setError("No access token available");
         return;
       }
-    setLoading(true);
-    try{
-      const response= await axios.get(`${ENDPOINT}/quiz/${quizId}`
-        ,{headers: { Authorization: `Bearer ${accessToken}` }});
-        const quiz=response.data.quiz
+      setLoading(true);
+      try {
+        const response = await axios.get(`${ENDPOINT}/quiz/${quizId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        const quiz = response.data.quiz;
         setQuizzes((prevQuizzes) => [
           ...prevQuizzes.filter((q) => q.id !== quiz.id),
           quiz,
         ]);
-       setQuestions(response.data.questions??[]);
-       setIsStaff(response.data.isStaff);
-       setIsInstructor(response.data.isInstructor);
-    }catch{
-      setError("Failed to fetch quiz");
-    }finally{
-      setLoading(false);
-    }
-    }, [accessToken]);
-
+        setQuestions(response.data.questions ?? []);
+        setIsStaff(response.data.isStaff);
+        setIsInstructor(response.data.isInstructor);
+      } catch {
+        setError("Failed to fetch quiz");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken]
+  );
 
   // Add quiz
   const addQuiz = useCallback(
@@ -182,7 +204,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     [accessToken]
   );
 
-  //Delete quiz
+  // Delete quiz
   const deleteQuiz = useCallback(
     async (quizId: number) => {
       const quiz = quizzes.find((q) => q.id === quizId);
@@ -203,10 +225,9 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     [quizzes, accessToken]
   );
 
-  //Submit the answers
-
+  // Submit the answers
   const submitAnswers = useCallback(
-    async (answers: Answer[], quizId:number) => {
+    async (answers: SubmittedAnswer[], quizId: number): Promise<Attempt> => {
       setLoading(true);
       try {
         const response = await axios.post(
@@ -214,20 +235,53 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
           { answers },
           {
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
               Authorization: `Bearer ${accessToken}`,
             },
           }
         );
-        setAnswers((prevAnswers) => [...(prevAnswers || []), ...response.data]);
-      } catch {
-        setError('Failed to submit answers');
+        console.log(response.data);
+        return response.data.attempt;
+
+      } catch (error) {
+        setError("Failed to submit answers");
+        throw new Error("Failed to submit answers");
       } finally {
         setLoading(false);
       }
     },
-    [accessToken, ENDPOINT]
+    [accessToken]
   );
+
+  // Fetch answers to show in results page
+  const fetchAnswers = useCallback(
+    async (attemptId: number) => {
+      if (!accessToken) {
+        setError("No access token available");
+        return;
+      }
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${ENDPOINT}/quiz_results/${attemptId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        setAttempts(response.data.attempt ?? []);
+        setAnswers(response.data.answers ?? []);
+      } catch {
+        setError("Failed to fetch Answers");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken]
+  );
+
   return (
     <QuizContext.Provider
       value={{
@@ -235,10 +289,12 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         answers,
         quizzes,
         questions,
+        attempts,
         fetchQuizzes,
         addQuiz,
         deleteQuiz,
         submitAnswers,
+        fetchAnswers,
         loading,
         error,
         isStaff,
@@ -249,7 +305,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     </QuizContext.Provider>
   );
 };
-
 
 export const useQuizContext = () => {
   const context = useContext(QuizContext);
