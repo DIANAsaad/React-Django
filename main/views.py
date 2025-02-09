@@ -1,6 +1,15 @@
 import logging
 from django.contrib.auth import logout as logout
-from main.models import Course, Module, Flashcard, ExternalLink, Quiz, Question, Answer, QuizAttempt
+from main.models import (
+    Course,
+    Module,
+    Flashcard,
+    ExternalLink,
+    Quiz,
+    Question,
+    Answer,
+    QuizAttempt,
+)
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
 from rest_framework.views import APIView
@@ -145,6 +154,8 @@ class CoursePageView(APIView):
 
 
 # Components of the Module (lesson) page
+
+
 class GetModuleView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -263,23 +274,25 @@ class GetQuizByIdView(APIView):
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
+
 class GetQuizResultsView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self,request,*args,**kwargs):
-        attempt_id=kwargs.get("attempt_id")
+    def get(self, request, *args, **kwargs):
+        attempt_id = kwargs.get("attempt_id")
         try:
-            attempt=QuizAttempt.objects.get(id=attempt_id)
-            answers=Answer.objects.filter(attempt=attempt)
-            data={
-                "attempt":QuizAttemptSerializer(attempt).data,
-                "answers":AnswerSerializer(answers,many=True).data
+            attempt = QuizAttempt.objects.get(id=attempt_id)
+            answers = Answer.objects.filter(quizattempt=attempt)
+            data = {
+                "attempt": QuizAttemptSerializer(attempt).data,
+                "answers": AnswerSerializer(answers, many=True).data,
             }
             return Response(data, status=status.HTTP_200_OK)
         except QuizAttempt.DoesNotExist or Answer.DoesNotExist:
             return Response(
-                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
+                {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
 
 # Functionality
 
@@ -516,7 +529,7 @@ class SubmitAnswersView(APIView):
             if serializer.is_valid():
 
                 serializer.save()
-                print(serializer.data)
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

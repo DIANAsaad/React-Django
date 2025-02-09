@@ -240,8 +240,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
             },
           }
         );
-        console.log(response.data);
-        return response.data.attempt;
+        return response.data;
 
       } catch (error) {
         setError("Failed to submit answers");
@@ -271,7 +270,10 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
             },
           }
         );
-        setAttempts(response.data.attempt ?? []);
+        setAttempts((prevAttempts) => [
+          ...prevAttempts.filter((a) => a.id !== attemptId),
+          response.data.attempt,
+        ]);
         setAnswers(response.data.answers ?? []);
       } catch {
         setError("Failed to fetch Answers");

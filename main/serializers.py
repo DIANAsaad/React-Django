@@ -233,28 +233,8 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
         taken_by = request.user
         answers_list = []
         score = 0
-        for answer in answers:
-            question_id = answer.pop("question_id")
-            answer_text = answer.pop("answer_text")
-            question_data = (
-                Question.objects.filter(id=question_id)
-                .values("correct_answer", "question_point")
-                .first()
-            )
-            if not question_data:
-                raise serializers.ValidationError("Invalid question id")
-            correct_answer = question_data["correct_answer"]
-            question_point = question_data["question_point"]
-            if answer_text == correct_answer:
-                is_correct = True
-                score = score + question_point
-            else:
-                is_correct = False
-            answer_instance = Answer(
-                answer_text=answer_text, is_correct=is_correct, question_id=question_id
-            )
-            answers_list.append(answer_instance)
-        Answer.objects.bulk_create(answers_list)
+
+        # We count previous attempts and create a new attempt to link it with the answers table
         prev_attempt = QuizAttempt.objects.filter(
             taken_by=taken_by, quiz_id=quiz_id
         ).count()
@@ -263,6 +243,40 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
             quiz_id=quiz_id,
             taken_by=taken_by,
             total_attempts=total_attempt,
-            score=score,
         )
+
+        # Answers Logic
+        for answer in answers:
+            question_id = answer.pop("question_id")
+            answer_text = answer.pop("answer_text")
+            question_data = (
+                Question.objects.filter(id=question_id)
+                .values("correct_answer", "question_point")
+                .first()
+            )
+
+            if not question_data:
+                raise serializers.ValidationError("Invalid question id")
+
+            correct_answer = question_data["correct_answer"]
+            question_point = question_data["question_point"]
+
+            is_correct = answer_text == correct_answer
+            if is_correct:
+                score += question_point
+
+            answers_list.append(
+                Answer(
+                    answer_text=answer_text,
+                    is_correct=is_correct,
+                    question_id=question_id,
+                    quizattempt=attempt,
+                )
+            )
+
+        Answer.objects.bulk_create(answers_list)
+
+        attempt.score = score
+        attempt.save(update_fields=["score"])
+
         return attempt

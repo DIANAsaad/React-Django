@@ -64,7 +64,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
   const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
   useEffect(() => {
-    // Fetch courses from your API
+
     const fetchCourses = async () => {
       try {
         setLoading(true);

@@ -62,7 +62,7 @@ const QuizPage: React.FC = () => {
 
         if (response?.id) {
           navigate(
-            `course/${courseId}/module/${moduleId}/quiz/${quizId}/results/${response.id}`
+            `/course/${courseId}/module/${moduleId}/quiz/${quizId}/results/${response.id}`
           );
         } else {
           console.error("Quiz submission succeeded, but attemptId is missing.");
