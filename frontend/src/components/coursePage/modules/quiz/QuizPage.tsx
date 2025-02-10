@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect,  useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   SubmittedAnswer,
@@ -24,23 +24,24 @@ const QuizPage: React.FC = () => {
     loading: quizLoading,
   } = useQuizContext();
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
-
-  const quizRef = useRef<Quiz | null>(null); // Using useRef to access the quiz in useEffect
+  const[quiz, setQuiz]=useState<Quiz|null>(null)
+  const[loading, setLoading]=useState<boolean>(true);
 
   useEffect(() => {
     if (quizId) {
-      (async () => {
+      setLoading(true);
+      const getQuiz = async () => {
         try {
-          quizRef.current = await fetchQuizById(Number(quizId)); // Store in ref
- 
-        } catch (error) {
-          console.error("Error receiving quiz:");
+          const fetchedQuiz = await fetchQuizById(Number(quizId));
+          setQuiz(fetchedQuiz);
+        } finally {
+          setLoading(false);
         }
-      })();
+      };
+      getQuiz();
     }
   }, [quizId, fetchQuizById]);
 
-  const quiz= quizRef.current
   const handleAnswerChange = (   
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     questionId: number
@@ -79,6 +80,10 @@ const QuizPage: React.FC = () => {
     },
     [submitAnswers, answers, quizId, courseId, moduleId, navigate]
   );
+
+  if (loading){
+    return <div>Loading</div>
+  }
 
   if (!quiz) {
     return <div>Quiz not found</div>;

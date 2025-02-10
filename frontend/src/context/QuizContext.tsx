@@ -135,10 +135,10 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       
       try {
-        //Check if quiz is already in state
+        //Check if quiz is already in stateto avoid fetchi again
         const existingQuiz = quizzes.find((q) => q.id === quizId);
         if (existingQuiz) {
-          return existingQuiz; // Return from cache to avoid re-fetching
+          return existingQuiz; 
         }
   
         // If quiz is not in state, fetch it from server
@@ -147,7 +147,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         });
   
         const quiz = response.data.quiz;
-        console.log(quiz);
         setQuestions(response.data.questions ?? []);
         setIsStaff(response.data.isStaff);
         setIsInstructor(response.data.isInstructor);

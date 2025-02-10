@@ -29,7 +29,7 @@ interface ModuleContextProps {
   modules: Module[] | null;
   fetchModules: (courseId: number) => Promise<void>;
   deleteModule: (moduleId: number) => Promise<void>;
-  fetchModulesById: (moduleId: number) => Promise<void>;
+  fetchModulesById: (moduleId: number) => Promise<Module>;
   addModule: (
     courseId: number,
     Module_name: string,
@@ -95,10 +95,9 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   // This function will fetch modules using the ID's
 
   const fetchModulesById = useCallback(
-    async (moduleId: number) => {
+    async (moduleId: number):Promise<Module> => {
       if (!accessToken) {
-        setError("No access token available");
-        return;
+        throw new Error("No access token available");
       }
 
       try {
@@ -107,14 +106,11 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const module = normalizeModule(response.data.module);
-        setModules((prevModules) => [
-          ...prevModules.filter((m) => m.id !== module.id),
-          module,
-        ]);
         setIsStaff(response.data.isStaff);
         setIsInstructor(response.data.isInstructor);
+        return module;
       } catch (err) {
-        setError("Failed to fetch module");
+        throw new Error("Failed to fetch module");
       } finally {
         setLoading(false);
       }
