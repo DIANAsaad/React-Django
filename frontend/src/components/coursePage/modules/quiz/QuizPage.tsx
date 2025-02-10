@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   SubmittedAnswer,
+  Quiz,
   useQuizContext,
 } from "../../../../context/QuizContext";
 import BaseWrapper from "../../../base/BaseWrapper";
@@ -15,7 +16,6 @@ const QuizPage: React.FC = () => {
   }>();
   const navigate = useNavigate();
   const {
-    quizzes,
     questions,
     fetchQuizById,
     submitAnswers,
@@ -25,16 +25,22 @@ const QuizPage: React.FC = () => {
   } = useQuizContext();
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
 
+  const quizRef = useRef<Quiz | null>(null); // Using useRef to access the quiz in useEffect
+
   useEffect(() => {
     if (quizId) {
-      fetchQuizById(Number(quizId));
+      (async () => {
+        try {
+          quizRef.current = await fetchQuizById(Number(quizId)); // Store in ref
+ 
+        } catch (error) {
+          console.error("Error receiving quiz:");
+        }
+      })();
     }
   }, [quizId, fetchQuizById]);
 
-  const quiz = useMemo(() => {    ` `
-    return quizzes?.find((q) => q.id === parseInt(quizId!, 10));
-  }, [quizzes, quizId]);
-
+  const quiz= quizRef.current
   const handleAnswerChange = (   
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     questionId: number

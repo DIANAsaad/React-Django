@@ -9,7 +9,7 @@ import axios from "axios";
 import { useAuth } from "./AuthContext";
 
 // Define the shape of a Quiz
-interface Quiz {
+export interface Quiz {
   id: number;
   quiz_title: string;
   quiz_description: string;
@@ -65,7 +65,7 @@ interface QuizContextProps {
   answers: Answer[] | null;
   attempts: Attempt[] | null;
   fetchQuizzes: (lessonId: number) => Promise<void>;
-  fetchQuizById: (quizId: number) => Promise<void>;
+  fetchQuizById: (quizId: number) => Promise<Quiz>;
   fetchAnswers: (attemptId: number) => Promise<void>;
   addQuiz: (data: {
     quiz_title: string;
@@ -127,32 +127,40 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch quiz and questions when entering to quiz page
   const fetchQuizById = useCallback(
-    async (quizId: number) => {
+    async (quizId: number): Promise<Quiz> => {
       if (!accessToken) {
         setError("No access token available");
-        return;
+        throw new Error("No access token available");
       }
       setLoading(true);
+      
       try {
+        //Check if quiz is already in state
+        const existingQuiz = quizzes.find((q) => q.id === quizId);
+        if (existingQuiz) {
+          return existingQuiz; // Return from cache to avoid re-fetching
+        }
+  
+        // If quiz is not in state, fetch it from server
         const response = await axios.get(`${ENDPOINT}/quiz/${quizId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
+  
         const quiz = response.data.quiz;
-        setQuizzes((prevQuizzes) => [
-          ...prevQuizzes.filter((q) => q.id !== quiz.id),
-          quiz,
-        ]);
         setQuestions(response.data.questions ?? []);
         setIsStaff(response.data.isStaff);
         setIsInstructor(response.data.isInstructor);
+  
+        return quiz;
       } catch {
-        setError("Failed to fetch quiz");
+        throw new Error("Failed to fetch quiz");
       } finally {
         setLoading(false);
       }
     },
-    [accessToken]
+    [accessToken, quizzes]
   );
+  
 
   // Add quiz
   const addQuiz = useCallback(
@@ -243,7 +251,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         return response.data;
 
       } catch (error) {
-        setError("Failed to submit answers");
         throw new Error("Failed to submit answers");
       } finally {
         setLoading(false);
