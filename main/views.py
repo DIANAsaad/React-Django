@@ -27,7 +27,9 @@ from main.serializers import (
     QuizSerializer,
     QuestionSerializer,
     QuizAttemptSerializer,
+    SubmitAnswerSerializer,
     AnswerSerializer,
+
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -517,19 +519,15 @@ class SubmitAnswersView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-
         quiz_id = kwargs.get("quiz_id")
 
-        serializer = QuizAttemptSerializer(
+        serializer = SubmitAnswerSerializer(
             data=request.data,
             context={"request": request, "quiz_id": quiz_id},
         )
-
         try:
             if serializer.is_valid():
-
                 serializer.save()
-
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -147,6 +147,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         });
   
         const quiz = response.data.quiz;
+        console.log(quiz);
         setQuestions(response.data.questions ?? []);
         setIsStaff(response.data.isStaff);
         setIsInstructor(response.data.isInstructor);

@@ -137,7 +137,7 @@ class ExternalLinkSerializer(serializers.ModelSerializer):
         fields = ["id", "description", "link", "lesson_id"]
 
     def create(self, validated_data):
-        print("Validated Data:", validated_data)
+
         lesson_id = validated_data.pop("lesson_id")
         lesson = get_object_or_404(Module, id=lesson_id)
         external_link = ExternalLink.objects.create(lesson=lesson, **validated_data)
@@ -161,14 +161,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             "correct_answer",
             "choices",
         ]
-
-
-class AnswerSerializer(serializers.ModelSerializer):
-    question_id = serializers.IntegerField()
-
-    class Meta:
-        model = Answer
-        fields = ["answer_text", "is_correct", "question_id"]
 
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -211,7 +203,6 @@ class QuizSerializer(serializers.ModelSerializer):
 
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True)
     taken_by = AchieveUserLoginSerializer(read_only=True)
 
     class Meta:
@@ -222,13 +213,24 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
             "taken_at",
             "total_attempts",
             "score",
-            "answers",
         ]
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    question_id = serializers.IntegerField()
+
+    class Meta:
+        model = Answer
+        fields = ["answer_text", "question_id"]
+
+
+class SubmitAnswerSerializer(serializers.Serializer):
+    answers = AnswerSerializer(many=True)
 
     def create(self, validated_data):
         request = self.context["request"]
         quiz_id = self.context["quiz_id"]
-        answers = validated_data.pop("answers", [])
+        answers = validated_data.get("answers", [])
 
         taken_by = request.user
         answers_list = []
@@ -270,7 +272,7 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
                     answer_text=answer_text,
                     is_correct=is_correct,
                     question_id=question_id,
-                    quizattempt=attempt,
+                    attempt=attempt,
                 )
             )
 
@@ -279,4 +281,4 @@ class QuizAttemptSerializer(serializers.ModelSerializer):
         attempt.score = score
         attempt.save(update_fields=["score"])
 
-        return attempt
+        return {"attempt.id":attempt.id}
