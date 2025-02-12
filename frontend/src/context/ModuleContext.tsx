@@ -10,7 +10,7 @@ import { useAuth } from "./AuthContext";
 
 //Define the shape of a Module
 
-interface Module {
+export interface Module {
   id: number;
   module_title: string;
   topic: string;

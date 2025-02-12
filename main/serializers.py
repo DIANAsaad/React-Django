@@ -221,15 +221,24 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ["answer_text", "question_id", "attempt"]
+        fields = ["answer_text", "question_id"]
 
 
 class SubmitAnswerSerializer(serializers.Serializer):
     answers = AnswerSerializer(many=True)
 
+    def validate(self, data):
+        if "answers" not in data:
+            raise serializers.ValidationError({"error": "Missing 'answers' field"})
+        return data
+
     def create(self, validated_data):
         request = self.context["request"]
         quiz_id = self.context["quiz_id"]
+        if "answers" not in validated_data:
+            raise serializers.ValidationError(
+                {"error": "Key 'answers' is missing in validated_data"}
+            )
         answers = validated_data.get("answers", [])
 
         taken_by = request.user
@@ -281,4 +290,8 @@ class SubmitAnswerSerializer(serializers.Serializer):
         attempt.score = score
         attempt.save(update_fields=["score"])
 
-        return {"attempt.id":attempt.id}
+        return {"id": attempt.id} #returning the attempt id to always direct us to  the last attempt.
+          
+
+    def to_representation(self, instance):
+        return instance

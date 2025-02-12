@@ -29,7 +29,6 @@ from main.serializers import (
     QuizAttemptSerializer,
     SubmitAnswerSerializer,
     AnswerSerializer,
-
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -515,6 +514,14 @@ class AddQuizView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from .serializers import SubmitAnswerSerializer
+from .models import Quiz  # Ensure correct import
+
+
 class SubmitAnswersView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -525,13 +532,17 @@ class SubmitAnswersView(APIView):
             data=request.data,
             context={"request": request, "quiz_id": quiz_id},
         )
-        try:
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        if not serializer.is_valid():
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            serializer.save()
+            print(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Quiz.DoesNotExist:
+
             return Response(
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )

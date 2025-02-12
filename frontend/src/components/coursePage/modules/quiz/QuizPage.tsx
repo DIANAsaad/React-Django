@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect,  useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   SubmittedAnswer,
@@ -24,8 +24,8 @@ const QuizPage: React.FC = () => {
     loading: quizLoading,
   } = useQuizContext();
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
-  const[quiz, setQuiz]=useState<Quiz|null>(null)
-  const[loading, setLoading]=useState<boolean>(true);
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (quizId) {
@@ -42,7 +42,7 @@ const QuizPage: React.FC = () => {
     }
   }, [quizId, fetchQuizById]);
 
-  const handleAnswerChange = (   
+  const handleAnswerChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     questionId: number
   ) => {
@@ -65,9 +65,10 @@ const QuizPage: React.FC = () => {
 
       try {
         const response = await submitAnswers(answers, Number(quizId));
+        console.log(response);
         setAnswers([]);
 
-        if (response?.id) {
+        if (response) {
           navigate(
             `/course/${courseId}/module/${moduleId}/quiz/${quizId}/results/${response.id}`
           );
@@ -81,8 +82,8 @@ const QuizPage: React.FC = () => {
     [submitAnswers, answers, quizId, courseId, moduleId, navigate]
   );
 
-  if (loading){
-    return <div>Loading</div>
+  if (loading) {
+    return <div>Loading</div>;
   }
 
   if (!quiz) {

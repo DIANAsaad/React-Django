@@ -9,7 +9,7 @@ import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
 const ModulePage: React.FC = () => {
-  const { loading, error, isInstructor, isStaff, fetchModulesById } =
+  const { error, isInstructor, isStaff, fetchModulesById } =
     useModuleContext();
   const { moduleId, courseId } = useParams<{
     moduleId: string;
@@ -38,6 +38,7 @@ const ModulePage: React.FC = () => {
   } = useQuizContext();
 
   const [module, setModule] = useState<Module | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,6 +53,7 @@ const ModulePage: React.FC = () => {
           const fetchedModule = await fetchModulesById(Number(moduleId));
           setModule(fetchedModule);
         } finally {
+          setLoading(false);
         }
       };
       getModule();
@@ -59,7 +61,7 @@ const ModulePage: React.FC = () => {
   }, [moduleId, fetchFlashcards, fetchModulesById, fetchLinks]);
 
   if (loading) {
-    <div> Loading Lesson</div>;
+    return <div> Loading Lesson...</div>;
   }
 
   if (!module) {

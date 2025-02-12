@@ -247,7 +247,8 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
               Authorization: `Bearer ${accessToken}`,
             },
           }
-        );
+        
+        );  console.log(answers);
         return response.data;
 
       } catch (error) {
