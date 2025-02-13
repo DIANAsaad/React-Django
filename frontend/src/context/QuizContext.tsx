@@ -46,7 +46,7 @@ interface Answer {
 export type SubmittedAnswer = Omit<Answer, "id" | "is_correct">;
 
 // Define the shape of the attempt
-interface Attempt {
+export interface Attempt {
   id: number;
   taken_at: Date;
   taken_by: {
@@ -66,7 +66,7 @@ interface QuizContextProps {
   attempts: Attempt[] | null;
   fetchQuizzes: (lessonId: number) => Promise<void>;
   fetchQuizById: (quizId: number) => Promise<Quiz>;
-  fetchAnswers: (attemptId: number) => Promise<void>;
+  fetchAnswers: (attemptId: number) => Promise<Attempt>;
   addQuiz: (data: {
     quiz_title: string;
     quiz_description: string;
@@ -95,7 +95,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [attempts] = useState<Attempt[]>([]); // Add setAttempts later for Profile Page
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
@@ -129,28 +129,18 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const fetchQuizById = useCallback(
     async (quizId: number): Promise<Quiz> => {
       if (!accessToken) {
-        setError("No access token available");
         throw new Error("No access token available");
       }
       setLoading(true);
-      
       try {
-        //Check if quiz is already in stateto avoid fetchi again
-        const existingQuiz = quizzes.find((q) => q.id === quizId);
-        if (existingQuiz) {
-          return existingQuiz; 
-        }
-  
-        // If quiz is not in state, fetch it from server
         const response = await axios.get(`${ENDPOINT}/quiz/${quizId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-  
-        const quiz = response.data.quiz;
+
         setQuestions(response.data.questions ?? []);
         setIsStaff(response.data.isStaff);
         setIsInstructor(response.data.isInstructor);
-  
+        const quiz = response.data.quiz;
         return quiz;
       } catch {
         throw new Error("Failed to fetch quiz");
@@ -158,9 +148,8 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    [accessToken, quizzes]
+    [accessToken]
   );
-  
 
   // Add quiz
   const addQuiz = useCallback(
@@ -247,10 +236,8 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
               Authorization: `Bearer ${accessToken}`,
             },
           }
-        
-        );  console.log(answers);
+        );
         return response.data;
-
       } catch (error) {
         throw new Error("Failed to submit answers");
       } finally {
@@ -262,10 +249,9 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
 
   // Fetch answers to show in results page
   const fetchAnswers = useCallback(
-    async (attemptId: number) => {
+    async (attemptId: number): Promise<Attempt> => {
       if (!accessToken) {
-        setError("No access token available");
-        return;
+        throw new Error("No access token available");
       }
       setLoading(true);
       try {
@@ -278,13 +264,12 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
             },
           }
         );
-        setAttempts((prevAttempts) => [
-          ...prevAttempts.filter((a) => a.id !== attemptId),
-          response.data.attempt,
-        ]);
         setAnswers(response.data.answers ?? []);
+        setQuestions(response.data.questions ?? []);
+        const attempt = response.data.attempt;
+        return attempt;
       } catch {
-        setError("Failed to fetch Answers");
+        throw new Error("Failed to fetch Answers");
       } finally {
         setLoading(false);
       }

@@ -21,7 +21,7 @@ const QuizPage: React.FC = () => {
     submitAnswers,
     isStaff,
     isInstructor,
-    loading: quizLoading,
+    loading: questionLoading,
   } = useQuizContext();
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -65,7 +65,6 @@ const QuizPage: React.FC = () => {
 
       try {
         const response = await submitAnswers(answers, Number(quizId));
-        console.log(response);
         setAnswers([]);
 
         if (response) {
@@ -83,7 +82,7 @@ const QuizPage: React.FC = () => {
   );
 
   if (loading) {
-    return <div>Loading</div>;
+    return <div>Loading Quiz...</div>;
   }
 
   if (!quiz) {
@@ -126,8 +125,8 @@ const QuizPage: React.FC = () => {
         </div>
 
         <div className="quiz-questions">
-          {quizLoading ? (
-            <div className="flashcard-alert">Loading quiz...</div>
+          {questionLoading ? (
+            <div className="flashcard-alert">Loading questions...</div>
           ) : questions && questions.length > 0 ? (
             <form onSubmit={handleSubmit}>
               {questions.map((question) => (
@@ -200,7 +199,7 @@ const QuizPage: React.FC = () => {
                   id="submit-button"
                   type="submit"
                   className="btn btn-success btn-lg shadow-sm"
-                  disabled={quizLoading}
+                  disabled={questionLoading}
                 >
                   Submit Quiz
                 </button>

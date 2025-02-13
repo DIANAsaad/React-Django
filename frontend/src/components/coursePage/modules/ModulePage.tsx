@@ -133,8 +133,8 @@ const ModulePage: React.FC = () => {
               <p className="text-muted ">{module.topic}</p>
               {(isStaff || isInstructor) && (
                 <p className="text-muted ">
-                  {" "}
-                  <strong>Created by: </strong>{" "}
+                 
+                  <strong>Created by: </strong>
                   {`${module.module_creator.first_name} ${module.module_creator.last_name}`}
                 </p>
               )}

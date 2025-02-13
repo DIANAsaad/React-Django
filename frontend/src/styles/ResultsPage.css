@@ -1,0 +1,9 @@
+.cstm-card {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+.list-group-item {
+  max-width: 100%;
+  border-radius: 5px;
+}

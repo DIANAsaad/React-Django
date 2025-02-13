@@ -156,7 +156,7 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name="answers"
     )
     attempt = models.ForeignKey(
-        QuizAttempt, on_delete=models.CASCADE, related_name="attempt", default=None
+        QuizAttempt, on_delete=models.CASCADE, related_name="attempt_answers", default=None
     )
     answer_text = models.TextField(blank=True, null=True)
     is_correct = models.BooleanField(null=True)

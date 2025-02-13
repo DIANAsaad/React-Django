@@ -203,7 +203,7 @@ class QuizSerializer(serializers.ModelSerializer):
 
 
 class QuizAttemptSerializer(serializers.ModelSerializer):
-    taken_by = AchieveUserLoginSerializer(read_only=True)
+    taken_by = AchieveUserSerializer(read_only=True)
 
     class Meta:
         model = QuizAttempt
@@ -221,7 +221,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ["answer_text", "question_id"]
+        fields = ["answer_text", "question_id", "is_correct"]
 
 
 class SubmitAnswerSerializer(serializers.Serializer):
@@ -290,8 +290,9 @@ class SubmitAnswerSerializer(serializers.Serializer):
         attempt.score = score
         attempt.save(update_fields=["score"])
 
-        return {"id": attempt.id} #returning the attempt id to always direct us to  the last attempt.
-          
+        return {
+            "id": attempt.id
+        }  # returning the attempt id to always direct us to the last attempt.
 
     def to_representation(self, instance):
         return instance

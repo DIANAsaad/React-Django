@@ -282,14 +282,22 @@ class GetQuizResultsView(APIView):
     def get(self, request, *args, **kwargs):
         attempt_id = kwargs.get("attempt_id")
         try:
-            attempt = QuizAttempt.objects.get(id=attempt_id)
-            answers = Answer.objects.filter(quizattempt=attempt)
+
+            attempt = QuizAttempt.objects.prefetch_related(
+                "attempt_answers__question"
+            ).get(id=attempt_id)
+            answers = attempt.attempt_answers.all()
+
+            questions = [answer.question for answer in answers]
+
             data = {
                 "attempt": QuizAttemptSerializer(attempt).data,
+                "questions": QuestionSerializer(questions, many=True).data,
                 "answers": AnswerSerializer(answers, many=True).data,
             }
             return Response(data, status=status.HTTP_200_OK)
-        except QuizAttempt.DoesNotExist or Answer.DoesNotExist:
+
+        except (QuizAttempt.DoesNotExist, Answer.DoesNotExist):
             return Response(
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
@@ -485,9 +493,9 @@ class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         # Copy the data to manually parse the nested objects since DRF does not natively support them
         data = request.data.copy()
-
         if "questions" in data and isinstance(data["questions"], str):
 
             try:
@@ -502,7 +510,6 @@ class AddQuizView(APIView):
 
         try:
             if serializer.is_valid():
-
                 quiz = serializer.save()
                 return Response(
                     QuizSerializer(quiz, context={"request": request}).data,
@@ -512,14 +519,6 @@ class AddQuizView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from .serializers import SubmitAnswerSerializer
-from .models import Quiz  # Ensure correct import
 
 
 class SubmitAnswersView(APIView):
@@ -539,7 +538,6 @@ class SubmitAnswersView(APIView):
 
         try:
             serializer.save()
-            print(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Quiz.DoesNotExist:
 
