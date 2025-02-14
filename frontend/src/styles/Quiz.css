@@ -51,8 +51,9 @@ h1.display-4 {
   color: #6c757d;
 }
 
-.module-details p.fs-5 {
+.module-details  {
   font-size: 1rem;
+  text-align: left;
 }
 
 p.fs-6 {

@@ -50,9 +50,9 @@ const ENDPOINT = "http://localhost:8000";
 const normalizeModule = (module: Module) => ({
   ...module,
   module_image: module.module_image
-    ? `${ENDPOINT}${module.module_image}`
+    ? module.module_image?.toString().startsWith(ENDPOINT)?module.module_image: `${ENDPOINT}${module.module_image}`
     : "/achieve_a_mark.png",
-  lesson_pdf: module.lesson_pdf ? `${ENDPOINT}${module.lesson_pdf}` : "/*",
+  lesson_pdf: module.lesson_pdf ?module.lesson_pdf?.toString().startsWith(ENDPOINT)?module.lesson_pdf: `${ENDPOINT}${module.lesson_pdf}` : "/*",
 });
 
 const normalizeModules = (modules: Module[]) => {

@@ -78,6 +78,7 @@ interface QuizContextProps {
   }) => Promise<void>;
   deleteQuiz: (quizId: number) => Promise<void>;
   loading: boolean;
+  submitLoading: boolean;
   error: string | null;
   isStaff: boolean;
   isInstructor: boolean;
@@ -97,6 +98,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [attempts] = useState<Attempt[]>([]); // Add setAttempts later for Profile Page
   const [loading, setLoading] = useState<boolean>(false);
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [isInstructor, setIsInstructor] = useState<boolean>(false);
@@ -225,7 +227,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   // Submit the answers
   const submitAnswers = useCallback(
     async (answers: SubmittedAnswer[], quizId: number): Promise<Attempt> => {
-      setLoading(true);
+      setSubmitLoading(true);
       try {
         const response = await axios.post(
           `${ENDPOINT}/submit_answers/${quizId}`,
@@ -241,7 +243,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         throw new Error("Failed to submit answers");
       } finally {
-        setLoading(false);
+        setSubmitLoading(false);
       }
     },
     [accessToken]
@@ -294,6 +296,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         error,
         isStaff,
         isInstructor,
+        submitLoading,
       }}
     >
       {children}

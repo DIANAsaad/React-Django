@@ -57,9 +57,10 @@ const AddQuiz: React.FC = () => {
     const newQuestions = [...formData.questions];
 
     if (key === "choices") {
-      newQuestions[index].choices = value
-        .split(",")
-        .map((choice) => choice.trim());
+      const choices=value.split(",").map((choice)=>choice.trim());
+      newQuestions[index].choices = choices;
+      newQuestions[index].correct_answer=choices[0];
+       
     } else {
       newQuestions[index] = { ...newQuestions[index], [key]: value };
     }

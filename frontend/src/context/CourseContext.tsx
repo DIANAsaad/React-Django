@@ -46,8 +46,10 @@ const ENDPOINT = "http://localhost:8000";
 const normalizeCourse = (course: Course) => ({
   ...course,
   course_image: course.course_image
-    ? `${ENDPOINT}${course.course_image}`
-    : "/achieve_a_mark.png",
+    ? course.course_image?.toString().startsWith(ENDPOINT)
+      ? course.course_image
+      : `${ENDPOINT}${course.course_image}`
+    : '/achieve_a_mark.png'
 });
 
 const normalizeCourses = (courses: Course[]) => {

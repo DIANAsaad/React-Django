@@ -268,6 +268,8 @@ class GetQuizByIdView(APIView):
             data = {
                 "quiz": QuizSerializer(quiz).data,
                 "questions": QuestionSerializer(questions, many=True).data,
+                "isStaff": request.user.is_staff,
+                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
         except Quiz.DoesNotExist or Question.DoesNotExist:
@@ -544,3 +546,20 @@ class SubmitAnswersView(APIView):
             return Response(
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
+        
+class DeleteQuizView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]\
+    
+    def delete(self, request,*args,**kwargs):
+        quiz_id=kwargs.get("quiz_id")
+        if not quiz_id:
+            return Response({"detail":"Quiz ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            return delete_object(
+                request,
+                app_label="main",
+                model_name="Quiz",
+                object_id=quiz_id,
+            )
+        except Quiz.DoesNotExist:
+            raise NotFound(detail="Quiz not found.", code=status.HTTP_404_NOT_FOUND)

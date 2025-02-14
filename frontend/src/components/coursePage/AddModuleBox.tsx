@@ -49,7 +49,7 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
   );
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+  const imageInputRef = useRef<HTMLInputElement|null>(null);
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
@@ -75,7 +75,7 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
   );
 
   const handleImageClick = useCallback(() => {
-    if (fileInputRef.current) fileInputRef.current.click();
+    if (imageInputRef.current) imageInputRef.current.click();
   }, []);
 
   return (
@@ -106,7 +106,7 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
             />
             <input
               type="file"
-              ref={fileInputRef}
+              ref={imageInputRef}
               style={{ display: "none" }}
               onChange={handleImageChange}
             />

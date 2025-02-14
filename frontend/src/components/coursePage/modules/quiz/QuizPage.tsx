@@ -21,8 +21,10 @@ const QuizPage: React.FC = () => {
     submitAnswers,
     isStaff,
     isInstructor,
+    submitLoading,
     loading: questionLoading,
   } = useQuizContext();
+  console.log(isStaff);
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -109,6 +111,7 @@ const QuizPage: React.FC = () => {
               </p>
             )}
             {(isStaff || isInstructor) && (
+         
               <p className="text-muted">
                 Created by:{" "}
                 <span className="fw-bold">
@@ -199,7 +202,7 @@ const QuizPage: React.FC = () => {
                   id="submit-button"
                   type="submit"
                   className="btn btn-success btn-lg shadow-sm"
-                  disabled={questionLoading}
+                  disabled={submitLoading}
                 >
                   Submit Quiz
                 </button>
