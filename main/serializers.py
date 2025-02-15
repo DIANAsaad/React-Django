@@ -221,7 +221,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ["answer_text", "question_id", "is_correct"]
+        fields = ["id","answer_text", "question_id", "is_correct"]
 
 
 class SubmitAnswerSerializer(serializers.Serializer):

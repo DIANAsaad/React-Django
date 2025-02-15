@@ -10,6 +10,7 @@
 
 .container .form-group {
   margin-bottom: 15px;
+
 }
 
 .container .form-control {
@@ -23,10 +24,11 @@
   margin-top: 10px;
   padding: 10px 20px;
   font-size: 16px;
+  background-color: #332254;
 }
 
  .question-container {
-  background-color: #ffd8c3;
+  background-color: #ddd1ff;
   padding: 20px;
   width:100%;
   border-radius: 8px;
@@ -37,11 +39,13 @@
 
  .question-container .form-group {
   margin-bottom: 15px;
+  
 }
 
 .question-container .form-control {
   width: 100%;
   max-width: 100%;
+
 }
 
 .question-container .btn-danger {
@@ -50,10 +54,8 @@
 
  .form-label {
   font-weight: bold;
-  color: #555;
+  color: #332254;
   text-align:left;
+
 }
 
-.container .text-danger {
-  color: #d9534f;
-}

@@ -1,6 +1,9 @@
 import React, { useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { QuestionWithoutId, useQuizContext } from "../../../../context/QuizContext";
+import {
+  QuestionWithoutId,
+  useQuizContext,
+} from "../../../../context/QuizContext";
 import BaseWrapper from "../../../base/BaseWrapper";
 import "../../../../styles/AddQuiz.css";
 
@@ -47,7 +50,7 @@ const AddQuiz: React.FC = () => {
   const handleQuestionChange = (
     index: number,
     e: React.ChangeEvent<
-      HTMLInputElement |HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     type QuestionKey = keyof QuestionWithoutId;
@@ -57,10 +60,9 @@ const AddQuiz: React.FC = () => {
     const newQuestions = [...formData.questions];
 
     if (key === "choices") {
-      const choices=value.split(",").map((choice)=>choice.trim());
+      const choices = value.split(",").map((choice) => choice.trim());
       newQuestions[index].choices = choices;
-      newQuestions[index].correct_answer=choices[0];
-       
+      newQuestions[index].correct_answer = choices[0];
     } else {
       newQuestions[index] = { ...newQuestions[index], [key]: value };
     }
@@ -149,7 +151,8 @@ const AddQuiz: React.FC = () => {
             <label htmlFor="quiz_description" className="form-label">
               Quiz Description:
             </label>
-            <textarea
+            <input
+              type="text"
               id="quiz_description"
               name="quiz_description"
               value={formData.quiz_description}
@@ -174,7 +177,7 @@ const AddQuiz: React.FC = () => {
               onChange={handleChange}
               placeholder="Enter the quiz time limit"
               className="form-control"
-                 min='0'
+              min="0"
             />
           </div>
         </div>
@@ -191,7 +194,7 @@ const AddQuiz: React.FC = () => {
               onChange={handleChange}
               placeholder="Enter the quiz total mark"
               className="form-control"
-              min='0'
+              min="0"
             />
           </div>
         </div>
@@ -251,16 +254,56 @@ const AddQuiz: React.FC = () => {
             <label htmlFor={`choices_${index}`} className="form-label">
               Choices:
             </label>
-            <input
-              type="text"
-              id={`choices_${index}`}
-              name="choices"
-              value={question.choices.join(",")}
-              onChange={(e) => handleQuestionChange(index, e)}
-              placeholder="Enter the choices separated by commas"
-              className="form-control"
-              required
-            />
+
+            <div className="form-group mb-3">
+              {question.choices.map((choice, i) => (
+                <div key={i} className="d-flex align-items-center gap-2 mb-2">
+                  <label
+                    htmlFor={`choices_${index}_${i}`}
+                    className="form-label me-2"
+                  >
+                    {String.fromCharCode(97 + i)}.
+                  </label>
+                  <input
+                    type="text"
+                    id={`choices_${index}_${i}`}
+                    name="choices"
+                    value={choice}
+                    onChange={(e) => {
+                      const newQuestions = [...formData.questions];
+                      newQuestions[index].choices[i] = e.target.value;
+                      setFormData({ ...formData, questions: newQuestions });
+                    }}
+                    placeholder={`Enter choice ${i + 1}`}
+                    className="form-control flex-grow-1"
+                    required
+                  />
+                  <span
+                    className="text-danger fw-bold ms-2 cursor-pointer"
+                    onClick={() => {
+                      const newQuestions = [...formData.questions];
+                      newQuestions[index].choices = newQuestions[
+                        index
+                      ].choices.filter((_, j) => j !== i);
+                      setFormData({ ...formData, questions: newQuestions });
+                    }}
+                  >
+                    ✖
+                  </span>
+                </div>
+              ))}
+              <span
+                className="text-primary fw-bold mt-2 cursor-pointer"
+                onClick={() => {
+                  const newQuestions = [...formData.questions];
+                  newQuestions[index].choices.push("");
+                  setFormData({ ...formData, questions: newQuestions });
+                }}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+              >
+                ➕ Add Choice
+              </span>
+            </div>
           </div>
           <div className="form-group">
             <label htmlFor={`correct_answer_${index}`} className="form-label">
@@ -274,7 +317,6 @@ const AddQuiz: React.FC = () => {
               className="form-control"
               required
             >
-             
               {question.choices.map((choice, i) => (
                 <option value={choice} key={i}>
                   {choice}
@@ -294,7 +336,7 @@ const AddQuiz: React.FC = () => {
               onChange={(e) => handleQuestionChange(index, e)}
               placeholder="Enter the question point"
               className="form-control"
-                 min='0'
+              min="0"
               required
             />
           </div>
@@ -344,9 +386,20 @@ const AddQuiz: React.FC = () => {
 };
 
 const AddQuizWrapper: React.FC = () => {
-  const {moduleId,courseId}=useParams<{moduleId:string, courseId:string}>();
+  const { moduleId, courseId } = useParams<{
+    moduleId: string;
+    courseId: string;
+  }>();
   return (
-    <BaseWrapper options={[{ link: "/courses", label: "Home" }, {link:`/course/${courseId}/module/${moduleId}`,label:"Back to Lesson"}]}>
+    <BaseWrapper
+      options={[
+        { link: "/courses", label: "Home" },
+        {
+          link: `/course/${courseId}/module/${moduleId}`,
+          label: "Back to Lesson",
+        },
+      ]}
+    >
       <AddQuiz />
     </BaseWrapper>
   );
