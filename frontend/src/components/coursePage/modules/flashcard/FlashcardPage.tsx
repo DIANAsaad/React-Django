@@ -96,7 +96,7 @@ const FlashcardPageWrapper: React.FC = () => {
         { link: "/courses", label: "Home" },
         { link: `/course/${courseId}/module/${moduleId}`, label: "Back to Lesson" },
       ]}
-      conditions={[]}
+      conditions={[{ isUserStaff: false, isUserInstructor: false }]} 
     >
       <FlashcardPage />
     </BaseWrapper>

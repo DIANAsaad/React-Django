@@ -103,7 +103,7 @@ const AddExternalLinkWrapper: React.FC = () => {
           label: "Back to Lesson",
         },
       ]}
-      conditions={[]}
+      conditions={[{ isUserStaff: false, isUserInstructor: false }]} 
     >
       <AddExternalLink />
     </BaseWrapper>

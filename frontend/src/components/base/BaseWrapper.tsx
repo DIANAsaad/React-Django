@@ -11,7 +11,7 @@ interface BaseProps {
 }
 
 const BaseWrapper: React.FC<BaseProps> = ({ children, options, conditions}) => {
-  const { isUserStaff, isUserInstructor } = conditions[0];
+  const { isUserStaff, isUserInstructor } = conditions?.[0]||{};
   return (
     <div className="base-layout">
       <Navbar />

@@ -123,21 +123,19 @@ const App: React.FC = () => {
 
 const AppWrapper: React.FC = () => (
   <AuthProvider>
- 
+    <EditButtonProvider>
       <CourseProvider>
         <ModuleProvider>
           <FlashcardProvider>
             <ExternalLinkProvider>
               <QuizProvider>
-                <EditButtonProvider>
                 <App />
-                </EditButtonProvider>
               </QuizProvider>
             </ExternalLinkProvider>
           </FlashcardProvider>
         </ModuleProvider>
       </CourseProvider>
-
+    </EditButtonProvider>
   </AuthProvider>
 );
 

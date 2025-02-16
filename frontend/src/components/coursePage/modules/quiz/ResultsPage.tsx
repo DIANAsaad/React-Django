@@ -112,7 +112,7 @@ const ResultsPageWrapper: React.FC = () => {
           label: "Back to Lesson",
         },
       ]}
-      conditions={[]}
+      conditions={[{ isUserStaff: false, isUserInstructor: false }]} 
     >
       <ResultsPage />
     </BaseWrapper>

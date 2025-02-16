@@ -4,10 +4,11 @@ import { useCourseContext } from "../context/CourseContext";
 import "../styles/Home.css";
 import AddCourseCard from "./homePage/AddCourseCard";
 import BaseWrapper from "./base/BaseWrapper";
+import { useEditButtonContext } from "../context/EditButtonContext";
 
 const Home: React.FC = () => {
   const { courses, loading, error, isStaff, isInstructor } = useCourseContext();
-
+  const { editButton } = useEditButtonContext();
   if (loading) {
     return <div>Loading courses...</div>;
   }
@@ -20,7 +21,7 @@ const Home: React.FC = () => {
     return (
       <>
         <div>No courses available</div>
-        {(isStaff || isInstructor) && (
+        {(editButton) && (
           <div className="col-md-4">
             <AddCourseCard />
           </div>
@@ -60,8 +61,12 @@ const Home: React.FC = () => {
 };
 
 const HomeWrapper: React.FC = () => {
+  const { isStaff, isInstructor } = useCourseContext();
   return (
-    <BaseWrapper options={[{ link: "/*", label: "Dashboard" }]}>
+    <BaseWrapper
+      options={[{ link: "/*", label: "Dashboard" }]}
+      conditions={[{ isUserStaff: isStaff, isUserInstructor: isInstructor }]}
+    >
       <Home />
     </BaseWrapper>
   );
