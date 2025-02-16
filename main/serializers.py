@@ -164,7 +164,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class QuizSerializer(serializers.ModelSerializer):
-    quiz_creator = AchieveUserLoginSerializer(read_only=True)
+    quiz_creator = AchieveUserSerializer(read_only=True)
     module_id = serializers.IntegerField()
     time_limit = serializers.IntegerField()
     total_mark = serializers.IntegerField()

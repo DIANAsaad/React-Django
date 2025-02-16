@@ -26,19 +26,20 @@
 .cstm-header .card-cstm-img-top {
   max-width: 150px;
   height: auto;
-
   overflow: hidden;
 }
 
 .details h1 {
   font-family: "Georgia", serif;
   color: #343a40;
+  text-align:left;
 }
 
 .details p {
   font-family: "Georgia", serif;
   color: #343a40;
   font-weight: normal;
+  text-align:left;
 }
 
 .modules-box {

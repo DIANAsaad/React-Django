@@ -15,17 +15,17 @@ const AddQuiz: React.FC = () => {
     module_id: number;
     quiz_title: string;
     quiz_description: string;
-    total_mark: number;
-    time_limit: number;
-    attempts_allowed: number;
+    total_mark: number|null;
+    time_limit: number|null;
+    attempts_allowed: number|null;
     questions: QuestionWithoutId[];
   }>({
     module_id: Number(moduleId),
     quiz_title: "",
     quiz_description: "",
-    total_mark: 0,
-    time_limit: 0,
-    attempts_allowed: 0,
+    total_mark: null,
+    time_limit: null,
+    attempts_allowed: null,
     questions: [
       {
         question_text: "",
@@ -64,7 +64,7 @@ const AddQuiz: React.FC = () => {
       newQuestions[index].choices = choices;
       newQuestions[index].correct_answer = choices[0];
     } else {
-      newQuestions[index] = { ...newQuestions[index], [key]: value };
+      newQuestions[index] = { ...newQuestions[index], [key]: value};
     }
 
     setFormData({ ...formData, questions: newQuestions });
@@ -103,9 +103,9 @@ const AddQuiz: React.FC = () => {
           module_id: Number(moduleId),
           quiz_title: "",
           quiz_description: "",
-          total_mark: 0,
-          time_limit: 0,
-          attempts_allowed: 0,
+          total_mark: null,
+          time_limit: null,
+          attempts_allowed: null,
           questions: [
             {
               question_text: "",
@@ -143,6 +143,7 @@ const AddQuiz: React.FC = () => {
               onChange={handleChange}
               placeholder="Enter the quiz title"
               className="form-control"
+              required
             />
           </div>
         </div>
@@ -159,6 +160,7 @@ const AddQuiz: React.FC = () => {
               onChange={handleChange}
               placeholder="Enter the quiz description"
               className="form-control"
+              required
             />
           </div>
         </div>
@@ -173,7 +175,7 @@ const AddQuiz: React.FC = () => {
               type="number"
               id="time_limit"
               name="time_limit"
-              value={formData.time_limit}
+              value={formData.time_limit??""}
               onChange={handleChange}
               placeholder="Enter the quiz time limit"
               className="form-control"
@@ -190,11 +192,12 @@ const AddQuiz: React.FC = () => {
               type="number"
               id="total_mark"
               name="total_mark"
-              value={formData.total_mark}
+              value={formData.total_mark??""}
               onChange={handleChange}
               placeholder="Enter the quiz total mark"
               className="form-control"
               min="0"
+              required
             />
           </div>
         </div>
@@ -207,7 +210,7 @@ const AddQuiz: React.FC = () => {
               type="number"
               id="attempts_allowed"
               name="attempts_allowed"
-              value={formData.attempts_allowed}
+              value={formData.attempts_allowed??""}
               onChange={handleChange}
               placeholder="Enter the attempts allowed for this quiz"
               className="form-control"
@@ -351,11 +354,11 @@ const AddQuiz: React.FC = () => {
               type="number"
               id={`question_time_limit_${index}`}
               name="question_time_limit"
-              value={question.question_time_limit}
+              value={question.question_time_limit??""}
               onChange={(e) => handleQuestionChange(index, e)}
               placeholder="Enter the question time limit"
               className="form-control"
-              required
+ 
             />
           </div>
           <div className="d-flex">

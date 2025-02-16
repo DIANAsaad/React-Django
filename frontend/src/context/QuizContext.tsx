@@ -26,10 +26,10 @@ export interface Quiz {
 // Define the shape of a Question
 interface Question {
   id: number;
-  question_point: number;
+  question_point?: number;
   question_text: string;
   question_type: string;
-  question_time_limit: number;
+  question_time_limit?: number;
   correct_answer: string;
   choices: string[];
 }
@@ -178,9 +178,9 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         formData.append("module_id", module_id.toString());
         formData.append("quiz_title", quiz_title);
         formData.append("quiz_description", quiz_description);
-        formData.append("total_mark", total_mark.toString());
-        formData.append("time_limit", time_limit.toString());
-        formData.append("attempts_allowed", attempts_allowed.toString());
+        if(total_mark)formData.append("total_mark", total_mark.toString());
+        if (time_limit)formData.append("time_limit", time_limit.toString());
+        if (attempts_allowed)formData.append("attempts_allowed", attempts_allowed.toString());
         formData.append("questions", JSON.stringify(questions));
 
         const response = await axios.post(`${ENDPOINT}/add_quiz`, formData, {

@@ -24,7 +24,7 @@ const QuizPage: React.FC = () => {
     submitLoading,
     loading: questionLoading,
   } = useQuizContext();
-  console.log(isStaff);
+ 
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -119,11 +119,7 @@ const QuizPage: React.FC = () => {
                 </span>
               </p>
             )}
-            {quiz.time_limit && (
-              <p className="text-muted">
-                Time Limit: <span className="fw-bold">{quiz.time_limit}</span>
-              </p>
-            )}
+         
           </div>
         </div>
 
