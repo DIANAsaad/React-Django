@@ -95,6 +95,7 @@ const AddFlashcardWrapper: React.FC = () => {
         { link: "/courses", label: "Home" },
         { link: `/course/${courseId}/module/${moduleId}`, label: "Back to Lesson" },
       ]}
+      conditions={[]}
     >
       <AddFlashcard />
     </BaseWrapper>

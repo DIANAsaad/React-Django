@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useFlashcardContext } from "../../../../context/FlashcardContext";
 import { useParams } from "react-router-dom";
-import Flashcard from "./Flashcard"; // Assuming you have a Flashcard component
-import "../../../../styles/FlashcardPage.css"; // Import CSS for styling
+import Flashcard from "./Flashcard"; 
+import "../../../../styles/FlashcardPage.css"; 
 import BaseWrapper from "../../../base/BaseWrapper";
 import DropdownMenu from "../../../DropdownMenu";
 
@@ -96,6 +96,7 @@ const FlashcardPageWrapper: React.FC = () => {
         { link: "/courses", label: "Home" },
         { link: `/course/${courseId}/module/${moduleId}`, label: "Back to Lesson" },
       ]}
+      conditions={[]}
     >
       <FlashcardPage />
     </BaseWrapper>

@@ -70,10 +70,10 @@ interface QuizContextProps {
   addQuiz: (data: {
     quiz_title: string;
     quiz_description: string;
-    total_mark: number;
-    time_limit: number;
+    total_mark: number|null;
+    time_limit: number|null;
     module_id: number;
-    attempts_allowed: number;
+    attempts_allowed: number|null;
     questions: QuestionWithoutId[];
   }) => Promise<void>;
   deleteQuiz: (quizId: number) => Promise<void>;
@@ -166,10 +166,10 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }: {
       quiz_title: string;
       quiz_description: string;
-      total_mark: number;
-      time_limit: number;
+      total_mark: number|null;
+      time_limit: number|null;
       module_id: number;
-      attempts_allowed: number;
+      attempts_allowed: number|null;
       questions: QuestionWithoutId[];
     }) => {
       setLoading(true);

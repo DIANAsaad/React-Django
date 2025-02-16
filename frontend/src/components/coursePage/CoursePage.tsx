@@ -2,6 +2,7 @@ import React, { useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useCourseContext } from "../../context/CourseContext";
 import { useModuleContext } from "../../context/ModuleContext";
+import { useEditButtonContext } from "../../context/EditButtonContext";
 import "../../styles/Course&LessonPage.css";
 import DropdownMenu from "../DropdownMenu";
 import AddModuleBox from "./AddModuleBox";
@@ -9,22 +10,18 @@ import { useNavigate } from "react-router-dom";
 import BaseWrapper from "../base/BaseWrapper";
 
 const CoursePage: React.FC = () => {
-  const {
-    courses,
-    loading: courseLoading,
-    error,
-    isStaff,
-  } = useCourseContext();
+  const { courses, loading: courseLoading, error } = useCourseContext();
 
   const { courseId } = useParams<{ courseId: string }>();
   const {
     modules,
-    isInstructor,
     fetchModules,
     loading: moduleLoading,
     error: moduleError,
     deleteModule,
   } = useModuleContext();
+
+  const { editButton } = useEditButtonContext();
 
   const navigate = useNavigate();
 
@@ -63,7 +60,7 @@ const CoursePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{course.course_title}</h1>
               <p className="text-muted ">{course.description}</p>
-              {isStaff && (
+              {editButton && (
                 <p className="text-muted ">
                   <strong>Created by: </strong>
                   {`${course.creator.first_name} ${course.creator.last_name}`}
@@ -102,7 +99,8 @@ const CoursePage: React.FC = () => {
                         <p>{module.topic}</p>
                       </div>
                     </div>
-                    {(isStaff || isInstructor) && (
+
+                    {editButton && (
                       <div className="dropdownmenu">
                         <DropdownMenu
                           buttonContent={"⋮"}
@@ -124,7 +122,7 @@ const CoursePage: React.FC = () => {
           ) : (
             <p>No lessons available for this course.</p>
           )}
-          {(isStaff || isInstructor) && courseId !== undefined && (
+          {editButton && courseId !== undefined && (
             <AddModuleBox courseId={Number(courseId)} />
           )}
           {course.study_guide && (
@@ -143,10 +141,15 @@ const CoursePage: React.FC = () => {
 };
 
 const CoursePageWrapper: React.FC = () => {
+  const { isStaff, isInstructor } = useCourseContext();
   return (
-    <BaseWrapper options={[{ link: "/courses", label: "Home" }]}>
+    <BaseWrapper
+      options={[{ link: "/courses", label: "Home" }]}
+      conditions={[{ isUserStaff: isStaff, isUserInstructor: isInstructor }]}
+    >
       <CoursePage />
     </BaseWrapper>
   );
 };
+
 export default CoursePageWrapper;

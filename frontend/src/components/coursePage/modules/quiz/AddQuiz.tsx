@@ -402,6 +402,7 @@ const AddQuizWrapper: React.FC = () => {
           label: "Back to Lesson",
         },
       ]}
+      conditions={[]}
     >
       <AddQuiz />
     </BaseWrapper>

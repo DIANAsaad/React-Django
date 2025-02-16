@@ -227,6 +227,7 @@ const QuizPageWrapper: React.FC = () => {
           label: "Back to Lesson",
         },
       ]}
+      conditions={[]}
     >
       <QuizPage />
     </BaseWrapper>

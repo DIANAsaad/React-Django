@@ -11,6 +11,7 @@ import { CourseProvider } from "./context/CourseContext";
 import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
 import { ExternalLinkProvider } from "./context/ExternalLinkContext";
+import { EditButtonProvider } from "./context/EditButtonContext";
 import AddFlashcard from "./components/coursePage/modules/flashcard/AddFlashcard";
 import AddExtrenalLink from "./components/coursePage/modules/externalLinks/AddExternalLink";
 import EditExtrenalLink from "./components/coursePage/modules/externalLinks/EditExternalLink";
@@ -122,17 +123,21 @@ const App: React.FC = () => {
 
 const AppWrapper: React.FC = () => (
   <AuthProvider>
-    <CourseProvider>
-      <ModuleProvider>
-        <FlashcardProvider>
-          <ExternalLinkProvider>
-            <QuizProvider>
-              <App />
-            </QuizProvider>
-          </ExternalLinkProvider>
-        </FlashcardProvider>
-      </ModuleProvider>
-    </CourseProvider>
+ 
+      <CourseProvider>
+        <ModuleProvider>
+          <FlashcardProvider>
+            <ExternalLinkProvider>
+              <QuizProvider>
+                <EditButtonProvider>
+                <App />
+                </EditButtonProvider>
+              </QuizProvider>
+            </ExternalLinkProvider>
+          </FlashcardProvider>
+        </ModuleProvider>
+      </CourseProvider>
+
   </AuthProvider>
 );
 

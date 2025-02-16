@@ -103,6 +103,7 @@ const AddExternalLinkWrapper: React.FC = () => {
           label: "Back to Lesson",
         },
       ]}
+      conditions={[]}
     >
       <AddExternalLink />
     </BaseWrapper>

@@ -3,13 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Module, useModuleContext } from "../../../context/ModuleContext";
 import { useFlashcardContext } from "../../../context/FlashcardContext";
 import { useExternalLinkContext } from "../../../context/ExternalLinkContext";
+import { useEditButtonContext } from "../../../context/EditButtonContext";
 import { useQuizContext } from "../../../context/QuizContext";
 import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
+const { editButton } = useEditButtonContext();
+
 const ModulePage: React.FC = () => {
-  const { error, isInstructor, isStaff, fetchModulesById } =
+  const { error, fetchModulesById } =
     useModuleContext();
   const { moduleId, courseId } = useParams<{
     moduleId: string;
@@ -69,7 +72,7 @@ const ModulePage: React.FC = () => {
   }
 
   const options = [
-    ...(isStaff || isInstructor
+    ...(editButton
       ? [
           {
             label: "Add Session Recording",
@@ -131,7 +134,7 @@ const ModulePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{module.module_title}</h1>
               <p className="text-muted ">{module.topic}</p>
-              {(isStaff || isInstructor) && (
+              {(editButton) && (
                 <p className="text-muted ">
                  
                   <strong>Created by: </strong>
@@ -160,7 +163,7 @@ const ModulePage: React.FC = () => {
                       Access and download your lesson
                     </a>
                   </div>
-                  {(isStaff || isInstructor) && (
+                  {(editButton) && (
                     <DropdownMenu
                       buttonContent={"..."}
                       options={[
@@ -194,7 +197,7 @@ const ModulePage: React.FC = () => {
                     <strong>Lesson Flashcards: </strong>
                     Access your Flashcards
                   </div>
-                  {(isStaff || isInstructor) && (
+                  {(editButton) && (
                     <DropdownMenu
                       buttonContent={"..."}
                       options={[
@@ -232,7 +235,7 @@ const ModulePage: React.FC = () => {
                         {link.description}
                       </a>
                     </div>
-                    {(isStaff || isInstructor) && (
+                    {(editButton) && (
                       <DropdownMenu
                         buttonContent={"..."}
                         options={[
@@ -278,7 +281,7 @@ const ModulePage: React.FC = () => {
                     >
                       Lesson Quiz: {quiz.quiz_title}: {quiz.quiz_description}
                     </div>
-                    {(isStaff || isInstructor) && (
+                    {(editButton) && (
                       <DropdownMenu
                         buttonContent={"..."}
                         options={[
@@ -313,13 +316,14 @@ const ModulePage: React.FC = () => {
 
 const ModulePageWrapper: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
-
+  const {isStaff,isInstructor}=useModuleContext()
   return (
     <BaseWrapper
       options={[
         { link: "/courses", label: "Home" },
         { link: `/course/${courseId}`, label: "Back to Course" },
       ]}
+      conditions={[{ isUserStaff: isStaff, isUserInstructor: isInstructor }]}
     >
       <ModulePage />
     </BaseWrapper>
