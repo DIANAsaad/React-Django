@@ -146,7 +146,7 @@ class ExternalLinkSerializer(serializers.ModelSerializer):
 
 # Quizz
 class QuestionSerializer(serializers.ModelSerializer):
-    question_time_limit = serializers.IntegerField()
+    question_time_limit = serializers.IntegerField(required=False)
     question_point = serializers.IntegerField()
     choices = serializers.ListField(child=serializers.CharField())
 
@@ -166,9 +166,10 @@ class QuestionSerializer(serializers.ModelSerializer):
 class QuizSerializer(serializers.ModelSerializer):
     quiz_creator = AchieveUserSerializer(read_only=True)
     module_id = serializers.IntegerField()
-    time_limit = serializers.IntegerField()
+    time_limit = serializers.IntegerField(required=False)
     total_mark = serializers.IntegerField()
-    questions = QuestionSerializer(many=True, required=False)
+    attempts_allowed= serializers.IntegerField(required=False)
+    questions = QuestionSerializer(many=True)
 
     class Meta:
         model = Quiz

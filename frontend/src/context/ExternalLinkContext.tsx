@@ -35,8 +35,7 @@ interface ExternalLinkContextProps {
   }) => Promise<void>;
   loading: boolean;
   error: string | null;
-  isStaff: boolean;
-  isInstructor: boolean;
+
 }
 
 const ExternalLinkContext = createContext<ExternalLinkContextProps | undefined>(
@@ -50,8 +49,7 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
   const [links, setLinks] = useState<ExternalLink[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [isInstructor, setIsInstructor] = useState<boolean>(false);
+
 
   const fetchLinks = useCallback(
     async (moduleId: number) => {
@@ -68,8 +66,7 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
           }
         );
         setLinks(response.data.external_links ?? []);
-        setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor); 
+     
       } catch (err) {
         setError("Failed to fetch External Links");
       } finally {
@@ -194,8 +191,7 @@ export const ExternalLinkProvider = ({ children }: { children: ReactNode }) => {
         addLink,
         loading,
         error,
-        isStaff,
-        isInstructor,
+      
       }}
     >
       {children}

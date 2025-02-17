@@ -13,6 +13,8 @@ interface AchieveUser {
   first_name: string;
   last_name: string;
   email: string;
+  is_staff: boolean;
+  is_instructor: boolean;
 }
 
 // Define AuthContext type

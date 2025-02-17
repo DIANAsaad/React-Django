@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Attempt, useQuizContext } from "../../../../context/QuizContext";
 import { useParams } from "react-router-dom";
 import BaseWrapper from "../../../base/BaseWrapper";
-import "../../../../styles/ResultsPage.css";
+import "../../../../styles/Quiz.css";
 
 const ResultsPage: React.FC = () => {
   const { attemptId } = useParams<{ attemptId: string }>();
@@ -33,66 +33,60 @@ const ResultsPage: React.FC = () => {
   }
 
   return (
-    <div className="container mt-4">
-      <div className="cstm-card shadow-sm p-4 mb-4">
-        <h1 className="display-4 text-center">Quiz Results</h1>
-        <div className="row mt-4">
-          <div className="col-md-6">
-            <p className="text-muted">
-              <strong>Taken By: </strong>
-              <span>{`${attempt.taken_by.first_name} ${attempt.taken_by.last_name}`}</span>
-            </p>
-          </div>
-          <div className="col-md-6">
-            <p className="text-muted">
-              <strong>Score: </strong>
-              <span>{attempt.score}</span>
-            </p>
-          </div>
-          <div className="col-md-6">
-            <p className="text-muted">
-              <strong>Taken At: </strong>
-              <span>{new Date(attempt.taken_at).toLocaleString()}</span>
-            </p>
-          </div>
+    <div className="container card-dtylr mt-4">
+      <div className="quiz-info-box d-flex align-items-center p-5 mb-4 shadow rounded">
+        <div className="module-details ms-4">
+          <h1 className="display-4">Quiz Results</h1>
+          <p className="text-muted">
+            <strong>Taken By: </strong>
+            <span>{`${attempt.taken_by.first_name} ${attempt.taken_by.last_name}`}</span>
+          </p>
+          <p className="text-muted">
+            <strong>Score: </strong>
+            <span>{attempt.score}</span>
+          </p>
+          <p className="text-muted">
+            <strong>Taken At: </strong>
+            <span>{new Date(attempt.taken_at).toLocaleString()}</span>
+          </p>
         </div>
       </div>
 
-      <div className="card shadow-sm p-4">
-        <h2 className="h4 text-center mb-4">Answers</h2>
-        <ul className="list-group">
-          {answers &&
-            questions &&
-            questions.length > 0 &&
-            answers.length > 0 &&
-            answers.map((answer) => {
-              const question = questions.find(
-                (q) => q.id === answer.question_id
-              );
-              return (
-                <li key={answer.id} className="list-group-item mb-3">
-                  <p className="mb-1">
-                    <strong>Question:</strong> {question?.question_text}
-                  </p>
-                  <p className="mb-1">
-                    <strong>Correct Answer:</strong> {question?.correct_answer}
-                  </p>
-                  <p className="mb-1">
-                    <strong>Your Answer:</strong> {answer.answer_text}
-                  </p>
-                  {answer.is_correct ? (
-                    <p className="mb-1 text-success">
-                      <strong>Correct</strong>
-                    </p>
-                  ) : (
-                    <p className="mb-1 text-danger">
-                      <strong>Not Correct</strong>
-                    </p>
-                  )}
-                </li>
-              );
-            })}
-        </ul>
+      <div className="quiz-questions">
+        {answers &&
+          questions &&
+          questions.length > 0 &&
+          answers.length > 0 &&
+          answers.map((answer) => {
+            const question = questions.find((q) => q.id === answer.question_id);
+            return (
+              <div
+                key={answer.id}
+                className="question-box p-4 shadow-lg rounded mb-4 hover-shadow"
+              >
+                <div className="question-content">
+                  <h5 className="fw-bold">{question?.question_text}</h5>
+                  {question?.choices.map((choice, index) => (
+                    <div key={index} className="form-check">
+                      {choice === question?.correct_answer ? (
+                        <div className="text-success-answer"><strong>{choice}</strong></div>
+                      ) : choice === answer.answer_text ? (
+                        <div
+                          className={
+                            answer.is_correct ? "text-success-answer" : "text-danger-answer"
+                          }
+                        >
+                          <strong>{choice}</strong> 
+                        </div>
+                      ) : (
+                        <span>{choice}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
       </div>
     </div>
   );
@@ -112,7 +106,6 @@ const ResultsPageWrapper: React.FC = () => {
           label: "Back to Lesson",
         },
       ]}
-      conditions={[{ isUserStaff: false, isUserInstructor: false }]} 
     >
       <ResultsPage />
     </BaseWrapper>

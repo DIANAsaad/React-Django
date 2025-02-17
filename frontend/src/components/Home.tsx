@@ -61,11 +61,9 @@ const Home: React.FC = () => {
 };
 
 const HomeWrapper: React.FC = () => {
-  const { isStaff, isInstructor } = useCourseContext();
   return (
     <BaseWrapper
       options={[{ link: "/*", label: "Dashboard" }]}
-      conditions={[{ isUserStaff: isStaff, isUserInstructor: isInstructor }]}
     >
       <Home />
     </BaseWrapper>

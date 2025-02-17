@@ -39,8 +39,7 @@ interface ModuleContextProps {
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
-  isStaff: boolean;
-  isInstructor: boolean;
+
 }
 
 const ModuleContext = createContext<ModuleContextProps | undefined>(undefined);
@@ -65,8 +64,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [isInstructor, setIsInstructor] = useState<boolean>(false);
+
 
   const fetchModules = useCallback(
     async (courseId: number) => {
@@ -81,8 +79,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setModules(normalizeModules(response.data.modules ?? []));
-        setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor);
+       
       } catch (err) {
         setError("Failed to fetch modules");
       } finally {
@@ -106,8 +103,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const module = normalizeModule(response.data.module);
-        setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor);
+      
         return module;
       } catch (err) {
         throw new Error("Failed to fetch module");
@@ -192,8 +188,6 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
         addModule,
         loading,
         error,
-        isStaff,
-        isInstructor,
       }}
     >
       {children}

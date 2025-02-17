@@ -90,3 +90,16 @@ p.fs-6 {
 .hover-shadow:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
+
+.text-danger-answer{
+ background-color:rgba(255, 0, 0, 0.571);
+ color:white;
+ text-decoration:line-through;
+
+}
+
+.text-success-answer{
+  background-color:rgba(0, 128, 0, 0.559);
+  color:white;
+  
+}

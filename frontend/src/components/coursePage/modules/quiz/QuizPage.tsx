@@ -7,6 +7,8 @@ import {
 } from "../../../../context/QuizContext";
 import BaseWrapper from "../../../base/BaseWrapper";
 import "../../../../styles/Quiz.css";
+import { useEditButtonContext } from "../../../../context/EditButtonContext";
+
 
 const QuizPage: React.FC = () => {
   const { quizId, courseId, moduleId } = useParams<{
@@ -19,12 +21,10 @@ const QuizPage: React.FC = () => {
     questions,
     fetchQuizById,
     submitAnswers,
-    isStaff,
-    isInstructor,
     submitLoading,
     loading: questionLoading,
   } = useQuizContext();
- 
+  const { editButton } = useEditButtonContext();
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -110,7 +110,7 @@ const QuizPage: React.FC = () => {
                 Allowed Attempts: <span className="fw-bold">Open</span>
               </p>
             )}
-            {(isStaff || isInstructor) && (
+            {(editButton) && (
          
               <p className="text-muted">
                 Created by:{" "}
@@ -227,7 +227,6 @@ const QuizPageWrapper: React.FC = () => {
           label: "Back to Lesson",
         },
       ]}
-      conditions={[{ isUserStaff: false, isUserInstructor: false }]} 
     >
       <QuizPage />
     </BaseWrapper>

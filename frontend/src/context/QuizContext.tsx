@@ -80,8 +80,7 @@ interface QuizContextProps {
   loading: boolean;
   submitLoading: boolean;
   error: string | null;
-  isStaff: boolean;
-  isInstructor: boolean;
+
   submitAnswers: (
     answers: SubmittedAnswer[],
     quizId: number
@@ -100,8 +99,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [isInstructor, setIsInstructor] = useState<boolean>(false);
 
   // Fetch quizzes when entering into the lesson's (module's) page
   const fetchQuizzes = useCallback(
@@ -116,8 +113,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setQuizzes(response.data.quizzes ?? []);
-        setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor);
+  
       } catch (err) {
         setError("Failed to fetch quizzes");
       } finally {
@@ -140,8 +136,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         });
 
         setQuestions(response.data.questions ?? []);
-        setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor);
         const quiz = response.data.quiz;
         return quiz;
       } catch {
@@ -294,8 +288,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         fetchAnswers,
         loading,
         error,
-        isStaff,
-        isInstructor,
         submitLoading,
       }}
     >

@@ -48,7 +48,3 @@
   input:checked + .slider:before {
     transform: translateX(26px);
   }
-
-  .edit-mode-text{
-    font-family: Arial, sans-serif;
-  }

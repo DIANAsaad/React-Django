@@ -24,7 +24,7 @@ export const EditButtonProvider = ({ children }: { children: ReactNode }) => {
 
 export const useEditButtonContext = () => {
   const context = useContext(EditButtonContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useEditButton must be used within an EditButtonProvider");
   }
   return context;

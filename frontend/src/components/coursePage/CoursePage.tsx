@@ -141,11 +141,9 @@ const CoursePage: React.FC = () => {
 };
 
 const CoursePageWrapper: React.FC = () => {
-  const { isStaff, isInstructor } = useCourseContext();
   return (
     <BaseWrapper
       options={[{ link: "/courses", label: "Home" }]}
-      conditions={[{ isUserStaff: isStaff, isUserInstructor: isInstructor }]}
     >
       <CoursePage />
     </BaseWrapper>

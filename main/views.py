@@ -1,4 +1,4 @@
-import logging
+
 from django.contrib.auth import logout as logout
 from main.models import (
     Course,
@@ -36,6 +36,7 @@ from .permissions import IsStaffOrIsInstructor
 import json
 
 
+
 # Authentication & Authorization
 
 
@@ -47,12 +48,15 @@ class CustomLoginView(APIView):
 
         if serializer.is_valid():
             user = serializer.validated_data["user"]
+            user_data = AchieveUserSerializer(user).data
+            user_data["is_staff"] = user.is_staff
+            user_data["is_instructor"] = user.groups.filter(name="Instructors").exists()
             refresh_token = RefreshToken.for_user(user)
             access_token = str(refresh_token.access_token)
             data = {
                 "access_token": access_token,
                 "refresh_token": str(refresh_token),
-                "user": AchieveUserSerializer(user).data,
+                "user": user_data,
             }
 
             return Response(data, status=status.HTTP_200_OK)
@@ -89,7 +93,11 @@ class GetUserView(APIView):
     def get(self, request, *args, **kwargs):
         serializer = AchieveUserSerializer(request.user)
 
-        return Response(serializer.data)
+        data = serializer.data
+        data["is_staff"] = request.user.is_staff
+        data["is_instructor"] = request.user.groups.filter(name="Instructors").exists()
+
+        return Response(data)
 
 
 class RefreshAccessTokenView(APIView):
@@ -129,8 +137,6 @@ class HomePageView(APIView):
         is_staff = request.user.is_staff
         data = {
             "courses": CourseSerializer(courses, many=True).data,
-            "isStaff": is_staff,
-            "isInstructor": request.user.groups.filter(name="Instructors").exists(),
         }
 
         return Response(data, status=status.HTTP_200_OK)
@@ -148,8 +154,6 @@ class CoursePageView(APIView):
         modules = Module.objects.filter(course_id=course_id).all()
         data = {
             "modules": ModuleSerializer(modules, many=True).data,
-            "isStaff": is_staff,
-            "isInstructor": request.user.groups.filter(name="Instructors").exists(),
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -167,8 +171,6 @@ class GetModuleView(APIView):
 
             data = {
                 "module": ModuleSerializer(module).data,
-                "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
         except Module.DoesNotExist:
@@ -187,8 +189,6 @@ class GetFlashcardView(APIView):
             flashcards = Flashcard.objects.filter(lesson_id=lesson_id).all()
             data = {
                 "flashcards": FlashcardSerializer(flashcards, many=True).data,
-                "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
         except Flashcard.DoesNotExist:
@@ -209,8 +209,6 @@ class GetExternalLinkView(APIView):
                 "external_links": ExternalLinkSerializer(
                     external_links, many=True
                 ).data,
-                "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
         except ExternalLink.DoesNotExist:
@@ -247,8 +245,6 @@ class GetQuizzesView(APIView):
 
             data = {
                 "quizzes": QuizSerializer(quizzes, many=True).data,
-                "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
         except Quiz.DoesNotExist:
@@ -268,11 +264,9 @@ class GetQuizByIdView(APIView):
             data = {
                 "quiz": QuizSerializer(quiz).data,
                 "questions": QuestionSerializer(questions, many=True).data,
-                "isStaff": request.user.is_staff,
-                "isInstructor": request.user.groups.filter(name="Instructors").exists(),
             }
             return Response(data, status=status.HTTP_200_OK)
-        except Quiz.DoesNotExist or Question.DoesNotExist:
+        except (Quiz.DoesNotExist, Question.DoesNotExist):
             return Response(
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
@@ -495,7 +489,7 @@ class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
+        print(f"Request data: {request.data}")
         # Copy the data to manually parse the nested objects since DRF does not natively support them
         data = request.data.copy()
         if "questions" in data and isinstance(data["questions"], str):
@@ -509,9 +503,9 @@ class AddQuizView(APIView):
                 )
 
         serializer = QuizSerializer(data=data, context={"request": request})
-
         try:
             if serializer.is_valid():
+                print(serializer.errors)
                 quiz = serializer.save()
                 return Response(
                     QuizSerializer(quiz, context={"request": request}).data,
@@ -546,14 +540,17 @@ class SubmitAnswersView(APIView):
             return Response(
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
+
 class DeleteQuizView(APIView):
-    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]\
-    
-    def delete(self, request,*args,**kwargs):
-        quiz_id=kwargs.get("quiz_id")
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def delete(self, request, *args, **kwargs):
+        quiz_id = kwargs.get("quiz_id")
         if not quiz_id:
-            return Response({"detail":"Quiz ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Quiz ID is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
         try:
             return delete_object(
                 request,

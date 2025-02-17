@@ -14,3 +14,14 @@
   flex: 1;
   padding: 30px;
 }
+
+.content-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.content-children {
+  flex: 1;
+  padding: 2px;
+}

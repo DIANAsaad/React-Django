@@ -9,7 +9,6 @@ import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
-const { editButton } = useEditButtonContext();
 
 const ModulePage: React.FC = () => {
   const { error, fetchModulesById } =
@@ -18,6 +17,8 @@ const ModulePage: React.FC = () => {
     moduleId: string;
     courseId: string;
   }>();
+
+  const { editButton } = useEditButtonContext();
 
   const {
     flashcards,
@@ -316,14 +317,12 @@ const ModulePage: React.FC = () => {
 
 const ModulePageWrapper: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
-  const {isStaff,isInstructor}=useModuleContext()
   return (
     <BaseWrapper
       options={[
         { link: "/courses", label: "Home" },
         { link: `/course/${courseId}`, label: "Back to Course" },
       ]}
-      conditions={[{ isUserStaff: isStaff, isUserInstructor: isInstructor }]}
     >
       <ModulePage />
     </BaseWrapper>

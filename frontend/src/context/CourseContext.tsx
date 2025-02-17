@@ -34,8 +34,7 @@ interface CourseContextProps {
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
-  isStaff: boolean;
-  isInstructor: boolean;
+
 }
 
 // Create the context
@@ -62,8 +61,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [isInstructor, setIsInstructor] = useState<boolean>(false);
+
 
   useEffect(() => {
 
@@ -74,8 +72,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setCourses(normalizeCourses(response.data.courses ?? []));
-        setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor);
+    
       } catch {
         setError("Failed to fetch courses.");
       } finally {
@@ -157,9 +154,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         deleteCourse,
         addCourse,
         loading,
-        error,
-        isStaff,
-        isInstructor,       
+        error,     
       }}
     >
       {children}

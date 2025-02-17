@@ -35,8 +35,7 @@ interface FlashcardContextProps {
   }) => Promise<void>;
   loading: boolean;
   error: string | null;
-  isStaff: boolean;
-  isInstructor: boolean;
+
 }
 
 const FlashcardContext = createContext<FlashcardContextProps | undefined>(
@@ -50,8 +49,7 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [isInstructor, setIsInstructor] = useState<boolean>(false);
+  
 
   const fetchFlashcards = useCallback(
     async (moduleId: number) => {
@@ -66,8 +64,7 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setFlashcards(response.data.flashcards ?? []);
-        setIsStaff(response.data.isStaff);
-        setIsInstructor(response.data.isInstructor);
+    
       } catch (err) {
         setError("Failed to fetch flashcards");
       } finally {
@@ -182,8 +179,7 @@ export const FlashcardProvider = ({ children }: { children: ReactNode }) => {
         addFlashcard,
         loading,
         error,
-        isStaff,
-        isInstructor,
+
       }}
     >
       {children}
