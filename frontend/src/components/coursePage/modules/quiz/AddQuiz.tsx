@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   QuestionWithoutId,
   useQuizContext,
@@ -8,16 +8,19 @@ import BaseWrapper from "../../../base/BaseWrapper";
 import "../../../../styles/AddQuiz.css";
 
 const AddQuiz: React.FC = () => {
-  const { moduleId } = useParams<{ moduleId: string }>();
-  const { addQuiz } = useQuizContext();
-
+  const { moduleId, courseId } = useParams<{
+    moduleId: string;
+    courseId: string;
+  }>();
+  const { addQuiz, loading: quizLoading } = useQuizContext();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<{
     module_id: number;
     quiz_title: string;
     quiz_description: string;
-    total_mark: number|null;
-    time_limit: number|null;
-    attempts_allowed: number|null;
+    total_mark: number | null;
+    time_limit: number | null;
+    attempts_allowed: number | null;
     questions: QuestionWithoutId[];
   }>({
     module_id: Number(moduleId),
@@ -64,7 +67,11 @@ const AddQuiz: React.FC = () => {
       newQuestions[index].choices = choices;
       newQuestions[index].correct_answer = choices[0];
     } else {
-      newQuestions[index] = { ...newQuestions[index], [key]: value};
+      newQuestions[index] = { ...newQuestions[index], [key]: value };
+    }
+
+    if (!newQuestions[index].question_type) {
+      newQuestions[index].question_type = "MCQ";
     }
 
     setFormData({ ...formData, questions: newQuestions });
@@ -117,6 +124,7 @@ const AddQuiz: React.FC = () => {
             },
           ],
         });
+        navigate(`/course/${courseId}/module/${moduleId}`);
       } catch (error) {
         console.error("Failed to add quiz", error);
         setError("Failed to add quiz");
@@ -175,7 +183,7 @@ const AddQuiz: React.FC = () => {
               type="number"
               id="time_limit"
               name="time_limit"
-              value={formData.time_limit??""}
+              value={formData.time_limit ?? ""}
               onChange={handleChange}
               placeholder="Enter the quiz time limit"
               className="form-control"
@@ -192,7 +200,7 @@ const AddQuiz: React.FC = () => {
               type="number"
               id="total_mark"
               name="total_mark"
-              value={formData.total_mark??""}
+              value={formData.total_mark ?? ""}
               onChange={handleChange}
               placeholder="Enter the quiz total mark"
               className="form-control"
@@ -210,7 +218,7 @@ const AddQuiz: React.FC = () => {
               type="number"
               id="attempts_allowed"
               name="attempts_allowed"
-              value={formData.attempts_allowed??""}
+              value={formData.attempts_allowed ?? ""}
               onChange={handleChange}
               placeholder="Enter the attempts allowed for this quiz"
               className="form-control"
@@ -275,6 +283,10 @@ const AddQuiz: React.FC = () => {
                     onChange={(e) => {
                       const newQuestions = [...formData.questions];
                       newQuestions[index].choices[i] = e.target.value;
+                      if (!newQuestions[index].correct_answer) {
+                        newQuestions[index].correct_answer =
+                          newQuestions[index].choices[0];
+                      }
                       setFormData({ ...formData, questions: newQuestions });
                     }}
                     placeholder={`Enter choice ${i + 1}`}
@@ -354,11 +366,10 @@ const AddQuiz: React.FC = () => {
               type="number"
               id={`question_time_limit_${index}`}
               name="question_time_limit"
-              value={question.question_time_limit??""}
+              value={question.question_time_limit ?? ""}
               onChange={(e) => handleQuestionChange(index, e)}
               placeholder="Enter the question time limit"
               className="form-control"
- 
             />
           </div>
           <div className="d-flex">
@@ -380,7 +391,11 @@ const AddQuiz: React.FC = () => {
         </div>
       ))}
 
-      <button type="submit" className="btn btn-cstm-submit" disabled={loading}>
+      <button
+        type="submit"
+        className="btn btn-cstm-submit"
+        disabled={quizLoading}
+      >
         {loading ? "Adding..." : "Add Quiz"}
       </button>
       {error && <p className="text-danger mt-3">{error}</p>}

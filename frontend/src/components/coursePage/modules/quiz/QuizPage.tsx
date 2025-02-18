@@ -9,7 +9,6 @@ import BaseWrapper from "../../../base/BaseWrapper";
 import "../../../../styles/Quiz.css";
 import { useEditButtonContext } from "../../../../context/EditButtonContext";
 
-
 const QuizPage: React.FC = () => {
   const { quizId, courseId, moduleId } = useParams<{
     quizId: string;
@@ -28,6 +27,32 @@ const QuizPage: React.FC = () => {
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+
+  // In case of quiz.time_limit
+  useEffect(() => {
+    if (quiz && quiz.time_limit) {
+      setRemainingTime(quiz.time_limit * 60); // convert into miniutes
+    }
+  }, [quiz]);
+
+  useEffect(() => {
+    if (remainingTime === null) {
+      return;
+    }
+
+    if (remainingTime <= 0) {
+      alert("Time's up! Your answers have been submitted.");
+      handleSubmit();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setRemainingTime((prev) => (prev !== null ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [remainingTime, quiz]);
 
   useEffect(() => {
     if (quizId) {
@@ -62,8 +87,10 @@ const QuizPage: React.FC = () => {
   };
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+    async (e?: React.FormEvent) => {
+      if (e) {
+        e.preventDefault();
+      }
 
       try {
         const response = await submitAnswers(answers, Number(quizId));
@@ -110,8 +137,28 @@ const QuizPage: React.FC = () => {
                 Allowed Attempts: <span className="fw-bold">Open</span>
               </p>
             )}
-            {(editButton) && (
-         
+            {quiz.time_limit ? (
+              <p className="text-muted">
+                Time Limit:{" "}
+                <span className="fw-bold">
+                  {" "}
+                  {remainingTime !== null ? (
+                    <>
+                      {Math.floor(remainingTime / 60)}:
+                      {remainingTime % 60 < 10 ? "0" : ""}
+                      {remainingTime % 60} / {quiz?.time_limit} minutes
+                    </>
+                  ) : (
+                    <>Loading...</> 
+                  )}
+                </span>
+              </p>
+            ) : (
+              <p className="text-muted">
+                Time Limit: <span className="fw-bold">Open</span>
+              </p>
+            )}
+            {editButton && (
               <p className="text-muted">
                 Created by:{" "}
                 <span className="fw-bold">
@@ -119,7 +166,6 @@ const QuizPage: React.FC = () => {
                 </span>
               </p>
             )}
-         
           </div>
         </div>
 

@@ -22,6 +22,8 @@ const AddExternalLink: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+// Add security measure to avoid inserting malecious links (not done)
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();

@@ -9,10 +9,8 @@ import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
-
 const ModulePage: React.FC = () => {
-  const { error, fetchModulesById } =
-    useModuleContext();
+  const { error, fetchModulesById } = useModuleContext();
   const { moduleId, courseId } = useParams<{
     moduleId: string;
     courseId: string;
@@ -135,9 +133,8 @@ const ModulePage: React.FC = () => {
             <div className="details ms-4">
               <h1 className="title">{module.module_title}</h1>
               <p className="text-muted ">{module.topic}</p>
-              {(editButton) && (
+              {editButton && (
                 <p className="text-muted ">
-                 
                   <strong>Created by: </strong>
                   {`${module.module_creator.first_name} ${module.module_creator.last_name}`}
                 </p>
@@ -154,17 +151,24 @@ const ModulePage: React.FC = () => {
             <div>
               <div className="material-box p-4 shadow-sm rounded  align-items-center justify-content-between ">
                 <div className="d-flex align-items-center justify-content-between">
-                  <div className="material-box-details">
+                  <div className="material-box-details d-flex align-items-center">
+                    <div className="img-div">
+                    <img
+                      src="/lesson_pdf.png"
+                      className="attr-img" 
+                    />
+                    </div>
                     <a
                       href={lessonPdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <strong>Lesson PDF: </strong>
-                      Access and download your lesson
+                      <strong>Lesson PDF: </strong> Access and download your
+                      lesson
                     </a>
                   </div>
-                  {(editButton) && (
+
+                  {editButton && (
                     <DropdownMenu
                       buttonContent={"..."}
                       options={[
@@ -198,7 +202,7 @@ const ModulePage: React.FC = () => {
                     <strong>Lesson Flashcards: </strong>
                     Access your Flashcards
                   </div>
-                  {(editButton) && (
+                  {editButton && (
                     <DropdownMenu
                       buttonContent={"..."}
                       options={[
@@ -236,7 +240,7 @@ const ModulePage: React.FC = () => {
                         {link.description}
                       </a>
                     </div>
-                    {(editButton) && (
+                    {editButton && (
                       <DropdownMenu
                         buttonContent={"..."}
                         options={[
@@ -282,7 +286,7 @@ const ModulePage: React.FC = () => {
                     >
                       Lesson Quiz: {quiz.quiz_title}: {quiz.quiz_description}
                     </div>
-                    {(editButton) && (
+                    {editButton && (
                       <DropdownMenu
                         buttonContent={"..."}
                         options={[

@@ -52,7 +52,7 @@ const EditExternalLink: React.FC = () => {
       [name]: value,
     }));
   };
-
+// Add security measure to avoid inserting malecious links (not done)
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

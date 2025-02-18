@@ -70,13 +70,14 @@ interface QuizContextProps {
   addQuiz: (data: {
     quiz_title: string;
     quiz_description: string;
-    total_mark: number|null;
-    time_limit: number|null;
+    total_mark: number | null;
+    time_limit: number | null;
     module_id: number;
-    attempts_allowed: number|null;
+    attempts_allowed: number | null;
     questions: QuestionWithoutId[];
   }) => Promise<void>;
   deleteQuiz: (quizId: number) => Promise<void>;
+
   loading: boolean;
   submitLoading: boolean;
   error: string | null;
@@ -113,7 +114,6 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setQuizzes(response.data.quizzes ?? []);
-  
       } catch (err) {
         setError("Failed to fetch quizzes");
       } finally {
@@ -160,10 +160,10 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
     }: {
       quiz_title: string;
       quiz_description: string;
-      total_mark: number|null;
-      time_limit: number|null;
+      total_mark: number | null;
+      time_limit: number | null;
       module_id: number;
-      attempts_allowed: number|null;
+      attempts_allowed: number | null;
       questions: QuestionWithoutId[];
     }) => {
       setLoading(true);
@@ -172,9 +172,10 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         formData.append("module_id", module_id.toString());
         formData.append("quiz_title", quiz_title);
         formData.append("quiz_description", quiz_description);
-        if(total_mark)formData.append("total_mark", total_mark.toString());
-        if (time_limit)formData.append("time_limit", time_limit.toString());
-        if (attempts_allowed)formData.append("attempts_allowed", attempts_allowed.toString());
+        if (total_mark) formData.append("total_mark", total_mark.toString());
+        if (time_limit) formData.append("time_limit", time_limit.toString());
+        if (attempts_allowed)
+          formData.append("attempts_allowed", attempts_allowed.toString());
         formData.append("questions", JSON.stringify(questions));
 
         const response = await axios.post(`${ENDPOINT}/add_quiz`, formData, {

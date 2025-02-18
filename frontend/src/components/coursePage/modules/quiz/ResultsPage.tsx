@@ -53,10 +53,10 @@ const ResultsPage: React.FC = () => {
       </div>
 
       <div className="quiz-questions">
-        {answers &&
+        {(answers &&
           questions &&
           questions.length > 0 &&
-          answers.length > 0 &&
+          answers.length > 0)? (
           answers.map((answer) => {
             const question = questions.find((q) => q.id === answer.question_id);
             return (
@@ -65,28 +65,50 @@ const ResultsPage: React.FC = () => {
                 className="question-box p-4 shadow-lg rounded mb-4 hover-shadow"
               >
                 <div className="question-content">
-                  <h5 className="fw-bold">{question?.question_text}</h5>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-bold">{question?.question_text}</h5>
+                    {answer.is_correct && (
+                      <p className="text-success fw-bold">
+                        +{question?.question_point} points
+                      </p>
+                    )}
+                  </div>
+
                   {question?.choices.map((choice, index) => (
-                    <div key={index} className="form-check">
-                      {choice === question?.correct_answer ? (
-                        <div className="text-success-answer"><strong>{choice}</strong></div>
-                      ) : choice === answer.answer_text ? (
-                        <div
-                          className={
-                            answer.is_correct ? "text-success-answer" : "text-danger-answer"
-                          }
-                        >
-                          <strong>{choice}</strong> 
-                        </div>
-                      ) : (
-                        <span>{choice}</span>
-                      )}
+                    <div
+                      key={index}
+                      className="form-check d-flex align-items-center"
+                    >
+                      <div
+                        className={`form-check-input fake-radio ${
+                          choice === question?.correct_answer
+                            ? "text-success-answer selected correct"
+                            : choice === answer?.answer_text
+                            ? answer?.is_correct
+                              ? "text-success-answer selected correct"
+                              : "text-danger-answer selected incorrect"
+                            : ""
+                        }`}
+                      >
+                        {choice === question?.correct_answer
+                          ? "✔"
+                          : choice === answer?.answer_text
+                          ? "✖"
+                          : ""}
+                      </div>
+                      <label className="form-check-label">
+                        <strong>{choice}</strong>
+                      </label>
                     </div>
                   ))}
                 </div>
               </div>
             );
-          })}
+          })):(
+            <div className="text-center">No answers found. You did not submit any answer..</div>
+          )}
+
+          
       </div>
     </div>
   );
