@@ -34,8 +34,8 @@ const AddQuiz: React.FC = () => {
         question_text: "",
         question_type: "MCQ",
         correct_answer: "",
-        question_point: 0,
-        question_time_limit: 0,
+        question_point: null,
+        question_time_limit: null,
         choices: [""],
       },
     ],
@@ -86,8 +86,8 @@ const AddQuiz: React.FC = () => {
           question_text: "",
           question_type: "MCQ",
           correct_answer: "",
-          question_point: 0,
-          question_time_limit: 0,
+          question_point: null,
+          question_time_limit: null,
           choices: [""],
         },
       ],
@@ -118,8 +118,8 @@ const AddQuiz: React.FC = () => {
               question_text: "",
               question_type: "",
               correct_answer: "",
-              question_point: 0,
-              question_time_limit: 0,
+              question_point: null,
+              question_time_limit: null,
               choices: [""],
             },
           ],
@@ -347,7 +347,7 @@ const AddQuiz: React.FC = () => {
               type="number"
               id={`question_point_${index}`}
               name="question_point"
-              value={question.question_point}
+              value={question.question_point??""}
               onChange={(e) => handleQuestionChange(index, e)}
               placeholder="Enter the question point"
               className="form-control"

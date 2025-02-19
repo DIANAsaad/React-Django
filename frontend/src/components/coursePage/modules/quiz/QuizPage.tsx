@@ -28,8 +28,25 @@ const QuizPage: React.FC = () => {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
+;
+  useEffect(() => {
+    if (quizId) {
+      setLoading(true);
+      const getQuiz = async () => {
+        try {
+          const fetchedQuiz = await fetchQuizById(Number(quizId));
+          setQuiz(fetchedQuiz);
+        } finally {
+          setLoading(false);
+        }
+      };
+      getQuiz();
+    }
+  }, [quizId, fetchQuizById]);
 
-  // In case of quiz.time_limit
+
+  
+  // In case of we have a time limit for the quiz
   useEffect(() => {
     if (quiz && quiz.time_limit) {
       setRemainingTime(quiz.time_limit * 60); // convert into miniutes
@@ -54,20 +71,30 @@ const QuizPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [remainingTime, quiz]);
 
-  useEffect(() => {
-    if (quizId) {
-      setLoading(true);
-      const getQuiz = async () => {
-        try {
-          const fetchedQuiz = await fetchQuizById(Number(quizId));
-          setQuiz(fetchedQuiz);
-        } finally {
-          setLoading(false);
-        }
-      };
-      getQuiz();
-    }
-  }, [quizId, fetchQuizById]);
+
+  // In case of individual question time limit
+  const useQuestionTimer = (questionLimit: number, isTimerActive: boolean) => {
+    
+    const [remQuestionTime, setRemQuestionTime] = useState<number | null>(null);
+  
+    useEffect(() => {
+      if (isTimerActive && questionLimit > 0) {
+        setRemQuestionTime(questionLimit * 60);
+      }
+    }, [isTimerActive, questionLimit]);
+  
+    useEffect(() => {
+      if (!isTimerActive || remQuestionTime === null || remQuestionTime <= 0) return;
+  
+      const timer = setTimeout(() => {
+        setRemQuestionTime((prev) => (prev !== null ? prev - 1 : 0));
+      }, 1000);
+  
+      return () => clearTimeout(timer);
+    }, [isTimerActive, remQuestionTime]);
+return remQuestionTime;
+  };
+
 
   const handleAnswerChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -80,7 +107,7 @@ const QuizPage: React.FC = () => {
         (a) => a.question_id !== questionId
       );
       return [
-        ...updatedAnswers,
+        ...updatedAnswers,                         
         { question_id: questionId, answer_text: value },
       ];
     });
@@ -179,8 +206,23 @@ const QuizPage: React.FC = () => {
                   className="question-box p-4 shadow-lg rounded mb-4 hover-shadow"
                   key={question.id}
                 >
+                  {question.question_time_limit && (
+                    <div   onClick={() =>
+                      question.question_time_limit !== null &&(
+                        useQuestionTimer(question.question_time_limit, true))
+                    }>
+                      <option>This is a timed question, show Question</option>
+                    </div>
+                  )}
                   <div className="question-content">
                     <h5 className="fw-bold">{question.question_text}</h5>
+                    {remQuestionTime!==null &&
+                    <>
+                      {Math.floor(remQuestionTime / 60)}:
+                      {remQuestionTime % 60 < 10 ? "0" : ""}
+                      {remQuestionTime % 60} / {question.question_time_limit} minutes
+                    </>
+                    }
                     <div className="mb-3">
                       {question.question_type === "MCQ" ? (
                         <>

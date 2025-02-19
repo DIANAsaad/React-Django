@@ -1,14 +1,4 @@
 
-
-
-.title {
-  font-family: "Georgia", serif;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 15px;
-}
-
 .info-box {
   background: linear-gradient(120deg, #f8f9fa, #ffffff);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
@@ -28,13 +18,15 @@
 
 .details h1 {
   font-family: "Georgia", serif;
-  color: #343a40;
+  color:  #332254;;
   text-align:left;
+  margin-bottom: 15px;
+  font-size: 1.75rem;
 }
 
 .details p {
   font-family: "Georgia", serif;
-  color: #343a40;
+  color:  #332254;;
   font-weight: normal;
   text-align:left;
 }
@@ -58,7 +50,7 @@
   border: 2px dotted #ffd8c3;
   border-radius: 10px;
   font-size: 1rem;
-  color: #333;
+  color:#332254;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   margin-top: 10px;
@@ -66,12 +58,21 @@
   text-align: left;
 }
 
-.material-box a {
+.material-box-details a {
   text-decoration: none;
-  color: black;
+  color:#332254;
   font-weight: normal;
+  margin-left:1rem;
+  margin-top:1.2rem;
 }
 
+.material-box-details p {
+  text-decoration: none;
+  color:#332254;
+  font-weight: normal;
+  margin-left:1rem;
+  margin-top:2.2rem;
+}
 
 .study-guide-box:hover {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
@@ -169,13 +170,14 @@
 
 .dropdownmenu {
   display: inline-block;
-  margin-left: 50px;
+  margin-left: 5rem;
 }
 
-.flashcard-alert {
+.not-found-alert {
   margin-top: 20px;
   padding: 10px;
   text-align: center;
+  color:#332254;
 }
 
 
@@ -186,10 +188,13 @@
   width: 50px; 
   height: 50px;
   overflow: hidden;
+  margin-top: 20px;
+  margin-left:10px;
 }
 
 .attr-img {
   width: 100%;
   height: auto;
   object-fit: contain;
+  margin-bottom:0px;
 }

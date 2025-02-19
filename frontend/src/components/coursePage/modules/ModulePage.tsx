@@ -149,14 +149,11 @@ const ModulePage: React.FC = () => {
           </div>
           {lessonPdfUrl && (
             <div>
-              <div className="material-box p-4 shadow-sm rounded  align-items-center justify-content-between ">
+              <div className="material-box shadow-sm rounded  align-items-center justify-content-between ">
                 <div className="d-flex align-items-center justify-content-between">
                   <div className="material-box-details d-flex align-items-center">
                     <div className="img-div">
-                    <img
-                      src="/lesson_pdf.png"
-                      className="attr-img" 
-                    />
+                      <img src="/lesson_pdf.png" className="attr-img" />
                     </div>
                     <a
                       href={lessonPdfUrl}
@@ -184,23 +181,28 @@ const ModulePage: React.FC = () => {
             </div>
           )}
           {flashcardLoading ? (
-            <div className="flashcard-alert">
+            <div className="not-found-alert">
               Loading lesson's flashcards...
             </div>
           ) : flashcards && flashcards.length > 0 ? (
             <div>
-              <div className="material-box p-4 shadow-sm rounded align-items-center">
+              <div className="material-box  shadow-sm rounded align-items-center">
                 <div className="d-flex align-items-center justify-content-between">
                   <div
-                    className="material-box-details"
+                    className="material-box-details d-flex align-items-center"
                     onClick={() => {
                       navigate(
                         `/course/${courseId}/module/${module.id}/flashcards`
                       );
                     }}
                   >
-                    <strong>Lesson Flashcards: </strong>
-                    Access your Flashcards
+                    <div className="img-div">
+                      <img src="/flashcards.png" className="attr-img" />
+                    </div>
+                    <p>
+                      <strong>Lesson Flashcards: </strong>
+                      Access your Flashcards
+                    </p>
                   </div>
                   {editButton && (
                     <DropdownMenu
@@ -219,24 +221,27 @@ const ModulePage: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="flashcard-alert">No flashcards available.</div>
+            <div className="not-found-alert">No flashcards available.</div>
           )}
           {linkLoading ? (
-            <div className="flashcard-alert">
+            <div className="not-found-alert">
               Loading lesson's External Links...
             </div>
           ) : links && links.length > 0 ? (
             links.map((link) => (
               <div key={link.id}>
-                <div className="material-box p-4 shadow-sm rounded align-items-center">
+                <div className="material-box shadow-sm rounded align-items-center">
                   <div className="d-flex align-items-center justify-content-between">
-                    <div className="material-box-details">
+                    <div className="material-box-details d-flex align-items-center">
+                      <div className="img-div">
+                        <img src="/external_link.png" className="attr-img" />
+                      </div>
                       <a
                         href={link.link}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <strong>Helpful External Link: </strong>
+                        <strong>External Link: </strong>
                         {link.description}
                       </a>
                     </div>
@@ -266,25 +271,30 @@ const ModulePage: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="flashcard-alert">No external links available.</div>
+            <div className="not-found-alert">No external links available.</div>
           )}
 
           {quizLoading ? (
-            <div className="flashcard-alert">Loading lesson's Quizzes...</div>
+            <div className="not-found-alert">Loading lesson's Quizzes...</div>
           ) : quizzes && quizzes.length > 0 ? (
             quizzes.map((quiz) => (
               <div key={quiz.id}>
-                <div className="material-box p-4 shadow-sm rounded align-items-center">
+                <div className="material-box shadow-sm rounded align-items-center">
                   <div className="d-flex align-items-center justify-content-between">
                     <div
-                      className="material-box-details"
+                      className="material-box-details d-flex align-items-center"
                       onClick={() =>
                         navigate(
                           `/course/${courseId}/module/${moduleId}/quiz/${quiz.id}`
                         )
                       }
                     >
-                      Lesson Quiz: {quiz.quiz_title}: {quiz.quiz_description}
+                      <div className="img-div">
+                        <img src="/quizzes.png" className="attr-img" />
+                      </div>
+                      <p>
+                        <strong>Lesson Quiz: </strong> {quiz.quiz_description}
+                      </p>
                     </div>
                     {editButton && (
                       <DropdownMenu
@@ -311,7 +321,7 @@ const ModulePage: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="flashcard-alert">No quizzes available.</div>
+            <div className="not-found-alert">No quizzes available.</div>
           )}
         </div>
       </div>

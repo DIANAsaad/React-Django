@@ -26,10 +26,10 @@ export interface Quiz {
 // Define the shape of a Question
 interface Question {
   id: number;
-  question_point?: number;
+  question_point: number | null;
   question_text: string;
   question_type: string;
-  question_time_limit?: number;
+  question_time_limit: number | null;
   correct_answer: string;
   choices: string[];
 }
@@ -77,7 +77,6 @@ interface QuizContextProps {
     questions: QuestionWithoutId[];
   }) => Promise<void>;
   deleteQuiz: (quizId: number) => Promise<void>;
-
   loading: boolean;
   submitLoading: boolean;
   error: string | null;
@@ -176,7 +175,12 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         if (time_limit) formData.append("time_limit", time_limit.toString());
         if (attempts_allowed)
           formData.append("attempts_allowed", attempts_allowed.toString());
-        formData.append("questions", JSON.stringify(questions));
+        // Filter out the null questionn time limit 
+        const filteredQuestions = questions.map((question) => {
+          const { question_time_limit, ...rest } = question;
+          return question_time_limit ? { ...rest, question_time_limit } : rest;
+        });
+        formData.append("questions", JSON.stringify(filteredQuestions));
 
         const response = await axios.post(`${ENDPOINT}/add_quiz`, formData, {
           headers: {

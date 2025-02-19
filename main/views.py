@@ -1,4 +1,3 @@
-
 from django.contrib.auth import logout as logout
 from main.models import (
     Course,
@@ -34,7 +33,6 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from .permissions import IsStaffOrIsInstructor
 import json
-
 
 
 # Authentication & Authorization
@@ -489,7 +487,6 @@ class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kwargs):
-        print(f"Request data: {request.data}")
         # Copy the data to manually parse the nested objects since DRF does not natively support them
         data = request.data.copy()
         if "questions" in data and isinstance(data["questions"], str):
@@ -505,7 +502,6 @@ class AddQuizView(APIView):
         serializer = QuizSerializer(data=data, context={"request": request})
         try:
             if serializer.is_valid():
-                print(serializer.errors)
                 quiz = serializer.save()
                 return Response(
                     QuizSerializer(quiz, context={"request": request}).data,
