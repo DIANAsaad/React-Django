@@ -171,3 +171,14 @@ class ExternalLink(models.Model):
     )
     description = models.CharField(max_length=100)
     link = models.URLField(max_length=2083)
+
+
+# Comment
+
+class Comment(models.Model):
+    lesson=models.ForeignKey(
+        Module, on_delete=models.CASCADE, related_name="comments"
+    )
+    commentor=models.ForeignKey(AchieveUser, on_delete=models.CASCADE, related_name="commentor")
+    comment=models.TextField()
+    commented_at= models.DateTimeField(default=timezone.now)

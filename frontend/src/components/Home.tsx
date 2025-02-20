@@ -7,7 +7,7 @@ import BaseWrapper from "./base/BaseWrapper";
 import { useEditButtonContext } from "../context/EditButtonContext";
 
 const Home: React.FC = () => {
-  const { courses, loading, error, isStaff, isInstructor } = useCourseContext();
+  const { courses, loading, error,} = useCourseContext();
   const { editButton } = useEditButtonContext();
   if (loading) {
     return <div>Loading courses...</div>;
@@ -50,7 +50,7 @@ const Home: React.FC = () => {
               <CourseCard course={course} />
             </div>
           ))}
-        {(isStaff || isInstructor) && (
+        {(editButton) && (
           <div className="col-md-4">
             <AddCourseCard />
           </div>

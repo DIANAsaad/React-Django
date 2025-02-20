@@ -24,7 +24,7 @@ export interface Quiz {
 }
 
 // Define the shape of a Question
-interface Question {
+export interface Question {
   id: number;
   question_point: number | null;
   question_text: string;
