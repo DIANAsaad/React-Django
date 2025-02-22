@@ -39,7 +39,6 @@ interface ModuleContextProps {
   ) => Promise<void>;
   loading: boolean;
   error: string | null;
-
 }
 
 const ModuleContext = createContext<ModuleContextProps | undefined>(undefined);
@@ -49,9 +48,15 @@ const ENDPOINT = "http://localhost:8000";
 const normalizeModule = (module: Module) => ({
   ...module,
   module_image: module.module_image
-    ? module.module_image?.toString().startsWith(ENDPOINT)?module.module_image: `${ENDPOINT}${module.module_image}`
+    ? module.module_image?.toString().startsWith(ENDPOINT)
+      ? module.module_image
+      : `${ENDPOINT}${module.module_image}`
     : "/achieve_a_mark.png",
-  lesson_pdf: module.lesson_pdf ?module.lesson_pdf?.toString().startsWith(ENDPOINT)?module.lesson_pdf: `${ENDPOINT}${module.lesson_pdf}` : "/*",
+  lesson_pdf: module.lesson_pdf
+    ? module.lesson_pdf?.toString().startsWith(ENDPOINT)
+      ? module.lesson_pdf
+      : `${ENDPOINT}${module.lesson_pdf}`
+    : "/*",
 });
 
 const normalizeModules = (modules: Module[]) => {
@@ -64,7 +69,6 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
 
   const fetchModules = useCallback(
     async (courseId: number) => {
@@ -79,7 +83,6 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setModules(normalizeModules(response.data.modules ?? []));
-       
       } catch (err) {
         setError("Failed to fetch modules");
       } finally {
@@ -92,7 +95,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
   // This function will fetch modules using the ID's
 
   const fetchModulesById = useCallback(
-    async (moduleId: number):Promise<Module> => {
+    async (moduleId: number): Promise<Module> => {
       if (!accessToken) {
         throw new Error("No access token available");
       }
@@ -103,7 +106,7 @@ export const ModuleProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const module = normalizeModule(response.data.module);
-      
+
         return module;
       } catch (err) {
         throw new Error("Failed to fetch module");

@@ -175,7 +175,7 @@ export const QuizProvider = ({ children }: { children: ReactNode }) => {
         if (time_limit) formData.append("time_limit", time_limit.toString());
         if (attempts_allowed)
           formData.append("attempts_allowed", attempts_allowed.toString());
-        // Filter out the null questionn time limit 
+        // Filter out the null questionn time limit
         const filteredQuestions = questions.map((question) => {
           const { question_time_limit, ...rest } = question;
           return question_time_limit ? { ...rest, question_time_limit } : rest;

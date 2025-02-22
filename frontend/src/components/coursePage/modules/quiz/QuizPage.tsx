@@ -1,10 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { SubmittedAnswer, Quiz, useQuizContext, Question } from '../../../../context/QuizContext';
-import BaseWrapper from '../../../base/BaseWrapper';
-import '../../../../styles/Quiz.css';
-import { useEditButtonContext } from '../../../../context/EditButtonContext';
-
+import React, { useCallback, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  SubmittedAnswer,
+  Quiz,
+  useQuizContext,
+  Question,
+} from "../../../../context/QuizContext";
+import BaseWrapper from "../../../base/BaseWrapper";
+import "../../../../styles/Quiz.css";
+import { useEditButtonContext } from "../../../../context/EditButtonContext";
 
 const useQuestionTimer = (questionLimit: number) => {
   const [remQuestionTime, setRemQuestionTime] = useState<number | null>(null);
@@ -17,10 +21,11 @@ const useQuestionTimer = (questionLimit: number) => {
   }, [isTimerActive, questionLimit]);
 
   useEffect(() => {
-    if (!isTimerActive || remQuestionTime === null || remQuestionTime <= 0) return;
+    if (!isTimerActive || remQuestionTime === null || remQuestionTime <= 0)
+      return;
 
     const timer = setTimeout(() => {
-      setRemQuestionTime(prev => (prev !== null ? prev - 1 : 0));
+      setRemQuestionTime((prev) => (prev !== null ? prev - 1 : 0));
     }, 1000);
 
     return () => clearTimeout(timer);
@@ -30,75 +35,101 @@ const useQuestionTimer = (questionLimit: number) => {
     setIsTimerActive(true);
   };
 
-  return [remQuestionTime, startTimer] as [remQuestionTime: number | null, startTimer: () => void];
+  return [remQuestionTime, startTimer] as [
+    remQuestionTime: number | null,
+    startTimer: () => void
+  ];
 };
 
 const QuestionRow: React.FC<{
   question: Question;
-  handleAnswerChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, questionId: number) => void;
+  handleAnswerChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    questionId: number
+  ) => void;
 }> = ({ question, handleAnswerChange }) => {
-  const [remQuestionTime, startTimer] = useQuestionTimer(question.question_time_limit || 0);
+  const [remQuestionTime, startTimer] = useQuestionTimer(
+    question.question_time_limit || 0
+  );
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   return (
-    <div className='question-box p-4 shadow-lg rounded mb-4 hover-shadow' key={question.id}>
+    <div
+      className="question-box p-4 shadow-lg rounded mb-4 hover-shadow"
+      key={question.id}
+    >
       {question.question_time_limit && (
-        <div onClick={() => {question.question_time_limit !== null && startTimer()}
-        }>
-          <option>This is a timed question, show Question</option>
+        <div
+          onClick={() => {
+            if (question.question_time_limit !== null) {
+              startTimer();
+              setIsVisible(true);
+            }
+          }}
+        >
+          {!isVisible && <p>This is a timed question. show Question</p>}
         </div>
       )}
-      <div className='question-content'>
-        <h5 className='fw-bold'>{question.question_text}</h5>
-        {remQuestionTime !== null && (
-          <>
-            {Math.floor(remQuestionTime / 60)}:{remQuestionTime % 60 < 10 ? '0' : ''}
-            {remQuestionTime % 60} / {question.question_time_limit} minutes
-          </>
-        )}
-        <div className='mb-3'>
-          {question.question_type === 'MCQ' ? (
+      {((question.question_time_limit && isVisible) ||
+        !question.question_time_limit) && (
+        <div className="question-content">
+          <h5 className="fw-bold">{question.question_text}</h5>
+          {remQuestionTime !== null && (
             <>
-              <label className='form-label fs-6'>Choose the correct option:</label>
-              {question.choices.map((choice, index) => (
-                <div key={index} className='form-check'>
-                  <input
-                    className='form-check-input'
-                    type='radio'
-                    name={`question_${question.id}`}
-                    value={choice}
-                    onChange={e => handleAnswerChange(e, question.id)}
-                  />
-                  <label className='form-check-label'>{choice}</label>
-                </div>
-              ))}
-            </>
-          ) : (
-            <>
-              <label className='form-label fs-6'>True or False:</label>
-              <div className='form-check'>
-                <input
-                  className='form-check-input'
-                  type='radio'
-                  name='answer_text'
-                  value='True'
-                  onChange={e => handleAnswerChange(e, question.id)}
-                />
-                <label className='form-check-label'>True</label>
-              </div>
-              <div className='form-check'>
-                <input
-                  className='form-check-input'
-                  type='radio'
-                  name='answer_text'
-                  value='False'
-                  onChange={e => handleAnswerChange(e, question.id)}
-                />
-                <label className='form-check-label'>False</label>
-              </div>
+              {Math.floor(remQuestionTime / 60)}:
+              {remQuestionTime % 60 < 10 ? "0" : ""}
+              {remQuestionTime % 60} / {question.question_time_limit} minutes
             </>
           )}
+          <div className="mb-3">
+            {question.question_type === "MCQ" ? (
+              <>
+                <label className="form-label fs-6">
+                  Choose the correct option:
+                </label>
+                {question.choices.map((choice, index) => (
+                  <div key={index} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name={`question_${question.id}`}
+                      value={choice}
+                      onChange={(e) => handleAnswerChange(e, question.id)}
+                      disabled={remQuestionTime === 0}
+                    />
+                    <label className="form-check-label">{choice}</label>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                <label className="form-label fs-6">True or False:</label>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="answer_text"
+                    value="True"
+                    onChange={(e) => handleAnswerChange(e, question.id)}
+                  />
+                  <label className="form-check-label">True</label>
+                </div>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="answer_text"
+                    value="False"
+                    onChange={(e) => handleAnswerChange(e, question.id)}
+                    disabled={remQuestionTime === 0}
+                  />
+                  <label className="form-check-label">False</label>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -110,7 +141,13 @@ const QuizPage: React.FC = () => {
     moduleId: string;
   }>();
   const navigate = useNavigate();
-  const { questions, fetchQuizById, submitAnswers, submitLoading, loading: questionLoading } = useQuizContext();
+  const {
+    questions,
+    fetchQuizById,
+    submitAnswers,
+    submitLoading,
+    loading: questionLoading,
+  } = useQuizContext();
   const { editButton } = useEditButtonContext();
   const [answers, setAnswers] = useState<SubmittedAnswer[]>([]);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
@@ -150,18 +187,26 @@ const QuizPage: React.FC = () => {
     }
 
     const timer = setTimeout(() => {
-      setRemainingTime(prev => (prev !== null ? prev - 1 : 0));
+      setRemainingTime((prev) => (prev !== null ? prev - 1 : 0));
     }, 1000);
 
     return () => clearTimeout(timer);
   }, [remainingTime, quiz]);
 
-  const handleAnswerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, questionId: number) => {
+  const handleAnswerChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    questionId: number
+  ) => {
     const value = e.target.value;
 
-    setAnswers(prevAnswers => {
-      const updatedAnswers = prevAnswers.filter(a => a.question_id !== questionId);
-      return [...updatedAnswers, { question_id: questionId, answer_text: value }];
+    setAnswers((prevAnswers) => {
+      const updatedAnswers = prevAnswers.filter(
+        (a) => a.question_id !== questionId
+      );
+      return [
+        ...updatedAnswers,
+        { question_id: questionId, answer_text: value },
+      ];
     });
   };
 
@@ -170,18 +215,19 @@ const QuizPage: React.FC = () => {
       if (e) {
         e.preventDefault();
       }
-
       try {
         const response = await submitAnswers(answers, Number(quizId));
         setAnswers([]);
 
         if (response) {
-          navigate(`/course/${courseId}/module/${moduleId}/quiz/${quizId}/results/${response.id}`);
+          navigate(
+            `/course/${courseId}/module/${moduleId}/quiz/${quizId}/results/${response.id}`
+          );
         } else {
-          console.error('Quiz submission succeeded, but attemptId is missing.');
+          console.error("Quiz submission succeeded, but attemptId is missing.");
         }
       } catch (error) {
-        console.error('Failed to submit quiz:', error);
+        console.error("Failed to submit quiz:", error);
       }
     },
     [submitAnswers, answers, quizId, courseId, moduleId, navigate]
@@ -197,30 +243,32 @@ const QuizPage: React.FC = () => {
 
   return (
     <>
-      <div className='container card-style mt-4'>
-        <div className='quiz-info-box d-flex align-items-center p-5 mb-4 shadow rounded'>
-          <div className='module-details ms-4'>
-            <h1 className='display-4'>{quiz.quiz_title}</h1> 
-            <p className='text-muted'>
-              Total Marks: <span className='fw-bold'>{quiz.total_mark}</span>
+      <div className="container card-style mt-4">
+        <div className="quiz-info-box d-flex align-items-center p-5 mb-4 shadow rounded">
+          <div className="module-details ms-4">
+            <h1 className="display-4">{quiz.quiz_title}</h1>
+            <p className="text-muted">
+              Total Marks: <span className="fw-bold">{quiz.total_mark}</span>
             </p>
             {quiz.attempts_allowed ? (
-              <p className='text-muted'>
-                Allowed Attempts: <span className='fw-bold'>{quiz.attempts_allowed}</span>
+              <p className="text-muted">
+                Allowed Attempts:{" "}
+                <span className="fw-bold">{quiz.attempts_allowed}</span>
               </p>
             ) : (
-              <p className='text-muted'>
-                Allowed Attempts: <span className='fw-bold'>Open</span>
+              <p className="text-muted">
+                Allowed Attempts: <span className="fw-bold">Open</span>
               </p>
             )}
             {quiz.time_limit ? (
-              <p className='text-muted'>
-                Time Limit:{' '}
-                <span className='fw-bold'>
-                  {' '}
+              <p className="text-muted">
+                Time Limit:{" "}
+                <span className="fw-bold">
+                  {" "}
                   {remainingTime !== null ? (
                     <>
-                      {Math.floor(remainingTime / 60)}:{remainingTime % 60 < 10 ? '0' : ''}
+                      {Math.floor(remainingTime / 60)}:
+                      {remainingTime % 60 < 10 ? "0" : ""}
                       {remainingTime % 60} / {quiz?.time_limit} minutes
                     </>
                   ) : (
@@ -229,14 +277,14 @@ const QuizPage: React.FC = () => {
                 </span>
               </p>
             ) : (
-              <p className='text-muted'>
-                Time Limit: <span className='fw-bold'>Open</span>
+              <p className="text-muted">
+                Time Limit: <span className="fw-bold">Open</span>
               </p>
             )}
             {editButton && (
-              <p className='text-muted'>
-                Created by:{' '}
-                <span className='fw-bold'>
+              <p className="text-muted">
+                Created by:{" "}
+                <span className="fw-bold">
                   {quiz.quiz_creator.first_name} {quiz.quiz_creator.last_name}
                 </span>
               </p>
@@ -244,19 +292,23 @@ const QuizPage: React.FC = () => {
           </div>
         </div>
 
-        <div className='quiz-questions'>
+        <div className="quiz-questions">
           {questionLoading ? (
-            <div className='flashcard-alert'>Loading questions...</div>
+            <div className="flashcard-alert">Loading questions...</div>
           ) : questions && questions.length > 0 ? (
             <form onSubmit={handleSubmit}>
-              {questions.map(question => (
-                <QuestionRow key={question.id} question={question} handleAnswerChange={handleAnswerChange} />
+              {questions.map((question) => (
+                <QuestionRow
+                  key={question.id}
+                  question={question}
+                  handleAnswerChange={handleAnswerChange}
+                />
               ))}
-              <div className='text-end mt-4'>
+              <div className="text-end mt-4">
                 <button
-                  id='submit-button'
-                  type='submit'
-                  className='btn btn-success btn-lg shadow-sm'
+                  id="submit-button"
+                  type="submit"
+                  className="btn btn-success btn-lg shadow-sm"
                   disabled={submitLoading}
                 >
                   Submit Quiz
@@ -264,7 +316,7 @@ const QuizPage: React.FC = () => {
               </div>
             </form>
           ) : (
-            <div className='text-center'>No questions found!</div>
+            <div className="text-center">No questions found!</div>
           )}
         </div>
       </div>
@@ -280,11 +332,11 @@ const QuizPageWrapper: React.FC = () => {
   return (
     <BaseWrapper
       options={[
-        { link: '/courses', label: 'Home' },
+        { link: "/courses", label: "Home" },
         {
           link: `/course/${courseId}/module/${moduleId}`,
-          label: 'Back to Lesson'
-        }
+          label: "Back to Lesson",
+        },
       ]}
     >
       <QuizPage />

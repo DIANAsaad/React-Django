@@ -53,10 +53,7 @@ const ResultsPage: React.FC = () => {
       </div>
 
       <div className="quiz-questions">
-        {(answers &&
-          questions &&
-          questions.length > 0 &&
-          answers.length > 0)? (
+        {answers && questions && questions.length > 0 && answers.length > 0 ? (
           answers.map((answer) => {
             const question = questions.find((q) => q.id === answer.question_id);
             return (
@@ -104,11 +101,12 @@ const ResultsPage: React.FC = () => {
                 </div>
               </div>
             );
-          })):(
-            <div className="text-center">No answers found. You did not submit any answer..</div>
-          )}
-
-          
+          })
+        ) : (
+          <div className="text-center">
+            No answers found. You did not submit any answer..
+          </div>
+        )}
       </div>
     </div>
   );
