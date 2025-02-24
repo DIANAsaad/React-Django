@@ -17,8 +17,10 @@ import AddExtrenalLink from "./components/coursePage/modules/externalLinks/AddEx
 import EditExtrenalLink from "./components/coursePage/modules/externalLinks/EditExternalLink";
 import AddQuiz from "./components/coursePage/modules/quiz/AddQuiz";
 import { QuizProvider } from "./context/QuizContext";
+import { CommentProvider } from "./context/CommentContext";
 import QuizPage from "./components/coursePage/modules/quiz/QuizPage";
 import ResultsPage from "./components/coursePage/modules/quiz/ResultsPage";
+import AddComment from "./components/coursePage/modules/comment/AddComment";
 
 const App: React.FC = () => {
   return (
@@ -116,6 +118,14 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/course/:courseId/module/:moduleId/add-comment"
+          element={
+            <ProtectedRoute>
+              <AddComment/>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
@@ -129,7 +139,9 @@ const AppWrapper: React.FC = () => (
           <FlashcardProvider>
             <ExternalLinkProvider>
               <QuizProvider>
-                <App />
+                <CommentProvider>
+                  <App />
+                </CommentProvider>
               </QuizProvider>
             </ExternalLinkProvider>
           </FlashcardProvider>

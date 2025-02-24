@@ -8,6 +8,7 @@ from main.models import (
     Question,
     Answer,
     QuizAttempt,
+    Comment,
 )
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
@@ -28,6 +29,7 @@ from main.serializers import (
     QuizAttemptSerializer,
     SubmitAnswerSerializer,
     AnswerSerializer,
+    CommentSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -487,7 +489,6 @@ class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         # Copy the data to manually parse the nested objects since DRF does not natively support them
         data = request.data.copy()
         if "questions" in data and isinstance(data["questions"], str):
@@ -525,10 +526,6 @@ class SubmitAnswersView(APIView):
             context={"request": request, "quiz_id": quiz_id},
         )
 
-        if not serializer.is_valid():
-
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -557,3 +554,18 @@ class DeleteQuizView(APIView):
             )
         except Quiz.DoesNotExist:
             raise NotFound(detail="Quiz not found.", code=status.HTTP_404_NOT_FOUND)
+
+
+# Comments
+
+
+class AddCommentView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def post(self, request, *args, **kwargs):
+        print(request.data)
+        serializer = CommentSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

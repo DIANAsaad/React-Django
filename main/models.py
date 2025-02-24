@@ -183,6 +183,6 @@ class Comment(models.Model):
     comment=models.TextField()
     commented_at= models.DateTimeField(default=timezone.now)
 
-class comment_image(models.Model):
-    comment=models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="comment_images")
+class CommentImage(models.Model):
+    comment=models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="images")
     image=models.ImageField(upload_to="comment_images", blank=True, null=True)

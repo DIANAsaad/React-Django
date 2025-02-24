@@ -11,6 +11,8 @@ from .models import (
     Question,
     Answer,
     QuizAttempt,
+    Comment,
+    CommentImage
 )
 from django.shortcuts import get_object_or_404
 
@@ -145,6 +147,7 @@ class ExternalLinkSerializer(serializers.ModelSerializer):
 
 
 # Quizz
+
 class QuestionSerializer(serializers.ModelSerializer):
     question_time_limit = serializers.IntegerField(required=False)
     question_point = serializers.IntegerField()
@@ -297,3 +300,37 @@ class SubmitAnswerSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         return instance
+
+class CommentImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(required=False, allow_null=True)
+    class Meta:
+        model=CommentImage
+        fields=["id","image"]
+
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    commentor=AchieveUserSerializer(read_only=True)
+    images=CommentImageSerializer(many=True)
+    lesson_id=serializers.IntegerField()
+
+    
+    class Meta:
+        model=Comment
+        fields=["id","comment", "commentor", "images", "lesson_id"]
+
+
+    def create(self, **validated_data):
+        request = self.context["request"]
+        images = validated_data.pop("images", [])
+        lesson_id = validated_data.pop("lesson_id")
+        commentor = request.user
+        comment= Comment.objects.create(commentor=commentor, lesson_id=lesson_id, **validated_data)
+        image_list=[]
+        for image in images:
+            image=CommentImage(comment=comment, **image)
+            image_list.append(image)
+        CommentImage.objects.bulk_create(image_list)
+
+
+
