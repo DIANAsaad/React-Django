@@ -487,6 +487,7 @@ class AddQuizView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kwargs):
+        print(request.data)
         # Copy the data to manually parse the nested objects since DRF does not natively support them
         data = request.data.copy()
         if "questions" in data and isinstance(data["questions"], str):

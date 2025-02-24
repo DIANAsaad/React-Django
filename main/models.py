@@ -173,7 +173,7 @@ class ExternalLink(models.Model):
     link = models.URLField(max_length=2083)
 
 
-# Comment
+# Comment & Uploading Multiple Images (ScreenShots)
 
 class Comment(models.Model):
     lesson=models.ForeignKey(
@@ -182,3 +182,7 @@ class Comment(models.Model):
     commentor=models.ForeignKey(AchieveUser, on_delete=models.CASCADE, related_name="commentor")
     comment=models.TextField()
     commented_at= models.DateTimeField(default=timezone.now)
+
+class comment_image(models.Model):
+    comment=models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="comment_images")
+    image=models.ImageField(upload_to="comment_images", blank=True, null=True)

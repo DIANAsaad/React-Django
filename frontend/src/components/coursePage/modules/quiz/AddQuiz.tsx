@@ -74,6 +74,11 @@ const AddQuiz: React.FC = () => {
       newQuestions[index].question_type = "MCQ";
     }
 
+    if (key === "question_type" && value === "TF") {
+      newQuestions[index].choices = ["True", "False"];
+      newQuestions[index].correct_answer="True";
+
+    }
     setFormData({ ...formData, questions: newQuestions });
   };
 
@@ -262,63 +267,69 @@ const AddQuiz: React.FC = () => {
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor={`choices_${index}`} className="form-label">
-              Choices:
-            </label>
-
-            <div className="form-group mb-3">
-              {question.choices.map((choice, i) => (
-                <div key={i} className="d-flex align-items-center gap-2 mb-2">
-                  <label
-                    htmlFor={`choices_${index}_${i}`}
-                    className="form-label me-2"
-                  >
-                    {String.fromCharCode(97 + i)}.
-                  </label>
-                  <input
-                    type="text"
-                    id={`choices_${index}_${i}`}
-                    name="choices"
-                    value={choice}
-                    onChange={(e) => {
-                      const newQuestions = [...formData.questions];
-                      newQuestions[index].choices[i] = e.target.value;
-                      if (!newQuestions[index].correct_answer) {
-                        newQuestions[index].correct_answer =
-                          newQuestions[index].choices[0];
-                      }
-                      setFormData({ ...formData, questions: newQuestions });
-                    }}
-                    placeholder={`Enter choice ${i + 1}`}
-                    className="form-control flex-grow-1"
-                    required
-                  />
+            {question.question_type === "MCQ" && (
+              <>
+                <label htmlFor={`choices_${index}`} className="form-label">
+                  Choices:
+                </label>
+                <div className="form-group mb-3">
+                  {question.choices.map((choice, i) => (
+                    <div
+                      key={i}
+                      className="d-flex align-items-center gap-2 mb-2"
+                    >
+                      <label
+                        htmlFor={`choices_${index}_${i}`}
+                        className="form-label me-2"
+                      >
+                        {String.fromCharCode(97 + i)}.
+                      </label>
+                      <input
+                        type="text"
+                        id={`choices_${index}_${i}`}
+                        name="choices"
+                        value={choice}
+                        onChange={(e) => {
+                          const newQuestions = [...formData.questions];
+                          newQuestions[index].choices[i] = e.target.value;
+                          if (!newQuestions[index].correct_answer) {
+                            newQuestions[index].correct_answer =
+                              newQuestions[index].choices[0];
+                          }
+                          setFormData({ ...formData, questions: newQuestions });
+                        }}
+                        placeholder={`Enter choice ${i + 1}`}
+                        className="form-control flex-grow-1"
+                        required
+                      />
+                      <span
+                        className="text-danger fw-bold ms-2 cursor-pointer"
+                        onClick={() => {
+                          const newQuestions = [...formData.questions];
+                          newQuestions[index].choices = newQuestions[
+                            index
+                          ].choices.filter((_, j) => j !== i);
+                          setFormData({ ...formData, questions: newQuestions });
+                        }}
+                      >
+                        ✖
+                      </span>
+                    </div>
+                  ))}
                   <span
-                    className="text-danger fw-bold ms-2 cursor-pointer"
+                    className="text-primary fw-bold mt-2 cursor-pointer"
                     onClick={() => {
                       const newQuestions = [...formData.questions];
-                      newQuestions[index].choices = newQuestions[
-                        index
-                      ].choices.filter((_, j) => j !== i);
+                      newQuestions[index].choices.push("");
                       setFormData({ ...formData, questions: newQuestions });
                     }}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
                   >
-                    ✖
+                    ➕ Add Choice
                   </span>
                 </div>
-              ))}
-              <span
-                className="text-primary fw-bold mt-2 cursor-pointer"
-                onClick={() => {
-                  const newQuestions = [...formData.questions];
-                  newQuestions[index].choices.push("");
-                  setFormData({ ...formData, questions: newQuestions });
-                }}
-                style={{ cursor: "pointer", textDecoration: "underline" }}
-              >
-                ➕ Add Choice
-              </span>
-            </div>
+              </>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor={`correct_answer_${index}`} className="form-label">
@@ -347,7 +358,7 @@ const AddQuiz: React.FC = () => {
               type="number"
               id={`question_point_${index}`}
               name="question_point"
-              value={question.question_point??""}
+              value={question.question_point ?? ""}
               onChange={(e) => handleQuestionChange(index, e)}
               placeholder="Enter the question point"
               className="form-control"
