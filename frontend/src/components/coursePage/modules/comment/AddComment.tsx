@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useCommentContext } from '../../../../context/CommentContext';
 import { useParams } from "react-router-dom";
 import '../../../../styles/AddComment.css'; 
+import BaseWrapper from '../../../base/BaseWrapper';
 
 const AddComment: React.FC = () => {
     const { moduleId } = useParams();
@@ -21,7 +22,7 @@ const AddComment: React.FC = () => {
     const handleImageChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const files = e.target.files ? Array.from(e.target.files) : [];
-            setFormData((prev) => ({ ...prev, images: files }));
+            setFormData((prev) => ({ ...prev, images: [...prev.images, ...files] }));
         },
         []
     );
@@ -64,4 +65,24 @@ const AddComment: React.FC = () => {
     );
 };
 
-export default AddComment;
+const CommentWrapper: React.FC = () => {
+    const { courseId, moduleId } = useParams<{
+      courseId: string;
+      moduleId: string;
+    }>();
+    return (
+      <BaseWrapper
+        options={[
+          { link: "/courses", label: "Home" },
+          {
+            link: `/course/${courseId}/module/${moduleId}`,
+            label: "Back to Lesson",
+          },
+        ]}
+      >
+        <AddComment />
+      </BaseWrapper>
+    );
+};
+
+export default CommentWrapper;

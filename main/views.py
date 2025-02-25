@@ -563,9 +563,9 @@ class AddCommentView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         serializer = CommentSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

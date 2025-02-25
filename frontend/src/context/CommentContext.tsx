@@ -99,9 +99,10 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         const formData = new FormData();
         formData.append("lesson_id", lesson_id.toString());
         formData.append("comment", comment);
-        if (images)     images.forEach((image) => {
-          formData.append(`image`, image);
-        });
+        if (images)
+          images.forEach((image) => {
+            formData.append(`images`, image);
+          });
         const response = await axios.post(`${ENDPOINT}/add_comment`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -122,6 +123,8 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
             error.response?.data?.message || error.message
           }`
         );
+      } finally {
+        setLoading(false);
       }
     },
     [accessToken]

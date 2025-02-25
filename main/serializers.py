@@ -12,7 +12,7 @@ from .models import (
     Answer,
     QuizAttempt,
     Comment,
-    CommentImage
+    CommentImage,
 )
 from django.shortcuts import get_object_or_404
 
@@ -148,6 +148,7 @@ class ExternalLinkSerializer(serializers.ModelSerializer):
 
 # Quizz
 
+
 class QuestionSerializer(serializers.ModelSerializer):
     question_time_limit = serializers.IntegerField(required=False)
     question_point = serializers.IntegerField()
@@ -171,7 +172,7 @@ class QuizSerializer(serializers.ModelSerializer):
     module_id = serializers.IntegerField()
     time_limit = serializers.IntegerField(required=False)
     total_mark = serializers.IntegerField()
-    attempts_allowed= serializers.IntegerField(required=False)
+    attempts_allowed = serializers.IntegerField(required=False)
     questions = QuestionSerializer(many=True)
 
     class Meta:
@@ -225,7 +226,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ["id","answer_text", "question_id", "is_correct"]
+        fields = ["id", "answer_text", "question_id", "is_correct"]
 
 
 class SubmitAnswerSerializer(serializers.Serializer):
@@ -301,36 +302,41 @@ class SubmitAnswerSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return instance
 
+
 class CommentImageSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False, allow_null=True)
-    class Meta:
-        model=CommentImage
-        fields=["id","image"]
 
+    class Meta:
+        model = CommentImage
+        fields = ["id", "image"]
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    commentor=AchieveUserSerializer(read_only=True)
-    images=CommentImageSerializer(many=True)
-    lesson_id=serializers.IntegerField()
+    commentor = AchieveUserSerializer(read_only=True)
+    images = CommentImageSerializer(many=True, required=False)
+    lesson_id = serializers.IntegerField()
 
-    
     class Meta:
-        model=Comment
-        fields=["id","comment", "commentor", "images", "lesson_id"]
+        model = Comment
+        fields = ["id", "comment", "commentor", "images", "lesson_id"]
 
+    def to_internal_value(self, data):
+        images_data = data.getlist("images")
+        internal_value = super().to_internal_value(data)
+        internal_value["images"] = images_data
+        return internal_value
 
-    def create(self, **validated_data):
+    def create(self, validated_data):
         request = self.context["request"]
         images = validated_data.pop("images", [])
         lesson_id = validated_data.pop("lesson_id")
         commentor = request.user
-        comment= Comment.objects.create(commentor=commentor, lesson_id=lesson_id, **validated_data)
-        image_list=[]
+        comment = Comment.objects.create(
+            commentor=commentor, lesson_id=lesson_id, **validated_data
+        )
+        image_list = []
         for image in images:
-            image=CommentImage(comment=comment, **image)
+            image = CommentImage(comment=comment, image=image)
             image_list.append(image)
         CommentImage.objects.bulk_create(image_list)
-
-
-
+        return comment

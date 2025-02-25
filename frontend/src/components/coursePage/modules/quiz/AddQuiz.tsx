@@ -52,34 +52,51 @@ const AddQuiz: React.FC = () => {
 
   const handleQuestionChange = (
     index: number,
-    e: React.ChangeEvent<
+    event: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    type QuestionKey = keyof QuestionWithoutId;
-    const key = e.target.name as QuestionKey;
-    const value = e.target.value;
+    const { name, value } = event.target;
+    const key = name as keyof QuestionWithoutId;
+    setFormData((prevFormData) => {
+      const updatedQuestions = [...prevFormData.questions];
+      const questionToUpdate = { ...updatedQuestions[index] };
 
-    const newQuestions = [...formData.questions];
-
-    if (key === "choices") {
-      const choices = value.split(",").map((choice) => choice.trim());
-      newQuestions[index].choices = choices;
-      newQuestions[index].correct_answer = choices[0];
-    } else {
-      newQuestions[index] = { ...newQuestions[index], [key]: value };
-    }
-
-    if (!newQuestions[index].question_type) {
-      newQuestions[index].question_type = "MCQ";
-    }
-
-    if (key === "question_type" && value === "TF") {
-      newQuestions[index].choices = ["True", "False"];
-      newQuestions[index].correct_answer="True";
-
-    }
-    setFormData({ ...formData, questions: newQuestions });
+      switch (key) {
+        case "choices": {
+          const choices = value.split(",").map((choice) => choice.trim());
+          questionToUpdate.choices = choices;
+          questionToUpdate.correct_answer = choices[0] ?? "";
+          break;
+        }
+        case "question_type": {
+          questionToUpdate.question_type = value as QuestionWithoutId["question_type"];
+          if (value === "TF") {
+            questionToUpdate.choices = ["True", "False"];
+            questionToUpdate.correct_answer = "True";
+          }
+          break;
+        }
+        case "question_text":
+        case "correct_answer":{
+          questionToUpdate[key] = value 
+          break;
+        }
+        case "question_point":
+        case "question_time_limit":{
+          questionToUpdate[key]=value===""?null:Number(value);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      if (!questionToUpdate.question_type) {
+        questionToUpdate.question_type = "MCQ";
+      }
+      updatedQuestions[index] = questionToUpdate;
+      return { ...prevFormData, questions: updatedQuestions };
+    });
   };
 
   const addQuestion = () => {
@@ -121,7 +138,7 @@ const AddQuiz: React.FC = () => {
           questions: [
             {
               question_text: "",
-              question_type: "",
+              question_type: "MCQ",
               correct_answer: "",
               question_point: null,
               question_time_limit: null,
@@ -137,7 +154,7 @@ const AddQuiz: React.FC = () => {
         setLoading(false);
       }
     },
-    [addQuiz, formData, moduleId]
+    [addQuiz, formData, moduleId, courseId, navigate]
   );
 
   return (
@@ -259,7 +276,7 @@ const AddQuiz: React.FC = () => {
               name="question_type"
               onChange={(e) => handleQuestionChange(index, e)}
               className="form-control"
-              value={question.question_type}
+              value={question.question_type || "MCQ"}
               required
             >
               <option value="MCQ">Multiple Choice</option>
@@ -338,7 +355,7 @@ const AddQuiz: React.FC = () => {
             <select
               id={`correct_answer_${index}`}
               name="correct_answer"
-              value={question.correct_answer}
+              value={question.correct_answer || question.choices[0]}
               onChange={(e) => handleQuestionChange(index, e)}
               className="form-control"
               required
