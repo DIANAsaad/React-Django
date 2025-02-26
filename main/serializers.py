@@ -318,7 +318,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ["id", "comment", "commentor", "images", "lesson_id"]
+        fields = ["id", "comment", "commentor", "images", "lesson_id", "commented_at"]
 
     def to_internal_value(self, data):
         images_data = data.getlist("images")

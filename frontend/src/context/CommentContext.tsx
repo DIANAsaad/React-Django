@@ -17,14 +17,13 @@ interface Comment {
     last_name: string;
   };
   comment: string;
-  commented: Date;
+  commented_at: Date;
   images: {
-    image: File | null;
-  };
+    image: string|File | null;
+  }[];
 }
 
-//Define the context structure
-
+// Define the context structure
 interface CommentContextProps {
   comments: Comment[] | null;
   fetchComments: (lessonId: number) => Promise<void>;
@@ -43,13 +42,15 @@ const CommentContext = createContext<CommentContextProps | undefined>(
 );
 const ENDPOINT = "http://localhost:8000";
 
-const normalizeComment = (comment: Comment) => ({
+const normalizeComment = (comment: Comment):Comment => ({
   ...comment,
-  image: comment.images.image
-    ? comment.images.image?.toString().startsWith(ENDPOINT)
-      ? comment.images.image
-      : `${ENDPOINT}${comment.images.image}`
-    : null,
+  images:comment.images.map(image => ({
+        image: image.image
+          ? image.image.toString().startsWith(ENDPOINT)?
+           image.image
+            :`${ENDPOINT}${image.image}`
+          : null
+      }))
 });
 
 const normalizeComments = (comments: Comment[]) => {
@@ -174,7 +175,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
 export const useCommentContext = () => {
   const context = useContext(CommentContext);
   if (!context) {
-    throw new Error("useQuizContext must be used within a QuizProvider");
+    throw new Error("useCommentContext must be used within a CommentProvider");
   }
   return context;
 };

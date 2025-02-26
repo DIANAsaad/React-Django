@@ -30,7 +30,6 @@ from main.serializers import (
     SubmitAnswerSerializer,
     AnswerSerializer,
     CommentSerializer,
-    CommentImageSerializer
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -305,10 +304,8 @@ class GetCommentsView(APIView):
         lesson_id=kwargs.get("lesson_id")
         try:
             comments=Comment.objects.filter(lesson_id=lesson_id).all().prefetch_related("images")
-            images=[comment.images.all() for comment in comments]
             data={
                 "comments":CommentSerializer(comments, many=True).data,
-                "images":CommentImageSerializer(images, many=True).data
             }
             return Response(data, status=status.HTTP_200_OK)
         except Comment.DoesNotExist:
@@ -586,3 +583,23 @@ class AddCommentView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteCommentView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def delete(self, request, *args, **kwargs):
+        comment_id = kwargs.get("comment_id")
+        if not comment_id:
+            return Response(
+                {"detail": "Comment ID is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            return delete_object(
+                request,
+                app_label="main",
+                model_name="Comment",
+                object_id=comment_id,
+            )
+        except Quiz.DoesNotExist:
+            raise NotFound(detail="Comment not found.", code=status.HTTP_404_NOT_FOUND)

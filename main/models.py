@@ -186,3 +186,9 @@ class Comment(models.Model):
 class CommentImage(models.Model):
     comment=models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="images")
     image=models.ImageField(upload_to="comment_images/", blank=True, null=True)
+
+    def delete(self, *args, **kwargs):
+        if self.image:
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
+        super().delete(*args, **kwargs)
