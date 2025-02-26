@@ -8,25 +8,27 @@
   margin: 16px 0;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: relative;
+  text-align:left;
 }
 
-.comment-form::before {
-  content: '';
+
+.comment-form::after {
+  content: "";
   position: absolute;
-  left: -20px; /* Adjust this value to control the position of the tail */
-  top: 20px; /* Adjust this value to control the vertical position of the tail */
+  bottom: -0.7em; /* Adjusts the tail position */
+  left: 1em; /* Moves the tail towards the left */
   width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-right-color: #fff;
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
-  box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.1);
+  height: 0.4em;
+  border-style: solid;
+  border-width: 10px 10px 0 10px;
+  border-color: #fff transparent transparent transparent;
+
 }
+
 
 .form-group {
   margin-bottom: 16px;
+  text-align:left;
 }
 
 .comment-input {
@@ -68,3 +70,11 @@
   font-size: 14px;
   margin-top: 8px;
 }
+
+.comments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+

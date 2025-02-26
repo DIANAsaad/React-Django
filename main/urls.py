@@ -26,7 +26,8 @@ from main.views import (
     SubmitAnswersView,
     GetQuizResultsView,
     DeleteQuizView,
-    AddCommentView
+    AddCommentView,
+    GetCommentsView
 )
 
 
@@ -51,6 +52,7 @@ urlpatterns = [
     path("quizzes/<int:module_id>", GetQuizzesView.as_view(), name="quizzes"),
     path("quiz/<int:quiz_id>", GetQuizByIdView.as_view(), name="quiz"),
     path("quiz_results/<int:attempt_id>", GetQuizResultsView.as_view(), name="quiz_results"),
+    path("comments/<int:lesson_id>", GetCommentsView.as_view(), name="comments"),
     path("add_course", AddCourseView.as_view(), name="add_Course"),
     path(
         "refresh_access_token",

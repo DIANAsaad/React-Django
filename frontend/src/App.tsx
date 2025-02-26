@@ -20,7 +20,7 @@ import { QuizProvider } from "./context/QuizContext";
 import { CommentProvider } from "./context/CommentContext";
 import QuizPage from "./components/coursePage/modules/quiz/QuizPage";
 import ResultsPage from "./components/coursePage/modules/quiz/ResultsPage";
-import AddComment from "./components/coursePage/modules/comment/AddComment";
+import CommentPage from "./components/coursePage/modules/comment/CommentPage";
 
 const App: React.FC = () => {
   return (
@@ -122,7 +122,7 @@ const App: React.FC = () => {
           path="/course/:courseId/module/:moduleId/add-comment"
           element={
             <ProtectedRoute>
-              <AddComment/>
+              <CommentPage/>
             </ProtectedRoute>
           }
         />

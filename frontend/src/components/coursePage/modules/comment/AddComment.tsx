@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { useCommentContext } from '../../../../context/CommentContext';
 import { useParams } from "react-router-dom";
-import '../../../../styles/AddComment.css'; 
-import BaseWrapper from '../../../base/BaseWrapper';
+import '../../../../styles/Comment.css'; 
+
 
 const AddComment: React.FC = () => {
     const { moduleId } = useParams();
@@ -36,7 +36,9 @@ const AddComment: React.FC = () => {
     return (
         <form onSubmit={handleSubmit} className="comment-form">
             <div className="form-group">
-                <label htmlFor="comment">Comment:</label>
+                <label htmlFor="comment">
+                    Tell us about your concerns, you can include images.
+                </label>
                 <textarea
                     id="comment"
                     name="comment"
@@ -65,24 +67,5 @@ const AddComment: React.FC = () => {
     );
 };
 
-const CommentWrapper: React.FC = () => {
-    const { courseId, moduleId } = useParams<{
-      courseId: string;
-      moduleId: string;
-    }>();
-    return (
-      <BaseWrapper
-        options={[
-          { link: "/courses", label: "Home" },
-          {
-            link: `/course/${courseId}/module/${moduleId}`,
-            label: "Back to Lesson",
-          },
-        ]}
-      >
-        <AddComment />
-      </BaseWrapper>
-    );
-};
 
-export default CommentWrapper;
+export default AddComment;

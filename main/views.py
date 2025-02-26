@@ -30,6 +30,7 @@ from main.serializers import (
     SubmitAnswerSerializer,
     AnswerSerializer,
     CommentSerializer,
+    CommentImageSerializer
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -297,6 +298,22 @@ class GetQuizResultsView(APIView):
             return Response(
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
+
+class GetCommentsView(APIView):
+    permission_classes= [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        lesson_id=kwargs.get("lesson_id")
+        try:
+            comments=Comment.objects.filter(lesson_id=lesson_id).all().prefetch_related("images")
+            images=[comment.images.all() for comment in comments]
+            data={
+                "comments":CommentSerializer(comments, many=True).data,
+                "images":CommentImageSerializer(images, many=True).data
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except Comment.DoesNotExist:
+            return Response({"error":"Comments not found"},  status=status.HTTP_404_NOT_FOUND)
+
 
 
 # Functionality
