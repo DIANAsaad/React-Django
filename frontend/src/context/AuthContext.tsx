@@ -8,7 +8,7 @@ import useLocalStorage from '../hooks/use-local-storage';
 const TOKEN_EXPIRATION_TIME = 86_400_000; 
 
 // Define User type
-interface AchieveUser {
+ interface AchieveUser {
   id: number;
   first_name: string;
   last_name: string;

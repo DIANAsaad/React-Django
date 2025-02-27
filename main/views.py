@@ -33,7 +33,7 @@ from main.serializers import (
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from .permissions import IsStaffOrIsInstructor
+from .permissions import IsStaffOrIsInstructor, IsCommentorOrHasPerms
 import json
 
 
@@ -150,7 +150,6 @@ class CoursePageView(APIView):
 
     def get(self, request, *args, **kwargs):
         course_id = kwargs.get("course_id")
-        is_staff = request.user.is_staff
         modules = Module.objects.filter(course_id=course_id).all()
         data = {
             "modules": ModuleSerializer(modules, many=True).data,
@@ -298,19 +297,27 @@ class GetQuizResultsView(APIView):
                 {"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
-class GetCommentsView(APIView):
-    permission_classes= [IsAuthenticated]
-    def get(self, request, *args, **kwargs):
-        lesson_id=kwargs.get("lesson_id")
-        try:
-            comments=Comment.objects.filter(lesson_id=lesson_id).all().prefetch_related("images")
-            data={
-                "comments":CommentSerializer(comments, many=True).data,
-            }
-            return Response(data, status=status.HTTP_200_OK)
-        except Comment.DoesNotExist:
-            return Response({"error":"Comments not found"},  status=status.HTTP_404_NOT_FOUND)
 
+class GetCommentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        lesson_id = kwargs.get("lesson_id")
+        user = request.user
+
+        if user.is_staff or user.groups.filter(name="Instructors").exists():
+            # Instructors or staff get all comments
+            comments = Comment.objects.filter(lesson_id=lesson_id).prefetch_related(
+                "images", "replies"
+            )
+        else:
+            # Students only see their own comments
+            comments = Comment.objects.filter(lesson_id=lesson_id).prefetch_related(
+                "images", "replies"
+            )
+
+        data = {"comments": CommentSerializer(comments, many=True).data}
+        return Response(data, status=status.HTTP_200_OK)
 
 
 # Functionality
@@ -570,11 +577,11 @@ class DeleteQuizView(APIView):
             raise NotFound(detail="Quiz not found.", code=status.HTTP_404_NOT_FOUND)
 
 
-# Comments
+# Comments (Discussions)
 
 
 class AddCommentView(APIView):
-    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = CommentSerializer(data=request.data, context={"request": request})
@@ -586,7 +593,7 @@ class AddCommentView(APIView):
 
 
 class DeleteCommentView(APIView):
-    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+    permission_classes = [IsAuthenticated, IsCommentorOrHasPerms]
 
     def delete(self, request, *args, **kwargs):
         comment_id = kwargs.get("comment_id")
@@ -595,11 +602,14 @@ class DeleteCommentView(APIView):
                 {"detail": "Comment ID is required"}, status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            return delete_object(
-                request,
-                app_label="main",
-                model_name="Comment",
-                object_id=comment_id,
-            )
-        except Quiz.DoesNotExist:
+            comment = Comment.objects.get(id=comment_id)
+        except Comment.DoesNotExist:
             raise NotFound(detail="Comment not found.", code=status.HTTP_404_NOT_FOUND)
+
+        # Check permissions, raise exception in case of permission denial
+        self.check_object_permissions(request, comment)
+        comment.delete()
+        return Response(
+            {"detail": "Comment deleted successfully"},
+            status=status.HTTP_204_NO_CONTENT,
+        )

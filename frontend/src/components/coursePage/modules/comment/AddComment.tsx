@@ -4,13 +4,18 @@ import { useParams } from "react-router-dom";
 import '../../../../styles/Comment.css'; 
 
 
-const AddComment: React.FC = () => {
+interface AddCommentProps {
+    reply_to: number | null;
+}
+
+const AddComment: React.FC<AddCommentProps> = ({ reply_to }) => {
     const { moduleId } = useParams();
     const { addComment, loading, error } = useCommentContext();
-    const [formData, setFormData] = useState<{ comment: string, images: File[], lesson_id: number }>({
+    const [formData, setFormData] = useState<{ comment: string, images: File[], lesson_id: number, reply_to:number|null }>({
         comment: '',
         images: [],
-        lesson_id: Number(moduleId)
+        lesson_id: Number(moduleId),
+        reply_to:reply_to
     });
 
     const handleChange = (
@@ -30,14 +35,14 @@ const AddComment: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await addComment(formData);
-        setFormData({ comment: '', images: [], lesson_id: Number(moduleId) });
+        setFormData({ comment: '', images: [], lesson_id: Number(moduleId), reply_to:null });
     };
 
     return (
         <form onSubmit={handleSubmit} className="comment-form">
             <div className="form-group">
                 <label htmlFor="comment">
-                    Tell us about your concerns, you can include images.
+                    Tell your instructor about your concerns, discussions, and questions. You can include images.
                 </label>
                 <textarea
                     id="comment"

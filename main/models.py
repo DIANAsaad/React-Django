@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import os
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -67,6 +68,10 @@ class Course(models.Model):
             course_image_path = self.course_image.path
             if os.path.isfile(course_image_path):
                 os.remove(course_image_path)
+                # Trigerring the delete fucntion of modules to delete the file storage
+            if self.modules:
+                for module in self.modules.all():
+                    module.delete()
         super().delete(*args, **kwargs)
 
     def __str__(self):
@@ -156,7 +161,10 @@ class Answer(models.Model):
         Question, on_delete=models.CASCADE, related_name="answers"
     )
     attempt = models.ForeignKey(
-        QuizAttempt, on_delete=models.CASCADE, related_name="attempt_answers", default=None
+        QuizAttempt,
+        on_delete=models.CASCADE,
+        related_name="attempt_answers",
+        default=None,
     )
     answer_text = models.TextField(blank=True, null=True)
     is_correct = models.BooleanField(null=True)
@@ -173,19 +181,41 @@ class ExternalLink(models.Model):
     link = models.URLField(max_length=2083)
 
 
-# Comment & Uploading Multiple Images (ScreenShots)
+# Comment (Discussion Forum) & Uploading Multiple Images (ScreenShots)
+
 
 class Comment(models.Model):
-    lesson=models.ForeignKey(
+    lesson = models.ForeignKey(
         Module, on_delete=models.CASCADE, related_name="comments"
     )
-    commentor=models.ForeignKey(AchieveUser, on_delete=models.CASCADE, related_name="commentor")
-    comment=models.TextField()
-    commented_at= models.DateTimeField(default=timezone.now)
+    commentor = models.ForeignKey(
+        AchieveUser, on_delete=models.CASCADE, related_name="commentor"
+    )
+    comment = models.TextField()
+    commented_at = models.DateTimeField(default=timezone.now)
+    reply_to=models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name="replies")
+
+    def delete(self, *args, **kwargs):
+        if self.images:
+            for image in self.images.all():
+                image.delete()
+        super().delete(*args, **kwargs)
+
 
 class CommentImage(models.Model):
-    comment=models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="images")
-    image=models.ImageField(upload_to="comment_images/", blank=True, null=True)
+    MAX_IMAGES = 16
+    comment = models.ForeignKey(
+        Comment, on_delete=models.CASCADE, related_name="images"
+    )
+    image = models.ImageField(upload_to="comment_images/", blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.comment.images.count() > self.MAX_IMAGES:
+            raise ValidationError(
+                f"Cannot add more than {self.MAX_IMAGES} images to a comment."
+            )
+        else:
+            super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.image:

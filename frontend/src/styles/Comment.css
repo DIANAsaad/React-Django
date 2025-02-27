@@ -82,18 +82,24 @@
 .comment-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .comment-text {
   font-size: 14px;
+  width: 90%;
+  flex-grow: 1; 
   margin-bottom: 8px;
 }
 
 .comment-options {
   font-size: 14px;
   cursor: pointer;
+  width: 10%;
+  display: flex;
+  align-self: flex-start;
 }
+
 
 .comment-options a {
   text-decoration: none;

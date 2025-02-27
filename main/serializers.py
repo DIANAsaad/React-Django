@@ -315,11 +315,20 @@ class CommentSerializer(serializers.ModelSerializer):
     commentor = AchieveUserSerializer(read_only=True)
     images = CommentImageSerializer(many=True, required=False)
     lesson_id = serializers.IntegerField()
+    reply_to_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Comment
-        fields = ["id", "comment", "commentor", "images", "lesson_id", "commented_at"]
-
+        fields = [
+            "id",
+            "comment",
+            "commentor",
+            "images",
+            "lesson_id",
+            "commented_at",
+            "reply_to_id",
+        ]
+   # Need to override the internal valye func for handeling multiple images
     def to_internal_value(self, data):
         images_data = data.getlist("images")
         internal_value = super().to_internal_value(data)
@@ -330,9 +339,13 @@ class CommentSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         images = validated_data.pop("images", [])
         lesson_id = validated_data.pop("lesson_id")
+        reply_to_id = validated_data.pop("reply_to_id", None)
         commentor = request.user
         comment = Comment.objects.create(
-            commentor=commentor, lesson_id=lesson_id, **validated_data
+            commentor=commentor,
+            lesson_id=lesson_id,
+            reply_to_id=reply_to_id,
+            **validated_data
         )
         image_list = []
         for image in images:

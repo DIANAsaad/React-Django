@@ -8,16 +8,18 @@ import {
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 
-// Define the shape of the comment.
+// Define the shape of the comment (Discussion Forum)
 interface Comment {
   id: number;
   lesson_id: number;
   commentor: {
+    id:number;
     first_name: string;
     last_name: string;
   };
   comment: string;
   commented_at: Date;
+  reply_to:number;
   images: {
     image: string|File | null;
   }[];
@@ -29,6 +31,7 @@ interface CommentContextProps {
   fetchComments: (lessonId: number) => Promise<void>;
   addComment: (data: {
     lesson_id: number;
+    reply_to:number|null;
     comment: string;
     images: File[];
   }) => Promise<void>;
@@ -90,10 +93,12 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
       lesson_id,
       comment,
       images,
+      reply_to
     }: {
       lesson_id: number;
       comment: string;
       images: File[];
+      reply_to:number|null;
     }) => {
       setLoading(true);
       try {
@@ -104,6 +109,8 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
           images.forEach((image) => {
             formData.append(`images`, image);
           });
+        if (reply_to) 
+          formData.append("reply_to", reply_to.toString());
         const response = await axios.post(`${ENDPOINT}/add_comment`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",

@@ -102,7 +102,7 @@ const ModulePage: React.FC = () => {
         ]
       : []),
     {
-      label: "Add Comment",
+      label: "Add Discussion",
       action: () =>  navigate(
         `/course/${courseId}/module/${module.id}/add-comment`
       ),

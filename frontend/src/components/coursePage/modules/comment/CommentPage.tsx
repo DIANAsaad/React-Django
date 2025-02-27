@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useCommentContext } from "../../../../context/CommentContext";
 import { useParams } from "react-router-dom";
 import "../../../../styles/Comment.css";
@@ -7,8 +7,9 @@ import BaseWrapper from "../../../base/BaseWrapper";
 
 const CommentPage: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
-  const { comments, loading, fetchComments, deleteComment} = useCommentContext();
-  console.log(comments);
+  const { comments, loading, fetchComments, deleteComment } = useCommentContext();
+  const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
+
   useEffect(() => {
     if (moduleId) {
       fetchComments(Number(moduleId));
@@ -16,7 +17,7 @@ const CommentPage: React.FC = () => {
   }, [moduleId, fetchComments]);
 
   if (loading) {
-    return <div>Loading Comments...</div>;
+    return <div>Loading Discussions...</div>;
   }
 
   return (
@@ -31,7 +32,15 @@ const CommentPage: React.FC = () => {
                   {comment.comment}
                 </div>
                 <div className="comment-options">
-                  <a href="#">Reply </a>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setReplyToCommentId(comment.id);
+                    }}
+                  >
+                    Reply
+                  </a>
                   <a
                     href="#"
                     onClick={(e) => {
@@ -50,7 +59,9 @@ const CommentPage: React.FC = () => {
                       src={String(imageObj.image)}
                       alt="screenshots"
                       className="comment-image"
-                      onClick={() => window.open(String(imageObj.image), "_blank")}
+                      onClick={() =>
+                        window.open(String(imageObj.image), "_blank")
+                      }
                     />
                   </div>
                 ))}
@@ -58,14 +69,18 @@ const CommentPage: React.FC = () => {
               <div className="comment-time">
                 {new Date(comment.commented_at).toLocaleString()}
               </div>
+              {replyToCommentId === comment.id && (
+                <div className="reply-form">
+                  <AddComment reply_to={comment.id} />
+                </div>
+              )}
             </div>
           ))
         ) : (
-          <div>No Comments Found</div>
+          <div>No Previous Discussions Made. Add one!</div>
         )}
-           <AddComment />
+        <AddComment reply_to={null} />
       </div>
-   
     </>
   );
 };
