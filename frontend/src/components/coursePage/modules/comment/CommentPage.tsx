@@ -7,8 +7,10 @@ import BaseWrapper from "../../../base/BaseWrapper";
 
 const CommentPage: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
-  const { comments, loading, fetchComments, deleteComment } = useCommentContext();
+  const { comments, loading, fetchComments, deleteComment } =
+    useCommentContext();
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
+  const parentComments = comments?.filter((c) => c.reply_to_id === null);
 
   useEffect(() => {
     if (moduleId) {
@@ -20,11 +22,15 @@ const CommentPage: React.FC = () => {
     return <div>Loading Discussions...</div>;
   }
 
+  const handleReplyClick = (commentId: number) => {
+    setReplyToCommentId((prevId) => (prevId === commentId ? null : commentId));
+  };
+
   return (
     <>
       <div className="comments-container">
-        {comments && comments.length > 0 ? (
-          comments.map((comment) => (
+        {parentComments && parentComments.length > 0 ? (
+          parentComments.map((comment) => (
             <div key={comment.id} className="comment-form">
               <div className="comment-header">
                 <div className="comment-text">
@@ -36,10 +42,10 @@ const CommentPage: React.FC = () => {
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      setReplyToCommentId(comment.id);
+                      handleReplyClick(comment.id);
                     }}
                   >
-                    Reply
+                    {replyToCommentId === comment.id ? "Cancel" : "Reply"}
                   </a>
                   <a
                     href="#"
@@ -71,7 +77,55 @@ const CommentPage: React.FC = () => {
               </div>
               {replyToCommentId === comment.id && (
                 <div className="reply-form">
-                  <AddComment reply_to={comment.id} />
+                  <AddComment reply_to_id={comment.id} />
+                </div>
+              )}
+              {comment.replies && (
+                <div className="replies">
+                  {comment.replies.map((replyId) => {
+                    const reply = comments?.find((c) => c.id === replyId);
+                    if (!reply) return null;
+                    return (
+                      <div key={reply.id} className="reply">
+                        <div className="reply-header">
+                          <div className="reply-text">
+                            <strong>{`${reply.commentor.first_name} ${reply.commentor.last_name}: `}</strong>
+                            {reply.comment}
+                          </div>
+                          <div className="reply-options">
+                            <a
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleReplyClick(reply.id);
+                              }}
+                            >
+                              {replyToCommentId === reply.id
+                                ? "Cancel"
+                                : "Reply"}
+                            </a>
+                            <a
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                deleteComment(reply.id);
+                              }}
+                            >
+                              | Delete
+                            </a>
+                          </div>
+                        </div>
+                        <div className="reply-time">
+                          {new Date(reply.commented_at).toLocaleString()}
+                        </div>
+                        {replyToCommentId === reply.id && (
+                          <div className="reply-form">
+                            <AddComment reply_to_id={reply.id} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -79,7 +133,7 @@ const CommentPage: React.FC = () => {
         ) : (
           <div>No Previous Discussions Made. Add one!</div>
         )}
-        <AddComment reply_to={null} />
+        <AddComment reply_to_id={null} />
       </div>
     </>
   );

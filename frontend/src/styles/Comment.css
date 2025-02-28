@@ -33,7 +33,7 @@
 }
 
 .submit-button {
-  background-color: #3897f0;
+  background-color: #ff6000;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -49,7 +49,7 @@
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #318ce7;
+  background-color: #f47f32;
 }
 
 .error {
@@ -137,3 +137,25 @@
   color: #888;
   margin-top: 8px;
 }
+
+.comment-form .form-group-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.comment-form .form-group-inline label {
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.comment-form .form-group-inline .image-input {
+  flex-grow: 1;
+  margin-right: 10px;
+  margin-bottom:auto;
+}
+
+.comment-form .form-group-inline .submit-button {
+  flex-shrink: 0;
+}
+

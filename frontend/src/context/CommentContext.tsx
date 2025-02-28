@@ -19,7 +19,8 @@ interface Comment {
   };
   comment: string;
   commented_at: Date;
-  reply_to:number;
+  reply_to_id:number;
+  replies:number[];
   images: {
     image: string|File | null;
   }[];
@@ -31,7 +32,7 @@ interface CommentContextProps {
   fetchComments: (lessonId: number) => Promise<void>;
   addComment: (data: {
     lesson_id: number;
-    reply_to:number|null;
+    reply_to_id:number|null;
     comment: string;
     images: File[];
   }) => Promise<void>;
@@ -93,12 +94,12 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
       lesson_id,
       comment,
       images,
-      reply_to
+      reply_to_id
     }: {
       lesson_id: number;
       comment: string;
       images: File[];
-      reply_to:number|null;
+      reply_to_id:number|null;
     }) => {
       setLoading(true);
       try {
@@ -109,8 +110,8 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
           images.forEach((image) => {
             formData.append(`images`, image);
           });
-        if (reply_to) 
-          formData.append("reply_to", reply_to.toString());
+        if (reply_to_id) 
+          formData.append("reply_to_id", reply_to_id.toString());
         const response = await axios.post(`${ENDPOINT}/add_comment`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",

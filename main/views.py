@@ -310,6 +310,7 @@ class GetCommentsView(APIView):
             comments = Comment.objects.filter(lesson_id=lesson_id).prefetch_related(
                 "images", "replies"
             )
+
         else:
             # Students only see their own comments
             comments = Comment.objects.filter(lesson_id=lesson_id).prefetch_related(
@@ -584,6 +585,7 @@ class AddCommentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+
         serializer = CommentSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()

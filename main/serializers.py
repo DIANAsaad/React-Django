@@ -316,6 +316,7 @@ class CommentSerializer(serializers.ModelSerializer):
     images = CommentImageSerializer(many=True, required=False)
     lesson_id = serializers.IntegerField()
     reply_to_id = serializers.IntegerField(required=False)
+    replies = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Comment
@@ -327,8 +328,10 @@ class CommentSerializer(serializers.ModelSerializer):
             "lesson_id",
             "commented_at",
             "reply_to_id",
+            "replies"
+        
         ]
-   # Need to override the internal valye func for handeling multiple images
+   # Need to override the internal value func for handeling multiple images
     def to_internal_value(self, data):
         images_data = data.getlist("images")
         internal_value = super().to_internal_value(data)
