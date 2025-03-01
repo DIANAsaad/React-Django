@@ -26,9 +26,13 @@ interface Comment {
   }[];
 }
 
+interface CommentWithReplies extends Omit<Comment,'replies'> {
+  replies: Comment[];
+}
+
 // Define the context structure
 interface CommentContextProps {
-  comments: Comment[] | null;
+  comments: CommentWithReplies[] | null;
   fetchComments: (lessonId: number) => Promise<void>;
   addComment: (data: {
     lesson_id: number;
@@ -61,9 +65,44 @@ const normalizeComments = (comments: Comment[]) => {
   return comments.map(normalizeComment);
 };
 
+const translateCommentsToCommentWithReplies = (comments: Comment[]): CommentWithReplies[] => {
+  const commentsWithReplies = comments
+    .slice()
+    .filter(comment => comment.reply_to_id === null)
+    .map(comment => {
+      const replies = comments.filter(c => c.reply_to_id === comment.id);
+      return {
+        ...comment,
+        replies
+      };
+    });
+  return commentsWithReplies;
+};
+
+const handleNewComment = (comments: CommentWithReplies[], newComment: Comment): CommentWithReplies[] => {
+  const commentWithReplies = {
+    ...newComment,
+    replies: []
+  };
+
+  if (newComment.reply_to_id === null) {
+    return [commentWithReplies, ...comments];
+  }
+
+  return comments.map(comment => {
+    if (comment.id === newComment.reply_to_id) {
+      return {
+        ...comment,
+        replies: [...comment.replies, commentWithReplies]
+      };
+    }
+    return comment;
+  });
+};
+
 export const CommentProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuth();
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentWithReplies[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,7 +118,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         const response = await axios.get(`${ENDPOINT}/comments/${lessonId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        setComments(normalizeComments(response.data.comments ?? []));
+        setComments(translateCommentsToCommentWithReplies(normalizeComments(response.data.comments ?? [])));
       } catch (err) {
         setError("Failed to fetch comments");
       } finally {
@@ -118,10 +157,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setComments((prevComments) => [
-          ...(prevComments || []),
-          normalizeComment(response.data),
-        ]);
+        setComments((prevComments) => handleNewComment(prevComments || [], normalizeComment(response.data)));
       } catch (error: any) {
         console.error(
           "Error adding comment:",

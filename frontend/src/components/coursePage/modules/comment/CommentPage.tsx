@@ -10,7 +10,6 @@ const CommentPage: React.FC = () => {
   const { comments, loading, fetchComments, deleteComment } =
     useCommentContext();
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
-  const parentComments = comments?.filter((c) => c.reply_to_id === null);
 
   useEffect(() => {
     if (moduleId) {
@@ -29,8 +28,8 @@ const CommentPage: React.FC = () => {
   return (
     <>
       <div className="comments-container">
-        {parentComments && parentComments.length > 0 ? (
-          parentComments.map((comment) => (
+        {comments && comments.length > 0 ? (
+          comments.map((comment) => (
             <div key={comment.id} className="comment-form">
               <div className="comment-header">
                 <div className="comment-text">
@@ -82,17 +81,15 @@ const CommentPage: React.FC = () => {
               )}
               {comment.replies && (
                 <div className="replies">
-                  {comment.replies.map((replyId) => {
-                    const reply = comments?.find((c) => c.id === replyId);
-                    if (!reply) return null;
-                    return (
+                  {comment.replies.map((reply) =>  (
                       <div key={reply.id} className="reply">
-                        <div className="reply-header">
-                          <div className="reply-text">
+                        <div className="comment-header">
+                          <div className="comment-text">
+                            
                             <strong>{`${reply.commentor.first_name} ${reply.commentor.last_name}: `}</strong>
                             {reply.comment}
                           </div>
-                          <div className="reply-options">
+                          <div className="comment-options">
                             <a
                               href="#"
                               onClick={(e) => {
@@ -115,7 +112,7 @@ const CommentPage: React.FC = () => {
                             </a>
                           </div>
                         </div>
-                        <div className="reply-time">
+                        <div className="comment-time">
                           {new Date(reply.commented_at).toLocaleString()}
                         </div>
                         {replyToCommentId === reply.id && (
@@ -124,8 +121,8 @@ const CommentPage: React.FC = () => {
                           </div>
                         )}
                       </div>
-                    );
-                  })}
+                    )
+                  )}
                 </div>
               )}
             </div>

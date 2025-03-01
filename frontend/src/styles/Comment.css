@@ -159,3 +159,7 @@
   flex-shrink: 0;
 }
 
+.replies{
+  margin-top: 10px;
+  background-color: #f6e6f7;
+}

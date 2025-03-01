@@ -329,7 +329,6 @@ class CommentSerializer(serializers.ModelSerializer):
             "commented_at",
             "reply_to_id",
             "replies"
-        
         ]
    # Need to override the internal value func for handeling multiple images
     def to_internal_value(self, data):
