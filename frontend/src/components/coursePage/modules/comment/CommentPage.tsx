@@ -82,11 +82,12 @@ const CommentPage: React.FC = () => {
               {comment.replies && (
                 <div className="replies">
                   {comment.replies.map((reply) =>  (
+                    console.log(reply.id),
                       <div key={reply.id} className="reply">
                         <div className="comment-header">
                           <div className="comment-text">
                             
-                            <strong>{`${reply.commentor.first_name} ${reply.commentor.last_name}: `}</strong>
+                            <strong> <i className="fas fa-arrow-turn-right"></i> {`${reply.commentor.first_name} ${reply.commentor.last_name}: `}</strong>
                             {reply.comment}
                           </div>
                           <div className="comment-options">

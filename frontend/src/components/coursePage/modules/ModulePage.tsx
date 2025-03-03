@@ -9,6 +9,8 @@ import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
+
+
 const ModulePage: React.FC = () => {
   const { error, fetchModulesById } = useModuleContext();
   const { moduleId, courseId } = useParams<{
@@ -17,6 +19,7 @@ const ModulePage: React.FC = () => {
   }>();
 
   const { editButton } = useEditButtonContext();
+
 
   const {
     flashcards,

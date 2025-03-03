@@ -1,4 +1,6 @@
-import React, { useState, createContext, ReactNode, useContext } from "react";
+import React, { useState, createContext, ReactNode, useContext, useEffect,} from "react";
+import {useAuth} from "./AuthContext";
+
 
 // Define the context type
 interface EditButtonContextType {
@@ -13,7 +15,12 @@ const EditButtonContext = createContext<EditButtonContextType | undefined>(
 
 export const EditButtonProvider = ({ children }: { children: ReactNode }) => {
   const [editButton, setEditButton] = useState<boolean>(false);
- 
+  const {user}=useAuth();
+
+
+  useEffect(() => {
+      setEditButton(false);
+  }, [user]);
 
   return (
     <EditButtonContext.Provider value={{ editButton, setEditButton}}>
