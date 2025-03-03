@@ -27,7 +27,7 @@ interface Comment {
 }
 
 interface CommentWithReplies extends Omit<Comment, "replies"> {
-  replies: Comment[];
+  replies: CommentWithReplies[];
 }
 
 // Define the context structure
@@ -68,17 +68,17 @@ const normalizeComments = (comments: Comment[]) => {
 const translateCommentsToCommentWithReplies = (
   comments: Comment[]
 ): CommentWithReplies[] => {
-  const commentsWithReplies = comments
-    .slice()
-    .filter((comment) => comment.reply_to_id === null||comment.replies.length>0)
-    .map((comment) => {
-      const replies = comments.filter((c) => c.reply_to_id === comment.id);
-      return {
-        ...comment,
-        replies,
-      };
-    });
-  return commentsWithReplies;
+  const buildCommentWithReplies = (comment: Comment): CommentWithReplies => {
+    const replies = comments
+      .filter((c) => c.reply_to_id === comment.id)
+      .map(buildCommentWithReplies);
+    return {
+      ...comment,
+      replies,
+    };
+  };
+
+  return comments.filter((c) => c.reply_to_id === null).map(buildCommentWithReplies);
 };
 
 const handleNewComment = (
@@ -149,7 +149,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
       images: File[];
       reply_to_id: number | null;
     }) => {
-      setLoading(true);
+      
       try {
         const formData = new FormData();
         formData.append("lesson_id", lesson_id.toString());
@@ -178,9 +178,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
             error.response?.data?.message || error.message
           }`
         );
-      } finally {
-        setLoading(false);
-      }
+      } 
     },
     [accessToken]
   );

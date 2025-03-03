@@ -49,6 +49,11 @@ class AchieveUser(AbstractUser):
 
 # COURSES & MODULES & Quizzes
 
+class CourseEnrollment(models.Model):
+    course=models.ForeignKey('Course', on_delete=models.CASCADE, related_name="enrolled_users")
+    user=models.ForeignKey(AchieveUser, on_delete=models.CASCADE, related_name="enrolled_courses")
+    enrolled_at=models.DateTimeField(default=timezone.now)
+
 
 class Course(models.Model):
     creator = models.ForeignKey(
