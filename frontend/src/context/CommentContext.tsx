@@ -13,20 +13,20 @@ interface Comment {
   id: number;
   lesson_id: number;
   commentor: {
-    id:number;
+    id: number;
     first_name: string;
     last_name: string;
   };
   comment: string;
   commented_at: Date;
-  reply_to_id:number;
-  replies:number[];
+  reply_to_id: number;
+  replies: number[];
   images: {
-    image: string|File | null;
+    image: string | File | null;
   }[];
 }
 
-interface CommentWithReplies extends Omit<Comment,'replies'> {
+interface CommentWithReplies extends Omit<Comment, "replies"> {
   replies: Comment[];
 }
 
@@ -36,7 +36,7 @@ interface CommentContextProps {
   fetchComments: (lessonId: number) => Promise<void>;
   addComment: (data: {
     lesson_id: number;
-    reply_to_id:number|null;
+    reply_to_id: number | null;
     comment: string;
     images: File[];
   }) => Promise<void>;
@@ -50,50 +50,55 @@ const CommentContext = createContext<CommentContextProps | undefined>(
 );
 const ENDPOINT = "http://localhost:8000";
 
-const normalizeComment = (comment: Comment):Comment => ({
+const normalizeComment = (comment: Comment): Comment => ({
   ...comment,
-  images:comment.images.map(image => ({
-        image: image.image
-          ? image.image.toString().startsWith(ENDPOINT)?
-           image.image
-            :`${ENDPOINT}${image.image}`
-          : null
-      }))
+  images: comment.images.map((image) => ({
+    image: image.image
+      ? image.image.toString().startsWith(ENDPOINT)
+        ? image.image
+        : `${ENDPOINT}${image.image}`
+      : null,
+  })),
 });
 
 const normalizeComments = (comments: Comment[]) => {
   return comments.map(normalizeComment);
 };
 
-const translateCommentsToCommentWithReplies = (comments: Comment[]): CommentWithReplies[] => {
+const translateCommentsToCommentWithReplies = (
+  comments: Comment[]
+): CommentWithReplies[] => {
   const commentsWithReplies = comments
     .slice()
-    .filter(comment => comment.reply_to_id === null)
-    .map(comment => {
-      const replies = comments.filter(c => c.reply_to_id === comment.id);
+    .filter((comment) => comment.reply_to_id === null||comment.replies.length>0)
+    .map((comment) => {
+      const replies = comments.filter((c) => c.reply_to_id === comment.id);
       return {
         ...comment,
-        replies
+        replies,
       };
     });
   return commentsWithReplies;
 };
 
-const handleNewComment = (comments: CommentWithReplies[], newComment: Comment): CommentWithReplies[] => {
+const handleNewComment = (
+  comments: CommentWithReplies[],
+  newComment: Comment
+): CommentWithReplies[] => {
   const commentWithReplies = {
     ...newComment,
-    replies: []
+    replies: [],
   };
 
   if (newComment.reply_to_id === null) {
     return [commentWithReplies, ...comments];
   }
 
-  return comments.map(comment => {
+  return comments.map((comment) => {
     if (comment.id === newComment.reply_to_id) {
       return {
         ...comment,
-        replies: [...comment.replies, commentWithReplies]
+        replies: [...comment.replies, commentWithReplies],
       };
     }
     return comment;
@@ -118,7 +123,11 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         const response = await axios.get(`${ENDPOINT}/comments/${lessonId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        setComments(translateCommentsToCommentWithReplies(normalizeComments(response.data.comments ?? [])));
+        setComments(
+          translateCommentsToCommentWithReplies(
+            normalizeComments(response.data.comments ?? [])
+          )
+        );
       } catch (err) {
         setError("Failed to fetch comments");
       } finally {
@@ -133,12 +142,12 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
       lesson_id,
       comment,
       images,
-      reply_to_id
+      reply_to_id,
     }: {
       lesson_id: number;
       comment: string;
       images: File[];
-      reply_to_id:number|null;
+      reply_to_id: number | null;
     }) => {
       setLoading(true);
       try {
@@ -149,15 +158,16 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
           images.forEach((image) => {
             formData.append(`images`, image);
           });
-        if (reply_to_id) 
-          formData.append("reply_to_id", reply_to_id.toString());
+        if (reply_to_id) formData.append("reply_to_id", reply_to_id.toString());
         const response = await axios.post(`${ENDPOINT}/add_comment`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setComments((prevComments) => handleNewComment(prevComments || [], normalizeComment(response.data)));
+        setComments((prevComments) =>
+          handleNewComment(prevComments || [], normalizeComment(response.data))
+        );
       } catch (error: any) {
         console.error(
           "Error adding comment:",
