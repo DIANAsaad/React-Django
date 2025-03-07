@@ -310,14 +310,27 @@ class GetCommentsView(APIView):
             comments = Comment.objects.filter(lesson_id=lesson_id).prefetch_related(
                 "images", "replies"
             )
-
+            combined_comments=comments
         else:
             # Students only see their own comments
-            comments = Comment.objects.filter(lesson_id=lesson_id).prefetch_related(
-                "images", "replies"
+            print(user.groups.filter(name="Instructors").exists())
+            comments = Comment.objects.filter(
+                lesson_id=lesson_id, commentor=request.user
+            ).prefetch_related("images")
+            all_replies = Comment.objects.filter(lesson_id=lesson_id, reply_to_id__isnull=False).prefetch_related(
+                "images"
             )
-
-        data = {"comments": CommentSerializer(comments, many=True).data}
+            comment_replies = []
+            replies= []  
+            for comment in comments:
+                for reply in all_replies:
+                    if reply.reply_to_id == comment.id:
+                        comment_replies.append(reply)
+                        replies.append(reply)
+                comment.replies.set(comment_replies)
+                comment_replies = []
+            combined_comments = list(comments) + list(all_replies)
+        data = {"comments": CommentSerializer(combined_comments, many=True).data}
         return Response(data, status=status.HTTP_200_OK)
 
 

@@ -9,7 +9,7 @@ import axios from "axios";
 import { useAuth } from "./AuthContext";
 
 // Define the shape of the comment (Discussion Forum)
-interface Comment {
+export interface Comment {
   id: number;
   lesson_id: number;
   commentor: {
@@ -64,7 +64,6 @@ const normalizeComment = (comment: Comment): Comment => ({
 const normalizeComments = (comments: Comment[]) => {
   return comments.map(normalizeComment);
 };
-
 const translateCommentsToCommentWithReplies = (
   comments: Comment[]
 ): CommentWithReplies[] => {
@@ -78,7 +77,9 @@ const translateCommentsToCommentWithReplies = (
     };
   };
 
-  return comments.filter((c) => c.reply_to_id === null).map(buildCommentWithReplies);
+  return comments
+    .filter((c) => c.reply_to_id === null)
+    .map(buildCommentWithReplies);
 };
 
 const handleNewComment = (
@@ -149,7 +150,6 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
       images: File[];
       reply_to_id: number | null;
     }) => {
-      
       try {
         const formData = new FormData();
         formData.append("lesson_id", lesson_id.toString());
@@ -178,26 +178,34 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
             error.response?.data?.message || error.message
           }`
         );
-      } 
+      }
     },
     [accessToken]
   );
 
   const deleteComment = useCallback(
     async (commentId: number) => {
-      const comment = comments.find((c) => c.id === commentId);
-
-      if (!comment) {
-        alert("comment not found");
-        return;
-      }
-
       try {
         await axios.delete(`${ENDPOINT}/delete_comment/${commentId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
+        const removeComment = (comments: CommentWithReplies[], commentId: number): CommentWithReplies[] => {
+          return comments.reduce((acc, comment) => {
+            if (comment.id === commentId) {
+              return acc;
+            }
+            return [
+              ...acc,
+              {
+                ...comment,
+                replies: removeComment(comment.replies, commentId),
+              },
+            ];
+          }, [] as CommentWithReplies[]);
+        };
 
-        setComments(comments.filter((c) => c.id !== commentId));
+        setComments((prevComments) => removeComment(prevComments, commentId));
+      
       } catch (error) {
         console.error(`Error deleting comment:`, error);
         alert(

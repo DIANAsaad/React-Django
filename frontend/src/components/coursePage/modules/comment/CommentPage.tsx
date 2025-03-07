@@ -10,7 +10,7 @@ const CommentPage: React.FC = () => {
   const { comments, loading, fetchComments, deleteComment } =
     useCommentContext();
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
-
+  console.log(comments);
   useEffect(() => {
     if (moduleId) {
       fetchComments(Number(moduleId));
@@ -82,7 +82,7 @@ const CommentPage: React.FC = () => {
               {comment.replies && (
                 <div className="replies">
                   {comment.replies.map((reply) =>  (
-                    console.log(reply.id),
+
                       <div key={reply.id} className="reply">
                         <div className="comment-header">
                           <div className="comment-text">
@@ -118,7 +118,7 @@ const CommentPage: React.FC = () => {
                         </div>
                         {replyToCommentId === reply.id && (
                           <div className="reply-form">
-                            <AddComment reply_to_id={reply.id} />
+                            <AddComment reply_to_id={reply.reply_to_id} />
                           </div>
                         )}
                       </div>
