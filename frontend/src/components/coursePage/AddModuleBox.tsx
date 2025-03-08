@@ -99,7 +99,7 @@ const AddModuleBox: React.FC<AddModuleBoxProps> = ({ courseId }) => {
               src={
                 formData.module_image
                   ? URL.createObjectURL(formData.module_image)
-                  : "/achieve_a_mark.png"
+                  : "/logo.png"
               }
               className="card-img-add-top"
               alt="Course"

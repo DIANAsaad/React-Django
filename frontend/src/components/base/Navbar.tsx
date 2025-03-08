@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
     <nav className="navbar navbar-expand-lg">
       <div className="container-fluid">
         <a className="navbar-brand">
-          <img src="/achieve_logo_white.png" alt="Logo" width="150" />
+        <img src="/logo.png" alt="Logo" className="logo-size" />
         </a>
 
         <button
@@ -37,13 +37,13 @@ const Navbar: React.FC = () => {
             {isAuthenticated && user ? (
               <>
                 <li className="nav-item">
-                  <span className="navbar-text me-3  text-white">
+                  <span className="navbar-text me-3">
                     Logged in as {user.first_name} {user.last_name} |
                   </span>
                 </li>
                 <li className="nav-item">
                   <button
-                    className="logout-button text-white"
+                    className="logout-button "
                     onClick={handleLogout} // Trigger handleLogout
                   >
                     Logout

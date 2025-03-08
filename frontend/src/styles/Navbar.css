@@ -1,10 +1,7 @@
 .navbar {
-  background-color:  #332254;
-  box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1);
- 
+  background-color: #fbfaf9; 
   transition: box-shadow 0.3s ease;
   align-items: center;
-
 }
 
 .navbar .navbar-brand {
@@ -12,11 +9,16 @@
   font-weight: bold;
   color: white;
   transition: color 0.3s ease;
-  padding: 25px;
+  padding: 20px;
 }
 
 .navbar .navbar-brand:hover {
   color: #ff5733;
+}
+
+.logo-size {
+  width: 50px !important;
+  height: auto!important; /* This will maintain the aspect ratio */
 }
 
 .navbar-nav .nav-item .nav-link {
@@ -34,7 +36,7 @@
 }
 
 .navbar-text {
-  color: white;
+  color: #01284e;
   font-size: 1rem;
   margin-left: 7px;
   font-family: "Georgia", serif;
@@ -51,6 +53,7 @@
   width: 130px;
   height: auto;
   margin-bottom: 6px;
+  margin-left:2.4rem;
 }
 
 .navbar:hover {
@@ -62,7 +65,7 @@
   font-size: 1rem;
   background: none;
   border: none;
-  color: white;
+  color: #01284e;
   padding: 0;
   margin-left: -30px;
   margin-right: 20px;

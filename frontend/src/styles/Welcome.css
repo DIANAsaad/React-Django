@@ -22,10 +22,8 @@ body {
 }
 
 .header-bottom .header-bottom-brand img {
-  width: 130px;
-  height: auto;
-  margin-bottom: -1px;
-  opacity: 1;
+    width: 50px ;
+    height: auto
 }
 
 nav ul {
@@ -57,7 +55,7 @@ nav ul li a {
 }
 
 .social-btn {
-  background-color: #ff6000;
+  background-color: #01284e;
   color: white;
   border: none;
   border-radius: 50%;
@@ -73,7 +71,7 @@ nav ul li a {
 }
 
 .social-btn:hover {
-  background-color: #ff6000;
+    background-color:  #91c4f7;
 }
 
 .social-btn i {
@@ -97,7 +95,7 @@ img {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #222c36;
+  color:  #01284e;
   background-color: rgba(255, 255, 255, 0.8);
   padding: 40px;
   border-radius: 15px;
@@ -112,7 +110,7 @@ img {
 }
 
 footer {
-  background-color: #332254;
+  background-color:  #01284e;
   color: white;
   padding: 15px 0;
   text-align: center;
@@ -150,7 +148,7 @@ input[type="password"] {
   width: 100%;
   max-width: 150px;
   padding: 10px;
-  background-color: #ff6000;
+  background-color:  #01284e;
   color: white;
   border: none;
   border-radius: 5px;
@@ -163,7 +161,7 @@ input[type="password"] {
 
 /* Add a hover effect for the button */
 .container button:hover {
-  background-color: #fc8236;
+  background-color: #91c4f7;
 }
 
 /* Optional: Style error messages */

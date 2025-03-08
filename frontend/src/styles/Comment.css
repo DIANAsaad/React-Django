@@ -65,13 +65,6 @@
   padding: 16px;
 }
 
-.comments-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px;
-}
-
 .comment-form {
   background-color: #f0f0f0;
   border-radius: 8px;
@@ -88,7 +81,7 @@
 .comment-text {
   font-size: 14px;
   width: 90%;
-  flex-grow: 1; 
+  flex-grow: 1;
   margin-bottom: 8px;
 }
 
@@ -99,7 +92,6 @@
   display: flex;
   align-self: flex-start;
 }
-
 
 .comment-options a {
   text-decoration: none;
@@ -152,14 +144,117 @@
 .comment-form .form-group-inline .image-input {
   flex-grow: 1;
   margin-right: 10px;
-  margin-bottom:auto;
+  margin-bottom: auto;
 }
 
 .comment-form .form-group-inline .submit-button {
   flex-shrink: 0;
 }
 
-.replies{
+.replies {
   margin-top: 10px;
-  background-color: #f6e6f7;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .comment-form {
+    padding: 12px;
+  }
+
+  .form-group {
+    font-size: 12px;
+  }
+
+  .comment-input {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .submit-button {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .comment-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .comment-options {
+    font-size: 12px;
+    width: 100%;
+    margin-top: 8px;
+    justify-content: flex-start;
+  }
+
+  .comment-options a {
+    font-size: 12px;
+  }
+
+  .comment-images {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .comment-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .comment-time {
+    font-size: 10px;
+  }
+
+  .comment-form .form-group-inline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .comment-form .form-group-inline .image-input {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .comment-form {
+    padding: 8px;
+  }
+
+  .form-group {
+    font-size: 11px;
+  }
+
+  .comment-input {
+    font-size: 11px;
+    padding: 5px;
+  }
+
+  .submit-button {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  .comment-text {
+    font-size: 12px;
+  }
+
+  .comment-options {
+    font-size: 11px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .comment-images {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .comment-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .comment-time {
+    font-size: 9px;
+  }
 }

@@ -10,7 +10,7 @@ const CommentPage: React.FC = () => {
   const { comments, loading, fetchComments, deleteComment } =
     useCommentContext();
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
-  console.log(comments);
+
   useEffect(() => {
     if (moduleId) {
       fetchComments(Number(moduleId));

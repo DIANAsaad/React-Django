@@ -39,7 +39,7 @@ const Welcome: React.FC = () => {
           <nav>
             <ul>
               <li className="header-bottom-brand">
-                <img src="/achieve_logo_color.png" alt="Achieve Logo" />
+                <img src="/logo.png" alt="Achieve Logo" className="logo-size"/>
               </li>
             </ul>
           </nav>
@@ -75,15 +75,9 @@ const Welcome: React.FC = () => {
         </div>
       </header>
 
-      <div className="image-wrapper">
-        <img src="/lms_background.png" alt="LMS Background" />
+  
         <div className="content">
-          <p>
-            Achieve's Learning Management System empowers you to take control of
-            your studies with ease. Access a vast library of courses, track your
-            progress, and engage in interactive learning—all designed to help
-            you reach your academic goals and beyond.
-          </p>
+       
 
           {/* Login Form */}
           <div className="container">
@@ -105,15 +99,15 @@ const Welcome: React.FC = () => {
               {errorMessage && (
                 <div className="error-message">{errorMessage}</div>
               )}
-              <button type="submit" className="btn btn-primary">
+              <button type="submit" className="container-button">
                 Login
               </button>
             </form>
           </div>
         </div>
-      </div>
+      
 
-      <footer>&copy; 2024 Achieve's LMS. All rights reserved.</footer>
+
     </div>
   );
 };

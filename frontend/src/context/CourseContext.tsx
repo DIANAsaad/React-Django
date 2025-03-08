@@ -48,7 +48,7 @@ const normalizeCourse = (course: Course) => ({
     ? course.course_image?.toString().startsWith(ENDPOINT)
       ? course.course_image
       : `${ENDPOINT}${course.course_image}`
-    : '/achieve_a_mark.png'
+    : '/logo.png'
 });
 
 const normalizeCourses = (courses: Course[]) => {

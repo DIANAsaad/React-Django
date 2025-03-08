@@ -32,17 +32,6 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <div className="col-12 mb-4">
-        <h2 className="d-flex">
-          My Courses|
-          <input
-            type="text"
-            className="custom-width"
-            placeholder="Search courses..."
-            id="course-search"
-          />
-        </h2>
-      </div>
       <div className="row">
         {courses &&
           courses.map((course) => (

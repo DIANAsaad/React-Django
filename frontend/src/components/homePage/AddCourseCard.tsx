@@ -59,7 +59,7 @@ const AddCourseCard: React.FC = () => {
               src={
                 formData.course_image
                   ? URL.createObjectURL(formData.course_image)
-                  : "/achieve_a_mark.png"
+                  : "/logo.png"
               }
               className="card-img-add-top"
               alt="Course"

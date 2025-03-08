@@ -9,8 +9,6 @@ import "../../../styles/Course&LessonPage.css";
 import DropdownMenu from "../../DropdownMenu";
 import BaseWrapper from "../../base/BaseWrapper";
 
-
-
 const ModulePage: React.FC = () => {
   const { error, fetchModulesById } = useModuleContext();
   const { moduleId, courseId } = useParams<{
@@ -19,7 +17,6 @@ const ModulePage: React.FC = () => {
   }>();
 
   const { editButton } = useEditButtonContext();
-
 
   const {
     flashcards,
@@ -104,12 +101,7 @@ const ModulePage: React.FC = () => {
           },
         ]
       : []),
-    {
-      label: "Add Discussion",
-      action: () =>  navigate(
-        `/course/${courseId}/module/${module.id}/add-comment`
-      ),
-    },
+
   ];
 
   if (error) {
@@ -127,7 +119,7 @@ const ModulePage: React.FC = () => {
     <>
       <div className="row">
         <div className="container-cstm card-style mt-4" key={module.id}>
-          <div className="info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded">
+          <div className="info-box d-flex align-items-center p-4 mb-4 shadow-sm rounded position-relative">
             <div className="cstm-header">
               <img
                 src={String(module.module_image)}
@@ -137,9 +129,9 @@ const ModulePage: React.FC = () => {
             </div>
             <div className="details ms-4">
               <h1 className="title">{module.module_title}</h1>
-              <p className="text-muted ">{module.topic}</p>
+              <p className="text-muted">{module.topic}</p>
               {editButton && (
-                <p className="text-muted ">
+                <p className="text-muted">
                   <strong>Created by: </strong>
                   {`${module.module_creator.first_name} ${module.module_creator.last_name}`}
                 </p>
@@ -150,6 +142,10 @@ const ModulePage: React.FC = () => {
                 buttonContent={<i className="fas fa-pen"></i>}
                 options={options}
               />
+            </div>
+            <div className="lower-right-corner">
+              <p className="enrollment">Enrollment</p>
+              <p onClick={()=>navigate(`/course/${courseId}/module/${module.id}/add-comment`)}className="add-discussion">Add Discussion</p>
             </div>
           </div>
           {lessonPdfUrl && (

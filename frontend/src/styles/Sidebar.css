@@ -1,18 +1,16 @@
 /* SIDEBAR*/
 
 .sidebar {
-  background-color:#fbfaf9;
-  height: 100vh;
+  background-color: #01284e;
   padding-top: 30px;
-  height:100vh;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   padding-bottom: 20px;
-  overflow-y: auto;
-  float: right;
+  overflow-y: scroll;
+  min-height: 100vh;
 }
 
 .sidebar h4 {
-  color: #332254;
+  color: #fbfaf9; 
   font-family: "Georgia", serif;
   font-weight: bold;
   padding: 10px;
@@ -47,7 +45,7 @@
 
 .sidebar ul li a {
   text-decoration: none;
-  color: #332254;
+  color: #fbfaf9; 
   display: block;
   padding: 10px 0;
   font-size: 1rem;

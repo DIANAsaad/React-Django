@@ -35,6 +35,7 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from .permissions import IsStaffOrIsInstructor, IsCommentorOrHasPerms
 import json
+from django.db.models import Q
 
 
 # Authentication & Authorization
@@ -310,26 +311,31 @@ class GetCommentsView(APIView):
             comments = Comment.objects.filter(lesson_id=lesson_id).prefetch_related(
                 "images", "replies"
             )
-            combined_comments=comments
+            combined_comments = comments
         else:
             # Students only see their own comments
-            print(user.groups.filter(name="Instructors").exists())
             comments = Comment.objects.filter(
-                lesson_id=lesson_id, commentor=request.user
+                Q(commentor=request.user)
+                | Q(reply_to_id__isnull=False),  # Get user's comments + all replies
+                lesson_id=lesson_id,
             ).prefetch_related("images")
-            all_replies = Comment.objects.filter(lesson_id=lesson_id, reply_to_id__isnull=False).prefetch_related(
-                "images"
-            )
-            comment_replies = []
-            replies= []  
+            student_comments = []
+            replies = []
+            strict_student_replies = []
+
             for comment in comments:
-                for reply in all_replies:
-                    if reply.reply_to_id == comment.id:
-                        comment_replies.append(reply)
-                        replies.append(reply)
+                if comment.commentor == request.user and comment.reply_to_id is None:
+                    student_comments.append(comment)
+                else:
+                    replies.append(comment)
+            for comment in student_comments:
+                comment_replies = [
+                    reply for reply in replies if reply.reply_to_id == comment.id
+                ]
                 comment.replies.set(comment_replies)
-                comment_replies = []
-            combined_comments = list(comments) + list(all_replies)
+                strict_student_replies.extend(comment_replies)
+
+            combined_comments = list(comments) + list(strict_student_replies)
         data = {"comments": CommentSerializer(combined_comments, many=True).data}
         return Response(data, status=status.HTTP_200_OK)
 
@@ -553,6 +559,7 @@ class AddQuizView(APIView):
 class SubmitAnswersView(APIView):
     permission_classes = [IsAuthenticated]
 
+
     def post(self, request, *args, **kwargs):
         quiz_id = kwargs.get("quiz_id")
 
@@ -562,8 +569,9 @@ class SubmitAnswersView(APIView):
         )
 
         try:
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if serializer.is_valid():
+              serializer.save()
+              return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Quiz.DoesNotExist:
 
             return Response(
