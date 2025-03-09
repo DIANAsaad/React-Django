@@ -49,10 +49,18 @@ class AchieveUser(AbstractUser):
 
 # COURSES & MODULES & Quizzes
 
+
 class CourseEnrollment(models.Model):
-    course=models.ForeignKey('Course', on_delete=models.CASCADE, related_name="enrolled_users")
-    user=models.ForeignKey(AchieveUser, on_delete=models.CASCADE, related_name="enrolled_courses")
-    enrolled_at=models.DateTimeField(default=timezone.now)
+    course = models.ForeignKey(
+        "Course", on_delete=models.CASCADE, related_name="enrolled_users"
+    )
+    user = models.ForeignKey(
+        AchieveUser, on_delete=models.CASCADE, related_name="enrolled_courses"
+    )
+    enrolled_at = models.DateTimeField(default=timezone.now)
+    enrolled_by=models.ForeignKey(
+        AchieveUser, on_delete=models.CASCADE, related_name="enrolled_by", default=None
+    )
 
 
 class Course(models.Model):
@@ -198,12 +206,17 @@ class Comment(models.Model):
     )
     comment = models.TextField()
     commented_at = models.DateTimeField(default=timezone.now)
-    reply_to=models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name="replies")
+    reply_to = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="replies"
+    )
 
     def delete(self, *args, **kwargs):
         if self.images:
             for image in self.images.all():
                 image.delete()
+        if self.replies:
+            for reply in self.replies.all():
+                reply.delete()
         super().delete(*args, **kwargs)
 
 

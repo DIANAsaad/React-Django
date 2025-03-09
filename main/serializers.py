@@ -13,6 +13,7 @@ from .models import (
     QuizAttempt,
     Comment,
     CommentImage,
+    CourseEnrollment,
 )
 from django.shortcuts import get_object_or_404
 
@@ -44,7 +45,28 @@ class RefreshTokenSerializer(serializers.Serializer):
 
 #  WEB CONTENT
 
+
 # Course
+class EnrollmentSerializer(serializers.ModelSerializer):
+    course_id = serializers.IntegerField()
+    user_id = serializers.IntegerField()
+
+    class Meta:
+        model = CourseEnrollment
+        fields = ["id", "course_id", "user_id", "enrolled_at", "enrolled_by"]
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        course_id = validated_data.pop("course_id")
+        user_id = validated_data.pop("user_id")
+        enrolled_by = request.user
+        enrollment = CourseEnrollment.objects.create(
+            course_id=course_id,
+            user_id=user_id,
+            enrolled_by=enrolled_by,
+            **validated_data
+        )
+        return enrollment
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -328,9 +350,10 @@ class CommentSerializer(serializers.ModelSerializer):
             "lesson_id",
             "commented_at",
             "reply_to_id",
-            "replies"
+            "replies",
         ]
-   # Need to override the internal value func for handeling multiple images
+
+    # Need to override the internal value func for handeling multiple images
     def to_internal_value(self, data):
         images_data = data.getlist("images")
         internal_value = super().to_internal_value(data)

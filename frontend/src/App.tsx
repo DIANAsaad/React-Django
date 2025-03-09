@@ -2,9 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Home from "./components/Home";
-import CoursePage from "./components/coursePage/CoursePage";
-import ModulePage from "./components/coursePage/modules/ModulePage";
-import FlashcardPage from "./components/coursePage/modules/flashcard/FlashcardPage";
+import CoursePage from "./components/course/CoursePage";
+import ModulePage from "./components/course/modules/ModulePage";
+import FlashcardPage from "./components/course/modules/flashcard/FlashcardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext";
@@ -12,15 +12,16 @@ import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
 import { ExternalLinkProvider } from "./context/ExternalLinkContext";
 import { EditButtonProvider } from "./context/EditButtonContext";
-import AddFlashcard from "./components/coursePage/modules/flashcard/AddFlashcard";
-import AddExtrenalLink from "./components/coursePage/modules/externalLinks/AddExternalLink";
-import EditExtrenalLink from "./components/coursePage/modules/externalLinks/EditExternalLink";
-import AddQuiz from "./components/coursePage/modules/quiz/AddQuiz";
+import AddFlashcard from "./components/course/modules/flashcard/AddFlashcard";
+import AddExtrenalLink from "./components/course/modules/externalLinks/AddExternalLink";
+import EditExtrenalLink from "./components/course/modules/externalLinks/EditExternalLink";
+import AddQuiz from "./components/course/modules/quiz/AddQuiz";
 import { QuizProvider } from "./context/QuizContext";
 import { CommentProvider } from "./context/CommentContext";
-import QuizPage from "./components/coursePage/modules/quiz/QuizPage";
-import ResultsPage from "./components/coursePage/modules/quiz/ResultsPage";
-import CommentPage from "./components/coursePage/modules/comment/CommentPage";
+import QuizPage from "./components/course/modules/quiz/QuizPage";
+import ResultsPage from "./components/course/modules/quiz/ResultsPage";
+import CommentPage from "./components/course/modules/comment/CommentPage";
+import EnrolledUser from "./components/course/EnrolledUsers";
 
 const App: React.FC = () => {
   return (
@@ -46,6 +47,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <CoursePage />
+            </ProtectedRoute>
+          }
+        />
+          <Route
+          path="/course/:courseId/enrolledUsers"
+          element={
+            <ProtectedRoute>
+              <EnrolledUser />
             </ProtectedRoute>
           }
         />

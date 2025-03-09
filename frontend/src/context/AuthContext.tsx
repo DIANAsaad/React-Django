@@ -1,14 +1,18 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import axios, { AxiosError } from 'axios';
-import { ReactNode } from 'react';
-import useLocalStorage from '../hooks/use-local-storage';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import axios, { AxiosError } from "axios";
+import { ReactNode } from "react";
+import useLocalStorage from "../hooks/use-local-storage";
 
-
-
-const TOKEN_EXPIRATION_TIME = 86_400_000; 
+const TOKEN_EXPIRATION_TIME = 86_400_000;
 
 // Define User type
- interface AchieveUser {
+interface AchieveUser {
   id: number;
   first_name: string;
   last_name: string;
@@ -21,8 +25,10 @@ const TOKEN_EXPIRATION_TIME = 86_400_000;
 interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  fetchUsers: () => Promise<void>;
   isAuthenticated: boolean;
   user: AchieveUser | null;
+  users: AchieveUser[];
   isLoading: boolean; // For indicating blocking/loading state
   accessToken: string | null;
 }
@@ -36,34 +42,51 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [accessToken, setAccessToken] = useLocalStorage('access_token', localStorage.getItem('access_token'));
-  const [refreshToken, setRefreshToken] = useLocalStorage('refresh_token', localStorage.getItem('refresh_token'));
-
+  const [accessToken, setAccessToken] = useLocalStorage(
+    "access_token",
+    localStorage.getItem("access_token")
+  );
+  const [refreshToken, setRefreshToken] = useLocalStorage(
+    "refresh_token",
+    localStorage.getItem("refresh_token")
+  );
   const [user, setUser] = useState<AchieveUser | null>(null);
-
+  const [users, setUsers] = useState<AchieveUser[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const fetchAndSetUser = useCallback(async () => {
     if (!accessToken) return;
     try {
-      const { data } = await axios.get('http://127.0.0.1:8000/user', {
-        headers: { Authorization: `Bearer ${accessToken}` }
+      const { data } = await axios.get("http://127.0.0.1:8000/user", {
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       setUser(data);
     } catch (error) {
-      console.error('Failed to fetch user', error);
+      console.error("Failed to fetch user", error);
       setUser(null);
     }
   }, [accessToken]);
-
+  const fetchUsers = useCallback(async () => {
+    if (!accessToken) return;
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/users", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setUsers(response.data.users || []);
+    } catch {
+      console.error("Failed to fetch users");
+    }
+  }, [accessToken]);
   const refreshAccessToken = useCallback(async () => {
     if (!refreshToken) return;
 
     try {
       const { data } = await axios.post(
-        'http://127.0.0.1:8000/refresh_access_token',
+        "http://127.0.0.1:8000/refresh_access_token",
         { refresh_token: refreshToken },
-        { headers: { 'Content-Type': 'application/json' } }
+        { headers: { "Content-Type": "application/json" } }
       );
 
       const newAccessToken = data.access_token;
@@ -79,28 +102,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await fetchAndSetUser();
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('Failed to refresh access token', axiosError?.message);
+      console.error("Failed to refresh access token", axiosError?.message);
 
       setAccessToken(null);
       setRefreshToken(null);
       setUser(null);
     }
-  }, [accessToken, refreshToken, setAccessToken, setRefreshToken, fetchAndSetUser]);
+  }, [
+    accessToken,
+    refreshToken,
+    setAccessToken,
+    setRefreshToken,
+    fetchAndSetUser,
+  ]);
 
   const login = useCallback(
     async (email: string, password: string) => {
       try {
         const { data } = await axios.post(
-          'http://127.0.0.1:8000',
+          "http://127.0.0.1:8000",
           { email, password },
-          { headers: { 'Content-Type': 'application/json' } }
+          { headers: { "Content-Type": "application/json" } }
         );
 
         setAccessToken(data.access_token);
         setRefreshToken(data.refresh_token);
         setUser(data.user);
       } catch (error) {
-        console.error('Login failed', error);
+        console.error("Login failed", error);
       }
     },
     [setAccessToken, setRefreshToken]
@@ -114,14 +143,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Attempt to logout on the server side
       if (accessToken && refreshToken) {
         await axios.post(
-          'http://127.0.0.1:8000/logout',
+          "http://127.0.0.1:8000/logout",
           { refresh_token: refreshToken },
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );
       }
     } catch (error) {
-      console.error('Logout failed', error);
-    } 
+      console.error("Logout failed", error);
+    }
   }, [accessToken, refreshToken, setAccessToken, setRefreshToken]);
 
   useEffect(() => {
@@ -133,7 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Then fetch user
           await fetchAndSetUser();
         } catch (error) {
-          console.error('Error in immediate refresh/fetch:', error);
+          console.error("Error in immediate refresh/fetch:", error);
         } finally {
           setIsLoading(false);
         }
@@ -151,7 +180,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     if (refreshToken) {
       refreshInterval = setInterval(() => {
-        refreshAccessToken().catch(err => console.error('Error in scheduled refresh:', err));
+        refreshAccessToken().catch((err) =>
+          console.error("Error in scheduled refresh:", err)
+        );
       }, TOKEN_EXPIRATION_TIME);
     }
 
@@ -173,12 +204,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
+        users,
+        fetchUsers,
         login,
         logout,
         isAuthenticated: !!user,
         user,
         isLoading,
-        accessToken
+        accessToken,
       }}
     >
       {children}
@@ -192,7 +225,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

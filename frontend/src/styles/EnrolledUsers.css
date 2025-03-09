@@ -1,0 +1,29 @@
+.enrolled-users-container {
+    padding: 20px;
+}
+
+.enrolled-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.enrolled-users-table th,
+.enrolled-users-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.enrolled-users-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.enrolled-users-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.enrolled-users-table tr:hover {
+    background-color: #f1f1f1;
+}

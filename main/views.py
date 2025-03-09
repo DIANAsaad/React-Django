@@ -9,6 +9,8 @@ from main.models import (
     Answer,
     QuizAttempt,
     Comment,
+    CourseEnrollment,
+    AchieveUser
 )
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
@@ -30,6 +32,7 @@ from main.serializers import (
     SubmitAnswerSerializer,
     AnswerSerializer,
     CommentSerializer,
+    EnrollmentSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -97,7 +100,16 @@ class GetUserView(APIView):
         data = serializer.data
         data["is_staff"] = request.user.is_staff
         data["is_instructor"] = request.user.groups.filter(name="Instructors").exists()
+        return Response(data)
+    
+class GetAllUsersView(APIView):
+    permission_classes=[IsAuthenticated, IsStaffOrIsInstructor]
 
+    def get(self, request,*args,**kwargs):
+        users=AchieveUser.objects.all()
+        data={
+            "users":AchieveUserSerializer(users, many=True).data
+        }
         return Response(data)
 
 
@@ -127,6 +139,21 @@ class RefreshAccessTokenView(APIView):
 
 
 # Web API Views
+class GetEnrollmentInfoView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def get(self, request, *args, **kwargs):
+        course_id = kwargs.get("course_id")
+        try:
+            enrollments = CourseEnrollment.objects.filter(course_id=course_id).all()
+            data = {
+                "enrollments": EnrollmentSerializer(enrollments, many=True).data,
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except CourseEnrollment.DoesNotExist:
+            return Response(
+                {"error": "Enrollment not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class HomePageView(APIView):
@@ -135,7 +162,6 @@ class HomePageView(APIView):
     def get(self, request, *args, **kwargs):
 
         courses = Course.objects.all()
-        is_staff = request.user.is_staff
         data = {
             "courses": CourseSerializer(courses, many=True).data,
         }
@@ -559,7 +585,6 @@ class AddQuizView(APIView):
 class SubmitAnswersView(APIView):
     permission_classes = [IsAuthenticated]
 
-
     def post(self, request, *args, **kwargs):
         quiz_id = kwargs.get("quiz_id")
 
@@ -570,8 +595,8 @@ class SubmitAnswersView(APIView):
 
         try:
             if serializer.is_valid():
-              serializer.save()
-              return Response(serializer.data, status=status.HTTP_201_CREATED)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Quiz.DoesNotExist:
 
             return Response(
@@ -636,3 +661,21 @@ class DeleteCommentView(APIView):
             {"detail": "Comment deleted successfully"},
             status=status.HTTP_204_NO_CONTENT,
         )
+
+
+# ENROLLMENT LOGICCC (USERS IN COURSES)
+
+
+class EnrollUserView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = EnrollmentSerializer(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

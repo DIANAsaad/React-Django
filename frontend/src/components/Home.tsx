@@ -1,8 +1,8 @@
 import React from "react";
-import CourseCard from "./homePage/CourseCard";
+import CourseCard from "./home/CourseCard";
 import { useCourseContext } from "../context/CourseContext";
 import "../styles/Home.css";
-import AddCourseCard from "./homePage/AddCourseCard";
+import AddCourseCard from "./home/AddCourseCard";
 import BaseWrapper from "./base/BaseWrapper";
 import { useEditButtonContext } from "../context/EditButtonContext";
 

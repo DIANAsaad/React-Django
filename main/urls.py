@@ -29,13 +29,18 @@ from main.views import (
     AddCommentView,
     GetCommentsView,
     DeleteCommentView,
+    EnrollUserView,
+    GetEnrollmentInfoView,
+    GetAllUsersView
 )
 
 
 urlpatterns = [
+    # Get views
     path("", CustomLoginView.as_view(), name="Welcome"),
     path("logout", CustomLogoutView.as_view(), name="logout"),
     path("user", GetUserView.as_view(), name="get_user"),
+    path("users", GetAllUsersView.as_view(), name="gett_all_users"),
     path("courses", HomePageView.as_view(), name="course-list"),
     path("flashcards/<int:lesson_id>", GetFlashcardView.as_view(), name="flashcard"),
     path("modules/<int:course_id>", CoursePageView.as_view(), name="course_modules"),
@@ -52,8 +57,18 @@ urlpatterns = [
     ),
     path("quizzes/<int:module_id>", GetQuizzesView.as_view(), name="quizzes"),
     path("quiz/<int:quiz_id>", GetQuizByIdView.as_view(), name="quiz"),
-    path("quiz_results/<int:attempt_id>", GetQuizResultsView.as_view(), name="quiz_results"),
+    path(
+        "quiz_results/<int:attempt_id>",
+        GetQuizResultsView.as_view(),
+        name="quiz_results",
+    ),
     path("comments/<int:lesson_id>", GetCommentsView.as_view(), name="comments"),
+    path(
+        "get_enrollments/<int:course_id>",
+        GetEnrollmentInfoView.as_view(),
+        name="get_enrollments",
+    ),
+    # Perfom actions
     path("add_course", AddCourseView.as_view(), name="add_Course"),
     path(
         "refresh_access_token",
@@ -94,9 +109,17 @@ urlpatterns = [
         name="delete_external_link",
     ),
     path("add_quiz", AddQuizView.as_view(), name="add_quiz"),
-    path("submit_answers/<int:quiz_id>", SubmitAnswersView.as_view(), name="submit_answers"),
+    path(
+        "submit_answers/<int:quiz_id>",
+        SubmitAnswersView.as_view(),
+        name="submit_answers",
+    ),
     path("delete_quiz/<int:quiz_id>", DeleteQuizView.as_view(), name="delete_quiz"),
     path("add_comment", AddCommentView.as_view(), name="add_comment"),
-    path("delete_comment/<int:comment_id>", DeleteCommentView.as_view(), name="delete_comment")
-
+    path(
+        "delete_comment/<int:comment_id>",
+        DeleteCommentView.as_view(),
+        name="delete_comment",
+    ),
+    path("enroll_user", EnrollUserView.as_view(), name="enroll_user"),
 ]

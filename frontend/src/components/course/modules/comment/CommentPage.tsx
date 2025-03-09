@@ -81,49 +81,62 @@ const CommentPage: React.FC = () => {
               )}
               {comment.replies && (
                 <div className="replies">
-                  {comment.replies.map((reply) =>  (
-
-                      <div key={reply.id} className="reply">
-                        <div className="comment-header">
-                          <div className="comment-text">
-                            
-                            <strong> <i className="fas fa-arrow-turn-right"></i> {`${reply.commentor.first_name} ${reply.commentor.last_name}: `}</strong>
-                            {reply.comment}
-                          </div>
-                          <div className="comment-options">
-                            <a
-                              href="#"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleReplyClick(reply.id);
-                              }}
-                            >
-                              {replyToCommentId === reply.id
-                                ? "Cancel"
-                                : "Reply"}
-                            </a>
-                            <a
-                              href="#"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                deleteComment(reply.id);
-                              }}
-                            >
-                              | Delete
-                            </a>
-                          </div>
+                  {comment.replies.map((reply) => (
+                    <div key={reply.id} className="reply">
+                      <div className="comment-header">
+                        <div className="comment-text">
+                          <strong>
+                            {" "}
+                            <i className="fas fa-arrow-turn-right"></i>{" "}
+                            {`${reply.commentor.first_name} ${reply.commentor.last_name}: `}
+                          </strong>
+                          {reply.comment}
                         </div>
-                        <div className="comment-time">
-                          {new Date(reply.commented_at).toLocaleString()}
+                        <div className="comment-options">
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleReplyClick(reply.id);
+                            }}
+                          >
+                            {replyToCommentId === reply.id ? "Cancel" : "Reply"}
+                          </a>
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              deleteComment(reply.id);
+                            }}
+                          >
+                            | Delete
+                          </a>
                         </div>
-                        {replyToCommentId === reply.id && (
-                          <div className="reply-form">
-                            <AddComment reply_to_id={reply.reply_to_id} />
-                          </div>
-                        )}
                       </div>
-                    )
-                  )}
+                      <div className="comment-images">
+                        {reply.images?.map((imageObj, index) => (
+                          <div key={index} className="comment-image-container">
+                            <img
+                              src={String(imageObj.image)}
+                              alt="screenshots"
+                              className="comment-image"
+                              onClick={() =>
+                                window.open(String(imageObj.image), "_blank")
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="comment-time">
+                        {new Date(reply.commented_at).toLocaleString()}
+                      </div>
+                      {replyToCommentId === reply.id && (
+                        <div className="reply-form">
+                          <AddComment reply_to_id={reply.reply_to_id} />
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

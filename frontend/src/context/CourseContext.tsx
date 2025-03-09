@@ -22,9 +22,18 @@ export interface Course {
   study_guide: string;
 }
 
+interface Enrollment {
+  id: number;
+  course_id: number;
+  user: { id: number; first_name: string; last_name: string; email: string };
+  enrolled_by: { first_name: string; last_name: string };
+  enrolled_at: Date;
+}
+
 // Define the context structure
 interface CourseContextProps {
   courses: Course[] | null;
+  enrollments: Enrollment[] | null;
   deleteCourse: (courseId: number) => Promise<void>;
   addCourse: (
     course_name: string,
@@ -32,9 +41,16 @@ interface CourseContextProps {
     course_image: File | null,
     study_guide: string
   ) => Promise<void>;
+  enrollUser: ({
+    course_id,
+    user_id,
+  }: {
+    course_id: number;
+    user_id: number|null;
+  }) => Promise<void>;
+  unenrollUser: (course_id: number, user_id: number) => Promise<void>;
   loading: boolean;
   error: string | null;
-
 }
 
 // Create the context
@@ -48,7 +64,7 @@ const normalizeCourse = (course: Course) => ({
     ? course.course_image?.toString().startsWith(ENDPOINT)
       ? course.course_image
       : `${ENDPOINT}${course.course_image}`
-    : '/logo.png'
+    : "/logo.png",
 });
 
 const normalizeCourses = (courses: Course[]) => {
@@ -59,12 +75,11 @@ const normalizeCourses = (courses: Course[]) => {
 export const CourseProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
-
     const fetchCourses = async () => {
       try {
         setLoading(true);
@@ -72,7 +87,6 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setCourses(normalizeCourses(response.data.courses ?? []));
-    
       } catch {
         setError("Failed to fetch courses.");
       } finally {
@@ -147,14 +161,78 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
     [courses, accessToken]
   );
 
+  const enrollUser = useCallback(
+    async ({ course_id, user_id }: { course_id: number; user_id: number|null }) => {
+      if (!course_id || user_id) {
+        alert("Course and User are requiered to perfom enrollment");
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const formData = new FormData();
+        formData.append("course_id", course_id.toString());
+        if (user_id)formData.append("user_id", user_id.toString());
+        const response = await axios.post(`${ENDPOINT}/enroll_user`, formData, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }); 
+        setEnrollments((prevEnrollments) => [
+          ...(prevEnrollments || []),
+          response.data,
+        ]);
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || "Unknown error";
+        console.error(`Error enrolling user: ${errorMessage}`);
+        alert(`An error occurred while enrolling user: ${errorMessage}`);
+      }finally{
+        setLoading(false);
+      }
+    },  
+    [accessToken]
+  );
+
+  const unenrollUser = useCallback(
+    async (course_id: number, user_id: number) => {
+      try {
+        setLoading(true);
+        await axios.delete(`${ENDPOINT}/unroll_user/${course_id}/${user_id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setEnrollments((prevEnrollments) =>
+          prevEnrollments?.filter(
+            (e) => e.course_id !== course_id && e.user.id != user_id
+          )
+        );
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || error.message || "Unknown error";
+        console.error(`Error unenrolling user: ${errorMessage}`);
+        alert(`An error occurred while unenrolling user: ${errorMessage}`);
+      }finally{
+        setLoading(false);
+      }
+    },
+    [accessToken]
+  );
+
   return (
     <CourseContext.Provider
       value={{
         courses,
+        enrollments,
+        enrollUser,
+        unenrollUser,
         deleteCourse,
         addCourse,
         loading,
-        error,     
+        error,
       }}
     >
       {children}

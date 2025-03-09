@@ -67,6 +67,9 @@ const CoursePage: React.FC = () => {
                 </p>
               )}
             </div>
+            <div className="lower-right-corner">
+              {editButton && <p className="enrollment" onClick={()=>navigate(`/course/${course.id}/enrolledUsers`)}>Enrolled Users</p>}
+            </div>
           </div>
 
           {moduleLoading ? (
@@ -142,9 +145,7 @@ const CoursePage: React.FC = () => {
 
 const CoursePageWrapper: React.FC = () => {
   return (
-    <BaseWrapper
-      options={[{ link: "/courses", label: "Home" }]}
-    >
+    <BaseWrapper options={[{ link: "/courses", label: "Home" }]}>
       <CoursePage />
     </BaseWrapper>
   );

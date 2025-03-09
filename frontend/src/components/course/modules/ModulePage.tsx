@@ -71,37 +71,30 @@ const ModulePage: React.FC = () => {
   }
 
   const options = [
-    ...(editButton
-      ? [
-          {
-            label: "Add Session Recording",
-            action: () =>
-              navigate(`/course/${courseId}/module/${module.id}/add-flashcard`),
-          },
-          {
-            label: "Add Flashcards",
-            action: () =>
-              navigate(`/course/${courseId}/module/${module.id}/add-flashcard`),
-          },
-          {
-            label: "Add Quiz",
-            action: () =>
-              navigate(`/course/${courseId}/module/${module.id}/add-quiz`),
-          },
-          {
-            label: "Add External Links",
-            action: () =>
-              navigate(
-                `/course/${courseId}/module/${module.id}/add-external-link`
-              ),
-          },
-          {
-            label: "Add Activities",
-            action: () => {},
-          },
-        ]
-      : []),
-
+    {
+      label: "Add Session Recording",
+      action: () =>
+        navigate(`/course/${courseId}/module/${module.id}/add-flashcard`),
+    },
+    {
+      label: "Add Flashcards",
+      action: () =>
+        navigate(`/course/${courseId}/module/${module.id}/add-flashcard`),
+    },
+    {
+      label: "Add Quiz",
+      action: () =>
+        navigate(`/course/${courseId}/module/${module.id}/add-quiz`),
+    },
+    {
+      label: "Add External Links",
+      action: () =>
+        navigate(`/course/${courseId}/module/${module.id}/add-external-link`),
+    },
+    {
+      label: "Add Activities",
+      action: () => {},
+    },
   ];
 
   if (error) {
@@ -137,15 +130,25 @@ const ModulePage: React.FC = () => {
                 </p>
               )}
             </div>
-            <div className="ms-auto">
-              <DropdownMenu
-                buttonContent={<i className="fas fa-pen"></i>}
-                options={options}
-              />
-            </div>
+            {editButton && (
+              <div className="ms-auto">
+                <DropdownMenu
+                  buttonContent={<i className="fas fa-pen"></i>}
+                  options={options}
+                />
+              </div>
+            )}
             <div className="lower-right-corner">
-              <p className="enrollment">Enrollment</p>
-              <p onClick={()=>navigate(`/course/${courseId}/module/${module.id}/add-comment`)}className="add-discussion">Add Discussion</p>
+              <p
+                onClick={() =>
+                  navigate(
+                    `/course/${courseId}/module/${module.id}/add-comment`
+                  )
+                }
+                className="add-discussion"
+              >
+                Add Discussion
+              </p>
             </div>
           </div>
           {lessonPdfUrl && (
