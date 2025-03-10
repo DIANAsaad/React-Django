@@ -61,7 +61,10 @@ class CourseEnrollment(models.Model):
     enrolled_by=models.ForeignKey(
         AchieveUser, on_delete=models.CASCADE, related_name="enrolled_by", default=None
     )
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['course', 'user'], name='unique_enrollment')
+        ]
 
 class Course(models.Model):
     creator = models.ForeignKey(

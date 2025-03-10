@@ -46,9 +46,10 @@ interface CourseContextProps {
     user_id,
   }: {
     course_id: number;
-    user_id: number|null;
+    user_id: number | null;
   }) => Promise<void>;
   unenrollUser: (course_id: number, user_id: number) => Promise<void>;
+  fetchEnrollments: (courseId: number) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
@@ -161,9 +162,37 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
     [courses, accessToken]
   );
 
+  const fetchEnrollments = useCallback(
+    async (courseId: number) => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${ENDPOINT}/get_enrollments/${courseId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        setEnrollments(response.data.enrollments);
+      } catch {
+        setError("Failed to fetch enrollments.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken]
+  );
+
   const enrollUser = useCallback(
-    async ({ course_id, user_id }: { course_id: number; user_id: number|null }) => {
-      if (!course_id || user_id) {
+    async ({
+      course_id,
+      user_id,
+    }: {
+      course_id: number;
+      user_id: number | null;
+    }) => {
+      if (!course_id || !user_id) {
         alert("Course and User are requiered to perfom enrollment");
         return;
       }
@@ -172,13 +201,13 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         const formData = new FormData();
         formData.append("course_id", course_id.toString());
-        if (user_id)formData.append("user_id", user_id.toString());
+        if (user_id) formData.append("user_id", user_id.toString());
         const response = await axios.post(`${ENDPOINT}/enroll_user`, formData, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
-        }); 
+        });
         setEnrollments((prevEnrollments) => [
           ...(prevEnrollments || []),
           response.data,
@@ -188,10 +217,10 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           error.response?.data?.message || error.message || "Unknown error";
         console.error(`Error enrolling user: ${errorMessage}`);
         alert(`An error occurred while enrolling user: ${errorMessage}`);
-      }finally{
+      } finally {
         setLoading(false);
       }
-    },  
+    },
     [accessToken]
   );
 
@@ -215,7 +244,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           error.response?.data?.message || error.message || "Unknown error";
         console.error(`Error unenrolling user: ${errorMessage}`);
         alert(`An error occurred while unenrolling user: ${errorMessage}`);
-      }finally{
+      } finally {
         setLoading(false);
       }
     },
@@ -227,6 +256,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
       value={{
         courses,
         enrollments,
+        fetchEnrollments,
         enrollUser,
         unenrollUser,
         deleteCourse,

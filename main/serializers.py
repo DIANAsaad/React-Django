@@ -50,21 +50,21 @@ class RefreshTokenSerializer(serializers.Serializer):
 class EnrollmentSerializer(serializers.ModelSerializer):
     course_id = serializers.IntegerField()
     user_id = serializers.IntegerField()
+    user = AchieveUserSerializer(read_only=True)
+    enrolled_by = AchieveUserSerializer(read_only=True)
 
     class Meta:
         model = CourseEnrollment
-        fields = ["id", "course_id", "user_id", "enrolled_at", "enrolled_by"]
+        fields = ["id", "course_id", "user", "user_id","enrolled_at", "enrolled_by"]
 
     def create(self, validated_data):
         request = self.context["request"]
         course_id = validated_data.pop("course_id")
         user_id = validated_data.pop("user_id")
+        user = get_object_or_404(AchieveUser, id=user_id)
         enrolled_by = request.user
         enrollment = CourseEnrollment.objects.create(
-            course_id=course_id,
-            user_id=user_id,
-            enrolled_by=enrolled_by,
-            **validated_data
+            course_id=course_id, user=user, enrolled_by=enrolled_by, **validated_data
         )
         return enrollment
 
