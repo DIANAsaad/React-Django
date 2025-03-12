@@ -225,10 +225,10 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const unenrollUser = useCallback(
-    async (course_id: number, user_id: number) => {
+    async (enrollment_id:number) => {
       try {
         setLoading(true);
-        await axios.delete(`${ENDPOINT}/unroll_user/${course_id}/${user_id}`, {
+        await axios.delete(`${ENDPOINT}/unenroll_user/${enrollment_id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -236,7 +236,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         });
         setEnrollments((prevEnrollments) =>
           prevEnrollments?.filter(
-            (e) => e.course_id !== course_id && e.user.id != user_id
+            (e) => e.id!==enrollment_id
           )
         );
       } catch (error: any) {

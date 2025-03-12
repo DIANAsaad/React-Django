@@ -31,7 +31,8 @@ from main.views import (
     DeleteCommentView,
     EnrollUserView,
     GetEnrollmentInfoView,
-    GetAllUsersView
+    GetAllUsersView,
+    UnenrollUserView
 )
 
 
@@ -122,4 +123,5 @@ urlpatterns = [
         name="delete_comment",
     ),
     path("enroll_user", EnrollUserView.as_view(), name="enroll_user"),
+    path("unenroll_user/<int:enrollment_id>", UnenrollUserView.as_view(), name="unenroll_user")
 ]

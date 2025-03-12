@@ -160,13 +160,16 @@ class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-
-        courses = Course.objects.all()
+        user=request.user
+        enrollments=CourseEnrollment.objects.filter(user=user).all().prefetch_related("courses")
+        courses=[]
+        for enrollment in enrollments:
+            courses.append(enrollment.course)
         data = {
             "courses": CourseSerializer(courses, many=True).data,
         }
-
         return Response(data, status=status.HTTP_200_OK)
+
 
 
 # Course page is where we have the lessons of each course (modules)
@@ -679,3 +682,16 @@ class EnrollUserView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UnenrollUserView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def delete(self, request, *args, **kwargs):
+        enrollment_id=kwargs.get("enrollment_id")
+
+        if not enrollment_id:
+            return Response({'details':"Enrollment ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            return delete_object(request, app_label="main", model_name="CourseEnrollment", object_id=enrollment_id)
+        except CourseEnrollment.DoesNotExist:
+            raise NotFound(detail="Enrollment not found",code=status.HTTP_404_NOT_FOUND)

@@ -6,7 +6,7 @@ import BaseWrapper from "../base/BaseWrapper";
 import "../../styles/EnrolledUsers.css";
 
 const EnrollUser: React.FC = () => {
-  const { enrollUser } = useCourseContext();
+  const { enrollUser, enrollments } = useCourseContext();
   const { fetchUsers, users } = useAuth(); // Initialize users as an empty array
   const { courseId } = useParams<{ courseId: string }>();
   const [formData, setFormData] = useState<{
@@ -51,9 +51,15 @@ const EnrollUser: React.FC = () => {
               Select a user
             </option>
             {users?.map((user) => (
-              <option key={user.id} value={user.id}>
-                {`${user.first_name} ${user.last_name} (${user.email})`}
-              </option>
+              enrollments?.some((enrollment) => enrollment.user.id === user.id) ? (
+                <option key={user.id} disabled>
+                  {`${user.first_name} ${user.last_name} (${user.email})`}
+                </option>
+              ) : (
+                <option key={user.id} value={user.id}>
+                  {`${user.first_name} ${user.last_name} (${user.email})`}
+                </option>
+              )
             ))}
           </select>
         </div>
@@ -66,7 +72,7 @@ const EnrollUser: React.FC = () => {
 };
 
 const EnrolledUsers: React.FC = () => {
-  const { enrollments, fetchEnrollments } = useCourseContext();
+  const { enrollments, fetchEnrollments, unenrollUser } = useCourseContext();
   const { courseId } = useParams<{ courseId: string }>();
   useEffect(() => {
     fetchEnrollments(Number(courseId));
@@ -83,6 +89,7 @@ const EnrolledUsers: React.FC = () => {
             <th>User Email</th>
             <th>Enrolled By</th>
             <th>Enrolled At</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -93,6 +100,14 @@ const EnrolledUsers: React.FC = () => {
               <td>{enrollment.user.email}</td>
               <td>{`${enrollment.enrolled_by.first_name} ${enrollment.enrolled_by.last_name}`}</td>
               <td>{new Date(enrollment.enrolled_at).toLocaleString()}</td>
+              <td>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => unenrollUser(Number(enrollment.id))}
+                >
+                  Unenroll
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
