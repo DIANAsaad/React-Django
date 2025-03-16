@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
+    "channels",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -99,6 +100,13 @@ TEMPLATES = [
     },
 ]
 
+
+ASGI_APPLICATION = 'LMS.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer", 
+    },
+}
 WSGI_APPLICATION = "LMS.wsgi.application"
 
 REST_FRAMEWORK = {

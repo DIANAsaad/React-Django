@@ -156,20 +156,20 @@ class GetEnrollmentInfoView(APIView):
             )
 
 
+# Prefecth key is used as a reverese key. (Written in modules, used in course to access all its module.), here its different, im trying to acces
+## using prefetch related, a direct attribute from the model that contains the foreign key itself.
+
 class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        user=request.user
-        enrollments=CourseEnrollment.objects.filter(user=user).all().prefetch_related("courses")
-        courses=[]
-        for enrollment in enrollments:
-            courses.append(enrollment.course)
+        user = request.user
+        enrollments = CourseEnrollment.objects.filter(user=user).select_related("course")
+        courses = [enrollment.course for enrollment in enrollments]
         data = {
             "courses": CourseSerializer(courses, many=True).data,
         }
         return Response(data, status=status.HTTP_200_OK)
-
 
 
 # Course page is where we have the lessons of each course (modules)
@@ -381,6 +381,7 @@ class AddCourseView(APIView):
         serializer = CourseSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
+            CourseEnrollment.objects.create(user=request.user,enrolled_by=request.user, course_id=serializer.data["id"])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

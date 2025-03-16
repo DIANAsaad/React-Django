@@ -52,10 +52,10 @@ class AchieveUser(AbstractUser):
 
 class CourseEnrollment(models.Model):
     course = models.ForeignKey(
-        "Course", on_delete=models.CASCADE, related_name="enrolled_users"
+        "Course", on_delete=models.CASCADE, 
     )
     user = models.ForeignKey(
-        AchieveUser, on_delete=models.CASCADE, related_name="enrolled_courses"
+        AchieveUser, on_delete=models.CASCADE, 
     )
     enrolled_at = models.DateTimeField(default=timezone.now)
     enrolled_by=models.ForeignKey(
