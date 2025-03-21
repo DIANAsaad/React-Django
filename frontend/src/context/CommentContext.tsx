@@ -4,6 +4,7 @@ import {
   createContext,
   ReactNode,
   useContext,
+  useEffect,
 } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
@@ -112,6 +113,28 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8000/ws/");
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+     if (data.type === "comment.created") {
+        // Handle new comment created message
+        setComments((prevComments) =>
+          handleNewComment(prevComments || [], normalizeComment(data.comment))
+        );
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
+
   // fetch comments when in lesson
   const fetchComments = useCallback(
     async (lessonId: number) => {
@@ -189,7 +212,10 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         await axios.delete(`${ENDPOINT}/delete_comment/${commentId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
-        const removeComment = (comments: CommentWithReplies[], commentId: number): CommentWithReplies[] => {
+        const removeComment = (
+          comments: CommentWithReplies[],
+          commentId: number
+        ): CommentWithReplies[] => {
           return comments.reduce((acc, comment) => {
             if (comment.id === commentId) {
               return acc;
@@ -205,7 +231,6 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         };
 
         setComments((prevComments) => removeComment(prevComments, commentId));
-      
       } catch (error) {
         console.error(`Error deleting comment:`, error);
         alert(

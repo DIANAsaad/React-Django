@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 
 class AppConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.group_name = "lessons"
+        self.group_name = "LMS"
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
 
@@ -17,11 +17,16 @@ class AppConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.group_name,
             {
-                "type": "lesson_message",
+                "type": "main_message",
                 "message": message,
             }
         )
-
-    async def lesson_message(self, event):
+    
+    async def comment_created(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'message': message
+        }))
+    async def message(self, event):
         message = event["message"]
         await self.send(text_data=json.dumps({"message": message}))

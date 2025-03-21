@@ -39,7 +39,8 @@ from rest_framework.exceptions import NotFound
 from .permissions import IsStaffOrIsInstructor, IsCommentorOrHasPerms
 import json
 from django.db.models import Q
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 # Authentication & Authorization
 
@@ -638,7 +639,17 @@ class AddCommentView(APIView):
 
         serializer = CommentSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            serializer.save()
+            comment=serializer.save()
+             # Send WebSocket message
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "courses_group",  # Group name
+                {
+                    "type": "course.created",
+                    "message": f"New course created: {comment.comment}"
+                }
+            )
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

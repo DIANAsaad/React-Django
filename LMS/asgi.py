@@ -17,10 +17,10 @@ from main import routing
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LMS.settings')
 lms_asgi_application = get_asgi_application()
 application = ProtocolTypeRouter({
-    "http": lms_asgi_application(),
+    "http": lms_asgi_application,
     "websocket": AllowedHostsOriginValidator(
         AuthMiddlewareStack(
-            URLRouter(routing.websocket_urlspatterns)
+            URLRouter(routing.websocket_urlpatterns)
         )
     ),
 })
