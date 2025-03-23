@@ -1,5 +1,7 @@
 /* SIDEBAR*/
 
+/* SIDEBAR*/
+
 .sidebar {
   background-color: #01284e;
   padding-top: 30px;
@@ -7,6 +9,7 @@
   padding-bottom: 20px;
   overflow-y: scroll;
   min-height: 100vh;
+  order: 1; /* Default order */
 }
 
 .sidebar h4 {
@@ -49,4 +52,54 @@
   display: block;
   padding: 10px 0;
   font-size: 1rem;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+    height: auto;
+    position: relative;
+    min-height: auto;
+    order: 2; /* Change order on small screens */
+  }
+
+  .sidebar h4 {
+    font-size: 1rem;
+  }
+
+  .sidebar a {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+  }
+
+  .sidebar ul li {
+    font-size: 0.9rem;
+  }
+
+  .sidebar ul li a {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    min-height: auto;
+  }
+
+  .sidebar a {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+
+  .sidebar ul li {
+    font-size: 0.8rem;
+  }
+
+  .sidebar ul li a {
+    font-size: 0.8rem;
+  }
 }

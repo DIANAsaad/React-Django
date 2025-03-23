@@ -13,6 +13,7 @@
   top: -15px;
   flex: 1;
   padding: 30px;
+  order: 2;
 }
 
 .content-header {
@@ -24,4 +25,15 @@
 .content-children {
   flex: 1;
   padding: 2px;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 576px) {
+  .container-base {
+    flex-direction: column;
+  }
+
+  .content-base {
+    order: 1; /* Change order on small screens */
+  }
 }
