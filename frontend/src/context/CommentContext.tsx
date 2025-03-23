@@ -113,27 +113,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8000/ws/");
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-     if (data.type === "comment.created") {
-        // Handle new comment created message
-        setComments((prevComments) =>
-          handleNewComment(prevComments || [], normalizeComment(data.comment))
-        );
-      }
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, []);
+  
 
   // fetch comments when in lesson
   const fetchComments = useCallback(
@@ -182,15 +162,13 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
             formData.append(`images`, image);
           });
         if (reply_to_id) formData.append("reply_to_id", reply_to_id.toString());
-        const response = await axios.post(`${ENDPOINT}/add_comment`, formData, {
+         await axios.post(`${ENDPOINT}/add_comment`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setComments((prevComments) =>
-          handleNewComment(prevComments || [], normalizeComment(response.data))
-        );
+      
       } catch (error: any) {
         console.error(
           "Error adding comment:",
@@ -240,6 +218,36 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
     },
     [comments, accessToken]
   );
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8000/ws/");
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("dataSent",data);
+     if (data.type === "comment_created") {
+        // Handle new comment created message
+        setComments((prevComments) => {
+          // Check if the comment already exists
+          const commentExists = prevComments.some(
+            (comment) => comment.id === data.message.id
+          );
+          if (commentExists) {
+            return prevComments;
+          }
+          return handleNewComment(prevComments || [], normalizeComment(data.message));
+        });
+      }else{
+        console.log("not a commetn created message");
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+      // Cleanup WebSocket connection when the component unmounts or dependencies change
+  }, []);
 
   return (
     <CommentContext.Provider

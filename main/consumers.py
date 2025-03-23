@@ -25,6 +25,7 @@ class AppConsumer(AsyncWebsocketConsumer):
     async def comment_created(self, event):
         message = event['message']
         await self.send(text_data=json.dumps({
+            "type":"comment_created",
             'message': message
         }))
     async def message(self, event):

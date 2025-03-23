@@ -643,14 +643,14 @@ class AddCommentView(APIView):
              # Send WebSocket message
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
-                "courses_group",  # Group name
+                "LMS",  # Group name
                 {
-                    "type": "course.created",
-                    "message": f"New course created: {comment.comment}"
+                    "type": "comment_created",
+                    "message": serializer.data
                 }
             )
             
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
