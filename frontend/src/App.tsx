@@ -7,6 +7,7 @@ import ModulePage from "./components/course/modules/ModulePage";
 import FlashcardPage from "./components/course/modules/flashcard/FlashcardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext";
 import { CourseProvider } from "./context/CourseContext";
 import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
@@ -24,6 +25,7 @@ import CommentPage from "./components/course/modules/comment/CommentPage";
 import EnrolledUser from "./components/course/EnrolledUsers";
 
 const App: React.FC = () => {
+  const {user}=useAuth();
   return (
     <Router>
       {/* Routes to handle different pages */}
@@ -53,7 +55,7 @@ const App: React.FC = () => {
           <Route
           path="/course/:courseId/enrolledUsers"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute isStaff={user?.is_staff} isInstructor={user?.is_instructor}>
               <EnrolledUser />
             </ProtectedRoute>
           }
@@ -97,7 +99,7 @@ const App: React.FC = () => {
         <Route
           path="/course/:courseId/module/:moduleId/add-quiz"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute >
               <AddQuiz />
             </ProtectedRoute>
           }

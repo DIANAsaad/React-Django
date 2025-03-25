@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import axios, { AxiosError } from 'axios';
 import { ReactNode } from 'react';
 import useLocalStorage from '../hooks/use-local-storage';
+import usePrevious from '../hooks/use-previous';
 
 const TOKEN_EXPIRATION_TIME = 86_400_000;
 
@@ -25,6 +26,7 @@ interface AuthContextType {
   users: AchieveUser[];
   isLoading: boolean; // For indicating blocking/loading state
   accessToken: string | null;
+  registerSocketHandler: (event: string, handler: (data: unknown) => void) => void;
 }
 
 // Define AuthProviderProps
@@ -35,6 +37,9 @@ interface AuthProviderProps {
 // Create AuthContext
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+//SOCKET HANDLER
+type SocketHandlers = Record<string, (data: any) => void>;
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [accessToken, setAccessToken] = useLocalStorage('access_token', localStorage.getItem('access_token'));
   const [refreshToken, setRefreshToken] = useLocalStorage('refresh_token', localStorage.getItem('refresh_token'));
@@ -43,6 +48,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  const [socketHandlers, setSocketHandlers] = useState<SocketHandlers>({});
 
   const fetchAndSetUser = useCallback(async () => {
     if (!accessToken) return;
@@ -56,6 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
     }
   }, [accessToken]);
+
   const fetchUsers = useCallback(async () => {
     if (!accessToken) return;
     try {
@@ -69,6 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Failed to fetch users');
     }
   }, [accessToken]);
+
   const refreshAccessToken = useCallback(async () => {
     if (!refreshToken) return;
 
@@ -106,10 +115,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     ws.onopen = () => {
       console.log('Connected to WebSocket');
-    };
-
-    ws.onmessage = event => {
-      console.log('Message received:', event.data);
     };
 
     ws.onerror = error => {
@@ -162,8 +167,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await refreshAccessToken();
           // Then fetch user
           await fetchAndSetUser();
-          // Connect to WebSocket
-          await connectSocket();
         } catch (error) {
           console.error('Error in immediate refresh/fetch:', error);
         } finally {
@@ -175,8 +178,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
+
+  const previousUser = usePrevious(user);
+
+  useEffect(() => {
+    if (user?.id !== previousUser?.id) {
+      connectSocket();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = event => {
+        const data = JSON.parse(event.data);
+        const handler = socketHandlers[data.type];
+        if (handler) {
+          handler(data.message);
+        }
+      };
+    }
+  }, [socket, socketHandlers]);
 
   useEffect(() => {
     let refreshInterval: ReturnType<typeof setInterval> | null = null;
@@ -212,7 +235,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: !!user,
         user,
         isLoading,
-        accessToken
+        accessToken,
+        registerSocketHandler: (event, handler) => {
+          setSocketHandlers(prevHandlers => ({
+            ...prevHandlers,
+            [event]: handler
+          }));
+        }
       }}
     >
       {children}
@@ -220,9 +249,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-/**
- * Custom hook to consume AuthContext
- */
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

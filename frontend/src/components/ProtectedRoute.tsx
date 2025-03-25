@@ -4,16 +4,20 @@ import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
   children: JSX.Element;
+  isStaff?:boolean;
+  isInstructor?:boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children , isStaff, isInstructor}) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
-
-  return children;
+  else if(isStaff===false&&isInstructor===false){
+    return <Navigate to="/not-authorized" replace />;
+  }else{
+  return children;}
 };
 
 export default ProtectedRoute; 

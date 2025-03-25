@@ -48,7 +48,7 @@ interface CourseContextProps {
     course_id: number;
     user_id: number | null;
   }) => Promise<void>;
-  unenrollUser: (course_id: number, user_id: number) => Promise<void>;
+  unenrollUser: (enrollment_id:number) => Promise<void>;
   fetchEnrollments: (courseId: number) => Promise<void>;
   loading: boolean;
   error: string | null;
