@@ -10,7 +10,7 @@ from main.models import (
     QuizAttempt,
     Comment,
     CourseEnrollment,
-    AchieveUser
+    AchieveUser,
 )
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
@@ -102,15 +102,14 @@ class GetUserView(APIView):
         data["is_staff"] = request.user.is_staff
         data["is_instructor"] = request.user.groups.filter(name="Instructors").exists()
         return Response(data)
-    
-class GetAllUsersView(APIView):
-    permission_classes=[IsAuthenticated, IsStaffOrIsInstructor]
 
-    def get(self, request,*args,**kwargs):
-        users=AchieveUser.objects.all()
-        data={
-            "users":AchieveUserSerializer(users, many=True).data
-        }
+
+class GetAllUsersView(APIView):
+    permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
+
+    def get(self, request, *args, **kwargs):
+        users = AchieveUser.objects.all()
+        data = {"users": AchieveUserSerializer(users, many=True).data}
         return Response(data)
 
 
@@ -160,12 +159,15 @@ class GetEnrollmentInfoView(APIView):
 # Prefecth key is used as a reverese key. (Written in modules, used in course to access all its module.), here its different, im trying to acces
 ## using prefetch related, a direct attribute from the model that contains the foreign key itself.
 
+
 class HomePageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        enrollments = CourseEnrollment.objects.filter(user=user).select_related("course")
+        enrollments = CourseEnrollment.objects.filter(user=user).select_related(
+            "course"
+        )
         courses = [enrollment.course for enrollment in enrollments]
         data = {
             "courses": CourseSerializer(courses, many=True).data,
@@ -382,7 +384,11 @@ class AddCourseView(APIView):
         serializer = CourseSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
-            CourseEnrollment.objects.create(user=request.user,enrolled_by=request.user, course_id=serializer.data["id"])
+            CourseEnrollment.objects.create(
+                user=request.user,
+                enrolled_by=request.user,
+                course_id=serializer.data["id"],
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -639,17 +645,14 @@ class AddCommentView(APIView):
 
         serializer = CommentSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            comment=serializer.save()
-             # Send WebSocket message
+            comment = serializer.save()
+            # Send WebSocket message
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 "LMS",  # Group name
-                {
-                    "type": "comment_created",
-                    "message": serializer.data
-                }
+                {"type": "comment_created", "message": serializer.data},
             )
-            
+
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -666,12 +669,21 @@ class DeleteCommentView(APIView):
             )
         try:
             comment = Comment.objects.get(id=comment_id)
+
         except Comment.DoesNotExist:
             raise NotFound(detail="Comment not found.", code=status.HTTP_404_NOT_FOUND)
 
         # Check permissions, raise exception in case of permission denial
         self.check_object_permissions(request, comment)
         comment.delete()
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "LMS",  
+            {
+                "type": "comment_deleted",
+                "message": comment_id,
+            },
+        )
         return Response(
             {"detail": "Comment deleted successfully"},
             status=status.HTTP_204_NO_CONTENT,
@@ -695,15 +707,26 @@ class EnrollUserView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UnenrollUserView(APIView):
     permission_classes = [IsAuthenticated, IsStaffOrIsInstructor]
 
     def delete(self, request, *args, **kwargs):
-        enrollment_id=kwargs.get("enrollment_id")
+        enrollment_id = kwargs.get("enrollment_id")
 
         if not enrollment_id:
-            return Response({'details':"Enrollment ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"details": "Enrollment ID is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         try:
-            return delete_object(request, app_label="main", model_name="CourseEnrollment", object_id=enrollment_id)
+            return delete_object(
+                request,
+                app_label="main",
+                model_name="CourseEnrollment",
+                object_id=enrollment_id,
+            )
         except CourseEnrollment.DoesNotExist:
-            raise NotFound(detail="Enrollment not found",code=status.HTTP_404_NOT_FOUND)
+            raise NotFound(
+                detail="Enrollment not found", code=status.HTTP_404_NOT_FOUND
+            )

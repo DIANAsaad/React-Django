@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+
 class AppConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.group_name = "LMS"
@@ -19,15 +20,21 @@ class AppConsumer(AsyncWebsocketConsumer):
             {
                 "type": "main_message",
                 "message": message,
-            }
+            },
         )
-    
+
     async def comment_created(self, event):
-        message = event['message']
-        await self.send(text_data=json.dumps({
-            "type":"comment_created",
-            'message': message
-        }))
+        message = event["message"]
+        await self.send(
+            text_data=json.dumps({"type": "comment_created", "message": message})
+        )
+
+    async def comment_deleted(self, event):
+        message = event["message"]
+        await self.send(
+            text_data=json.dumps({"type": "comment_deleted", "message": message})
+        )
+
     async def message(self, event):
         message = event["message"]
         await self.send(text_data=json.dumps({"message": message}))

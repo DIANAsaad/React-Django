@@ -7,7 +7,7 @@ import ModulePage from "./components/course/modules/ModulePage";
 import FlashcardPage from "./components/course/modules/flashcard/FlashcardPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
-import { useAuth } from "./context/AuthContext";
+
 import { CourseProvider } from "./context/CourseContext";
 import { ModuleProvider } from "./context/ModuleContext";
 import { FlashcardProvider } from "./context/FlashcardContext";
@@ -23,9 +23,9 @@ import QuizPage from "./components/course/modules/quiz/QuizPage";
 import ResultsPage from "./components/course/modules/quiz/ResultsPage";
 import CommentPage from "./components/course/modules/comment/CommentPage";
 import EnrolledUser from "./components/course/EnrolledUsers";
+import NotAuthorized from "./components/NotAuthorized";
 
 const App: React.FC = () => {
-  const {user}=useAuth();
   return (
     <Router>
       {/* Routes to handle different pages */}
@@ -52,10 +52,10 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-          <Route
+        <Route
           path="/course/:courseId/enrolledUsers"
           element={
-            <ProtectedRoute isStaff={user?.is_staff} isInstructor={user?.is_instructor}>
+            <ProtectedRoute instructorOrStaff={true}>
               <EnrolledUser />
             </ProtectedRoute>
           }
@@ -82,7 +82,7 @@ const App: React.FC = () => {
         <Route
           path="/course/:courseId/module/:moduleId/add-flashcard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute instructorOrStaff={true}>
               <AddFlashcard />
             </ProtectedRoute>
           }
@@ -91,7 +91,7 @@ const App: React.FC = () => {
         <Route
           path="/course/:courseId/module/:moduleId/add-external-link"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute instructorOrStaff={true}>
               <AddExtrenalLink />
             </ProtectedRoute>
           }
@@ -99,7 +99,7 @@ const App: React.FC = () => {
         <Route
           path="/course/:courseId/module/:moduleId/add-quiz"
           element={
-            <ProtectedRoute >
+            <ProtectedRoute instructorOrStaff={true}>
               <AddQuiz />
             </ProtectedRoute>
           }
@@ -108,7 +108,7 @@ const App: React.FC = () => {
         <Route
           path="/course/:courseId/module/:moduleId/external-link/:linkId/edit"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute instructorOrStaff={true}>
               <EditExtrenalLink />
             </ProtectedRoute>
           }
@@ -133,7 +133,16 @@ const App: React.FC = () => {
           path="/course/:courseId/module/:moduleId/add-comment"
           element={
             <ProtectedRoute>
-              <CommentPage/>
+              <CommentPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/notAuthorized"
+          element={
+            <ProtectedRoute>
+              <NotAuthorized/>
             </ProtectedRoute>
           }
         />

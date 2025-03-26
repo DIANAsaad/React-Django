@@ -158,22 +158,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         await axios.delete(`${ENDPOINT}/delete_comment/${commentId}`, {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
-        const removeComment = (comments: CommentWithReplies[], commentId: number): CommentWithReplies[] => {
-          return comments.reduce((acc, comment) => {
-            if (comment.id === commentId) {
-              return acc;
-            }
-            return [
-              ...acc,
-              {
-                ...comment,
-                replies: removeComment(comment.replies, commentId)
-              }
-            ];
-          }, [] as CommentWithReplies[]);
-        };
-
-        setComments(prevComments => removeComment(prevComments, commentId));
+    
       } catch (error) {
         console.error(`Error deleting comment:`, error);
         alert(`An error occurred while deleting the comment. Please try again.`);
@@ -193,6 +178,25 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         }
         return handleNewComment(prevComments || [], normalizeComment(message));
       });
+    });
+
+    registerSocketHandler('comment_deleted', (message: any) => {
+      const removeComment = (comments: CommentWithReplies[],message:any): CommentWithReplies[] => {
+        return comments.reduce((acc, comment) => {
+          if (comment.id === message) {
+            return acc;
+          }
+          return [
+            ...acc,
+            {
+              ...comment,
+              replies: removeComment(comment.replies, message)
+            }
+          ];
+        }, [] as CommentWithReplies[]);
+      };
+
+      setComments(prevComments => removeComment(prevComments, message));
     });
   }, []);
 
