@@ -132,7 +132,7 @@ const CommentPage: React.FC = () => {
                       </div>
                       {replyToCommentId === reply.id && (
                         <div className="reply-form">
-                          <AddComment reply_to_id={reply.reply_to_id} />
+                          <AddComment reply_to_id={comment.id} />
                         </div>
                       )}
                     </div>

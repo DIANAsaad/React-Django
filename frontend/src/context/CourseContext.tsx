@@ -48,7 +48,7 @@ interface CourseContextProps {
     course_id: number;
     user_id: number | null;
   }) => Promise<void>;
-  unenrollUser: (enrollment_id:number) => Promise<void>;
+  unenrollUser: (enrollment_id: number) => Promise<void>;
   fetchEnrollments: (courseId: number) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -71,10 +71,9 @@ const normalizeCourse = (course: Course) => ({
 const normalizeCourses = (courses: Course[]) => {
   return courses.map(normalizeCourse);
 };
-
 // Provider component
 export const CourseProvider = ({ children }: { children: ReactNode }) => {
-  const { accessToken } = useAuth();
+  const { accessToken, registerSocketHandler } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -202,16 +201,12 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         const formData = new FormData();
         formData.append("course_id", course_id.toString());
         if (user_id) formData.append("user_id", user_id.toString());
-        const response = await axios.post(`${ENDPOINT}/enroll_user`, formData, {
+        await axios.post(`${ENDPOINT}/enroll_user`, formData, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setEnrollments((prevEnrollments) => [
-          ...(prevEnrollments || []),
-          response.data,
-        ]);
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message || error.message || "Unknown error";
@@ -225,7 +220,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const unenrollUser = useCallback(
-    async (enrollment_id:number) => {
+    async (enrollment_id: number) => {
       try {
         setLoading(true);
         await axios.delete(`${ENDPOINT}/unenroll_user/${enrollment_id}`, {
@@ -235,9 +230,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
           },
         });
         setEnrollments((prevEnrollments) =>
-          prevEnrollments?.filter(
-            (e) => e.id!==enrollment_id
-          )
+          prevEnrollments?.filter((e) => e.id !== enrollment_id)
         );
       } catch (error: any) {
         const errorMessage =
@@ -250,6 +243,20 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
     },
     [accessToken]
   );
+
+  useEffect(() => {
+    registerSocketHandler("enrollment_created", (message: any) => {
+      setEnrollments((prevEnrollments) => [
+        ...(prevEnrollments || []),
+        message.enrollment,
+      ]);
+
+      setCourses((prevCourses) => [
+        ...(prevCourses || []),
+        normalizeCourse(message.course),
+      ]);
+    });
+  }, []);
 
   return (
     <CourseContext.Provider

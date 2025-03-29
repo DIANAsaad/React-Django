@@ -23,18 +23,24 @@ class AppConsumer(AsyncWebsocketConsumer):
             },
         )
 
-    async def comment_created(self, event):
-        message = event["message"]
+    async def send_event(self, event_type, message):
+        """Helper method to send events to the WebSocket."""
         await self.send(
-            text_data=json.dumps({"type": "comment_created", "message": message})
+            text_data=json.dumps({"type": event_type, "message": message})
         )
+
+    async def comment_created(self, event):
+    
+        await self.send_event("comment_created", event.get("message", ""))
 
     async def comment_deleted(self, event):
-        message = event["message"]
-        await self.send(
-            text_data=json.dumps({"type": "comment_deleted", "message": message})
-        )
+
+        await self.send_event("comment_deleted", event.get("message", ""))
+
+    async def enrollment_created(self, event):
+
+        await self.send_event("enrollment_created", event.get("message", ""))
 
     async def message(self, event):
-        message = event["message"]
-        await self.send(text_data=json.dumps({"message": message}))
+    
+        await self.send_event("message", event.get("message", ""))

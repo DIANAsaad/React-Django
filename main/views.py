@@ -645,7 +645,7 @@ class AddCommentView(APIView):
 
         serializer = CommentSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            comment = serializer.save()
+            serializer.save()
             # Send WebSocket message
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
@@ -678,7 +678,7 @@ class DeleteCommentView(APIView):
         comment.delete()
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
-            "LMS",  
+            "LMS",
             {
                 "type": "comment_deleted",
                 "message": comment_id,
@@ -703,6 +703,13 @@ class EnrollUserView(APIView):
         )
         if serializer.is_valid():
             serializer.save()
+            course = Course.objects.get(id=serializer.data["course_id"])
+            course = CourseSerializer(course).data
+            channel_layer = get_channel_layer()
+            message = {"course": course, "enrollment": serializer.data}
+            async_to_sync(channel_layer.group_send)(
+                "LMS", {"type": "enrollment_created", "message": message}
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

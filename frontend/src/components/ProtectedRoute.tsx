@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   } 
-  else if (instructorOrStaff && !(user?.is_instructor===instructorOrStaff || user?.is_staff===instructorOrStaff)) {
+  else if (instructorOrStaff && !(user?.is_instructor|| user?.is_staff)) {
     return <Navigate to="/notAuthorized"/>;
   } 
   else {return children;}
