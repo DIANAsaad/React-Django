@@ -1,6 +1,13 @@
-import { useCallback, useState, createContext, ReactNode, useContext, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from './AuthContext';
+import {
+  useCallback,
+  useState,
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+} from "react";
+import axios from "axios";
+import { useAuth } from "./AuthContext";
 
 // Define the shape of the comment (Discussion Forum)
 export interface Comment {
@@ -20,7 +27,7 @@ export interface Comment {
   }[];
 }
 
-interface CommentWithReplies extends Omit<Comment, 'replies'> {
+interface CommentWithReplies extends Omit<Comment, "replies"> {
   replies: CommentWithReplies[];
 }
 
@@ -39,50 +46,61 @@ interface CommentContextProps {
   error: string | null;
 }
 
-const CommentContext = createContext<CommentContextProps | undefined>(undefined);
-const ENDPOINT = 'http://localhost:8000';
+const CommentContext = createContext<CommentContextProps | undefined>(
+  undefined
+);
+const ENDPOINT = "http://localhost:8000";
 
 const normalizeComment = (comment: Comment): Comment => ({
   ...comment,
-  images: comment.images.map(image => ({
+  images: comment.images.map((image) => ({
     image: image.image
       ? image.image.toString().startsWith(ENDPOINT)
         ? image.image
         : `${ENDPOINT}${image.image}`
-      : null
-  }))
+      : null,
+  })),
 });
 
 const normalizeComments = (comments: Comment[]) => {
   return comments.map(normalizeComment);
 };
-const translateCommentsToCommentWithReplies = (comments: Comment[]): CommentWithReplies[] => {
+const translateCommentsToCommentWithReplies = (
+  comments: Comment[]
+): CommentWithReplies[] => {
   const buildCommentWithReplies = (comment: Comment): CommentWithReplies => {
-    const replies = comments.filter(c => c.reply_to_id === comment.id).map(buildCommentWithReplies);
+    const replies = comments
+      .filter((c) => c.reply_to_id === comment.id)
+      .map(buildCommentWithReplies);
     return {
       ...comment,
-      replies
+      replies,
     };
   };
 
-  return comments.filter(c => c.reply_to_id === null).map(buildCommentWithReplies);
+  return comments
+    .filter((c) => c.reply_to_id === null)
+    .map(buildCommentWithReplies);
 };
 
-const handleNewComment = (comments: CommentWithReplies[], newComment: Comment): CommentWithReplies[] => {
+const handleNewComment = (
+  comments: CommentWithReplies[],
+  newComment: Comment
+): CommentWithReplies[] => {
   const commentWithReplies = {
     ...newComment,
-    replies: []
+    replies: [],
   };
 
   if (newComment.reply_to_id === null) {
     return [commentWithReplies, ...comments];
   }
 
-  return comments.map(comment => {
+  return comments.map((comment) => {
     if (comment.id === newComment.reply_to_id) {
       return {
         ...comment,
-        replies: [...comment.replies, commentWithReplies]
+        replies: [...comment.replies, commentWithReplies],
       };
     }
     return comment;
@@ -90,7 +108,7 @@ const handleNewComment = (comments: CommentWithReplies[], newComment: Comment): 
 };
 
 export const CommentProvider = ({ children }: { children: ReactNode }) => {
-  const { accessToken, registerSocketHandler } = useAuth();
+  const { accessToken, registerSocketHandler, user } = useAuth();
   const [comments, setComments] = useState<CommentWithReplies[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,17 +117,21 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
   const fetchComments = useCallback(
     async (lessonId: number) => {
       if (!accessToken) {
-        setError('No access token available');
+        setError("No access token available");
         return;
       }
       try {
         setLoading(true);
         const response = await axios.get(`${ENDPOINT}/comments/${lessonId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` }
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
-        setComments(translateCommentsToCommentWithReplies(normalizeComments(response.data.comments ?? [])));
+        setComments(
+          translateCommentsToCommentWithReplies(
+            normalizeComments(response.data.comments ?? [])
+          )
+        );
       } catch (err) {
-        setError('Failed to fetch comments');
+        setError("Failed to fetch comments");
       } finally {
         setLoading(false);
       }
@@ -122,7 +144,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
       lesson_id,
       comment,
       images,
-      reply_to_id
+      reply_to_id,
     }: {
       lesson_id: number;
       comment: string;
@@ -131,22 +153,29 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
     }) => {
       try {
         const formData = new FormData();
-        formData.append('lesson_id', lesson_id.toString());
-        formData.append('comment', comment);
+        formData.append("lesson_id", lesson_id.toString());
+        formData.append("comment", comment);
         if (images)
-          images.forEach(image => {
+          images.forEach((image) => {
             formData.append(`images`, image);
           });
-        if (reply_to_id) formData.append('reply_to_id', reply_to_id.toString());
+        if (reply_to_id) formData.append("reply_to_id", reply_to_id.toString());
         await axios.post(`${ENDPOINT}/add_comment`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${accessToken}`
-          }
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
       } catch (error: any) {
-        console.error('Error adding comment:', error.response?.data || error.message);
-        alert(`An error occurred while adding the comment: ${error.response?.data?.message || error.message}`);
+        console.error(
+          "Error adding comment:",
+          error.response?.data || error.message
+        );
+        alert(
+          `An error occurred while adding the comment: ${
+            error.response?.data?.message || error.message
+          }`
+        );
       }
     },
     [accessToken]
@@ -156,32 +185,52 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
     async (commentId: number) => {
       try {
         await axios.delete(`${ENDPOINT}/delete_comment/${commentId}`, {
-          headers: { Authorization: `Bearer ${accessToken}` }
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
-    
       } catch (error) {
         console.error(`Error deleting comment:`, error);
-        alert(`An error occurred while deleting the comment. Please try again.`);
+        alert(
+          `An error occurred while deleting the comment. Please try again.`
+        );
       }
     },
     [comments, accessToken]
   );
 
   useEffect(() => {
-   
-    registerSocketHandler('comment_created', (message: any) => {
-      setComments(prevComments => {
-        // Check if the comment already exists
-        const commentExists = prevComments.some(comment => comment.id === message.id);
-        if (commentExists) {
-          return prevComments;
+    registerSocketHandler("comment_created", (message: any) => {
+      comments.forEach((comment) => {
+        if (
+          (message.reply_to_id === comment.id &&
+            user?.id === comment.commentor.id) ||
+          user?.is_instructor ||
+          user?.is_staff ||
+          user?.id === message.commentor.id
+        ) {
+          setComments((prevComments) => {
+            // Check if the comment already exists
+            const commentExists = prevComments.some(
+              (comment) => comment.id === message.id
+            );
+            if (commentExists) {
+              return prevComments;
+            }
+            return handleNewComment(
+              prevComments || [],
+              normalizeComment(message)
+            );
+          });
+        } else {
+          return;
         }
-        return handleNewComment(prevComments || [], normalizeComment(message));
       });
     });
 
-    registerSocketHandler('comment_deleted', (message: any) => {
-      const removeComment = (comments: CommentWithReplies[],message:any): CommentWithReplies[] => {
+    registerSocketHandler("comment_deleted", (message: any) => {
+      const removeComment = (
+        comments: CommentWithReplies[],
+        message: any
+      ): CommentWithReplies[] => {
         return comments.reduce((acc, comment) => {
           if (comment.id === message) {
             return acc;
@@ -190,13 +239,13 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
             ...acc,
             {
               ...comment,
-              replies: removeComment(comment.replies, message)
-            }
+              replies: removeComment(comment.replies, message),
+            },
           ];
         }, [] as CommentWithReplies[]);
       };
 
-      setComments(prevComments => removeComment(prevComments, message));
+      setComments((prevComments) => removeComment(prevComments, message));
     });
   }, []);
 
@@ -208,7 +257,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         addComment,
         deleteComment,
         loading,
-        error
+        error,
       }}
     >
       {children}
@@ -219,7 +268,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
 export const useCommentContext = () => {
   const context = useContext(CommentContext);
   if (!context) {
-    throw new Error('useCommentContext must be used within a CommentProvider');
+    throw new Error("useCommentContext must be used within a CommentProvider");
   }
   return context;
 };
