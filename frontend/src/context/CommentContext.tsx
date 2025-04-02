@@ -199,31 +199,31 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     registerSocketHandler("comment_created", (message: any) => {
-      comments.forEach((comment) => {
-        if (
-          (message.reply_to_id === comment.id &&
-            user?.id === comment.commentor.id) ||
-          user?.is_instructor ||
-          user?.is_staff ||
-          user?.id === message.commentor.id
-        ) {
-          setComments((prevComments) => {
-            // Check if the comment already exists
-            const commentExists = prevComments.some(
-              (comment) => comment.id === message.id
-            );
-            if (commentExists) {
-              return prevComments;
-            }
-            return handleNewComment(
-              prevComments || [],
-              normalizeComment(message)
-            );
-          });
-        } else {
-          return;
-        }
-      });
+      const relevantComment = comments.find(
+        (comment) =>
+          message.reply_to_id === comment.id &&
+          user?.id === comment.commentor.id
+      );
+
+      if (
+        relevantComment ||
+        user?.is_instructor ||
+        user?.is_staff ||
+        user?.id === message.commentor.id
+      ) {
+        setComments((prevComments) => {
+          const commentExists = prevComments.some(
+            (comment) => comment.id === message.id
+          );
+          if (commentExists) {
+            return prevComments;
+          }
+          return handleNewComment(
+            prevComments || [],
+            normalizeComment(message)
+          );
+        });
+      }
     });
 
     registerSocketHandler("comment_deleted", (message: any) => {

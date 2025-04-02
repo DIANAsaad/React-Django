@@ -367,7 +367,7 @@ class GetCommentsView(APIView):
                 comment.replies.set(comment_replies)
                 strict_student_replies.extend(comment_replies)
 
-            combined_comments = list(comments) + list(strict_student_replies)
+            combined_comments = list(student_comments) + list(strict_student_replies)
         data = {"comments": CommentSerializer(combined_comments, many=True).data}
         return Response(data, status=status.HTTP_200_OK)
 
@@ -652,7 +652,6 @@ class AddCommentView(APIView):
                 "LMS",  # Group name
                 {"type": "comment_created", "message": serializer.data},
             )
-
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -707,8 +706,11 @@ class EnrollUserView(APIView):
             course = CourseSerializer(course).data
             channel_layer = get_channel_layer()
             message = {"course": course, "enrollment": serializer.data}
+            user_id = serializer.data["user_id"]
+            private_group_name = f"user_{user_id}"
             async_to_sync(channel_layer.group_send)(
-                "LMS", {"type": "enrollment_created", "message": message}
+                private_group_name,
+                {"type": "enrollment_created", "message": message},
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:

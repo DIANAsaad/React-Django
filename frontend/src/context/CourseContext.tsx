@@ -255,7 +255,9 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
         ...(prevCourses || []),
         normalizeCourse(message.course),
       ]);
+      console.log(message);
     });
+  
   }, []);
 
   return (
