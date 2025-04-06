@@ -705,12 +705,18 @@ class EnrollUserView(APIView):
             course = Course.objects.get(id=serializer.data["course_id"])
             course = CourseSerializer(course).data
             channel_layer = get_channel_layer()
-            message = {"course": course, "enrollment": serializer.data}
             user_id = serializer.data["user_id"]
-            private_group_name = f"user_{user_id}"
+            enrolled_by = serializer.data["enrolled_by"]
+            enrolled_by_id = enrolled_by["id"]
+            private_student_group_name = f"user_{user_id}"
+            private_teacher_group_name = f"user_{enrolled_by_id}"
             async_to_sync(channel_layer.group_send)(
-                private_group_name,
-                {"type": "enrollment_created", "message": message},
+                private_student_group_name,
+                {"type": "enrollment_created", "message": course},
+            )
+            async_to_sync(channel_layer.group_send)(
+                private_teacher_group_name,
+                {"type": "enrollment_details", "message": serializer.data},
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
@@ -729,12 +735,29 @@ class UnenrollUserView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         try:
-            return delete_object(
+            delete_object(
                 request,
                 app_label="main",
                 model_name="CourseEnrollment",
                 object_id=enrollment_id,
             )
+            enrollment = CourseEnrollment.objects.get(id=enrollment_id)
+            course_id = enrollment.course_id
+            enrolled_by_id = enrollment.enrolled_by_id
+            user_id = enrollment.user_id
+            private_student_group_name = f"user_{user_id}"
+            private_teacher_group_name = f"user_{enrolled_by_id}"
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                private_student_group_name,
+                {"type": "enrollment_deleted", "message": course_id},
+            )
+            async_to_sync(channel_layer.group_send)(
+                private_teacher_group_name,
+                {"type": "unenrollment_details", "message": enrollment_id},
+            )
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         except CourseEnrollment.DoesNotExist:
             raise NotFound(
                 detail="Enrollment not found", code=status.HTTP_404_NOT_FOUND

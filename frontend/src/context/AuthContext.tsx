@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [accessToken, refreshToken, setAccessToken, setRefreshToken, fetchAndSetUser]);
 
   const connectSocket = useCallback(async () => {
-    const ws = new WebSocket('ws://127.0.0.1:8000/ws/');
+    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/?token=${accessToken}`);
     setSocket(ws);
 
     ws.onopen = () => {
@@ -120,7 +120,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     ws.onerror = error => {
       console.error('WebSocket error:', error);
     };
-  }, []);
+  }, [accessToken]);
 
   const login = useCallback(
     async (email: string, password: string) => {

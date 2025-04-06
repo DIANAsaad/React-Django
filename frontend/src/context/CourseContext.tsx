@@ -229,9 +229,6 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setEnrollments((prevEnrollments) =>
-          prevEnrollments?.filter((e) => e.id !== enrollment_id)
-        );
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message || error.message || "Unknown error";
@@ -246,18 +243,28 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     registerSocketHandler("enrollment_created", (message: any) => {
-      setEnrollments((prevEnrollments) => [
-        ...(prevEnrollments || []),
-        message.enrollment,
-      ]);
-
       setCourses((prevCourses) => [
         ...(prevCourses || []),
-        normalizeCourse(message.course),
+        normalizeCourse(message),
       ]);
-      console.log(message);
     });
-  
+    registerSocketHandler("enrollment_details", (message: any) => {
+      setEnrollments((prevEnrollments) => [
+        ...(prevEnrollments || []),
+        message,
+      ]);
+    });
+
+    registerSocketHandler("enrollment_deleted", (message: any) => {
+      setCourses((prevCourses) => [
+        ...prevCourses.filter((c) => c.id !== message.id),
+      ]);
+    });
+    registerSocketHandler("unenrollment_details", (message: any) => {
+      setEnrollments((prevEnrollments) => [
+        ...prevEnrollments.filter((e) => e.id !== message.id),
+      ]);
+    });
   }, []);
 
   return (
