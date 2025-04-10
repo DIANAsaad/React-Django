@@ -40,9 +40,13 @@ def get_user_from_token(token):
     except Exception as e:
         logger.warning(f"Coudlnt excute the token: {e}")
         return AnonymousUser
-
+    
+@database_sync_to_async
+def user_is_instructor(user):
+    return user.groups.filter(name="instructors").exists()
 
 class AppConsumer(AsyncWebsocketConsumer):
+    
     async def connect(self):
         # Initialize group name
         self.public_group_name = "LMS"
@@ -54,8 +58,9 @@ class AppConsumer(AsyncWebsocketConsumer):
 
         if token:
             self.scope["user"] = await get_user_from_token(token=token)
-            if self.scope["user"].is_authenticated:
-                self.private_group_name = f"user_{self.scope['user'].id}"
+            user=self.scope["user"]
+            if user.is_authenticated:
+                self.private_group_name = f"user_{user.id}"
                 await self.channel_layer.group_add(
                     self.public_group_name, self.channel_name
                 )
@@ -64,7 +69,7 @@ class AppConsumer(AsyncWebsocketConsumer):
                 )
                 if (
                     self.scope["user"].is_staff
-                    or self.scope["user"].groups.filter(name="instructors").exists()
+                    or  await user_is_instructor(user)
                 ):
                     await self.channel_layer.group_add(
                         self.can_edit_group_name, self.channel_name
@@ -149,6 +154,11 @@ class AppConsumer(AsyncWebsocketConsumer):
     async def student_commented(self, event):
         """Handle comment_created event."""
         await self.send_event("student_commented", event.get("message", ""))
+
+    async def reply_to_student(self, event):
+        """Handle comment_created event."""
+        await self.send_event("reply_to_student", event.get("message", ""))
+
 
     # COMMENT DELETED
     async def comment_deleted(self, event):

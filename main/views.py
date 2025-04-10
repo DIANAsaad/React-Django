@@ -647,22 +647,37 @@ class AddCommentView(APIView):
         if serializer.is_valid():
             serializer.save()
             # Send WebSocket message
-            commentor = serializer.data["commentor"]
+            comment = serializer.data
             commentor_id = request.user.id
             channel_layer = get_channel_layer()
+            if comment["reply_to_id"] is not None:
+                reciever_id = (
+                    Comment.objects.filter(id=comment["reply_to_id"])
+                    .values("commentor_id")
+                    .first()
+                )
+                reciever_id = reciever_id["commentor_id"] if reciever_id else None
+                # a student might reply to himself and that would create a duplication
+                if reciever_id != request.user.id:
+                    private_student_group_name = f"user_{reciever_id}"
+                    async_to_sync(channel_layer.group_send)(
+                        private_student_group_name,
+                        {"type": "reply_to_student", "message": comment},
+                    )
+                # values is used with filter not get since its a queryset, to access the first result we use first
             if not (
                 request.user.is_staff
                 or request.user.groups.filter(name="instructors").exists()
-            ):
+            ) :
                 private_student_group_name = f"user_{commentor_id}"
                 async_to_sync(channel_layer.group_send)(
                     private_student_group_name,
-                    {"type": "student_commented", "message": serializer.data},
+                    {"type": "student_commented", "message": comment},
                 )
-            channel_layer = get_channel_layer()
+
             async_to_sync(channel_layer.group_send)(
                 "Editors",  # Group name
-                {"type": "comment_created", "message": serializer.data},
+                {"type": "comment_created", "message": comment},
             )
             return Response(status=status.HTTP_201_CREATED)
         else:

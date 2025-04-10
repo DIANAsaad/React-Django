@@ -208,6 +208,11 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
         return handleNewComment(prevComments || [], normalizeComment(message));
       });
     });
+    registerSocketHandler("reply_to_student", (message: any) => {
+      setComments((prevComments) => {
+        return handleNewComment(prevComments || [], normalizeComment(message));
+      });
+    });
     registerSocketHandler("comment_deleted", (message: any) => {
       const removeComment = (
         comments: CommentWithReplies[],
