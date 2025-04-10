@@ -647,9 +647,21 @@ class AddCommentView(APIView):
         if serializer.is_valid():
             serializer.save()
             # Send WebSocket message
+            commentor = serializer.data["commentor"]
+            commentor_id = request.user.id
+            channel_layer = get_channel_layer()
+            if not (
+                request.user.is_staff
+                or request.user.groups.filter(name="instructors").exists()
+            ):
+                private_student_group_name = f"user_{commentor_id}"
+                async_to_sync(channel_layer.group_send)(
+                    private_student_group_name,
+                    {"type": "student_commented", "message": serializer.data},
+                )
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
-                "LMS",  # Group name
+                "Editors",  # Group name
                 {"type": "comment_created", "message": serializer.data},
             )
             return Response(status=status.HTTP_201_CREATED)
@@ -735,16 +747,16 @@ class UnenrollUserView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         try:
+            enrollment = CourseEnrollment.objects.get(id=enrollment_id)
+            course_id = enrollment.course_id
+            enrolled_by_id = enrollment.enrolled_by_id
+            user_id = enrollment.user_id
             delete_object(
                 request,
                 app_label="main",
                 model_name="CourseEnrollment",
                 object_id=enrollment_id,
             )
-            enrollment = CourseEnrollment.objects.get(id=enrollment_id)
-            course_id = enrollment.course_id
-            enrolled_by_id = enrollment.enrolled_by_id
-            user_id = enrollment.user_id
             private_student_group_name = f"user_{user_id}"
             private_teacher_group_name = f"user_{enrolled_by_id}"
             channel_layer = get_channel_layer()

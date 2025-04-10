@@ -44,9 +44,10 @@ def get_user_from_token(token):
 
 class AppConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Public group for all users
+        # Initialize group name
         self.public_group_name = "LMS"
-        self.private_group_name = None  # Initialize private group name
+        self.private_group_name = None
+        self.can_edit_group_name = "Editors"
         token = self.scope.get("query_string", b"").decode().split("=")[-1]
 
         # Add user to public and private groups if authenticated
@@ -61,6 +62,13 @@ class AppConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_add(
                     self.private_group_name, self.channel_name
                 )
+                if (
+                    self.scope["user"].is_staff
+                    or self.scope["user"].groups.filter(name="instructors").exists()
+                ):
+                    await self.channel_layer.group_add(
+                        self.can_edit_group_name, self.channel_name
+                    )
             else:
                 await self.close()
         else:
@@ -137,6 +145,10 @@ class AppConsumer(AsyncWebsocketConsumer):
     async def comment_created(self, event):
         """Handle comment_created event."""
         await self.send_event("comment_created", event.get("message", ""))
+
+    async def student_commented(self, event):
+        """Handle comment_created event."""
+        await self.send_event("student_commented", event.get("message", ""))
 
     # COMMENT DELETED
     async def comment_deleted(self, event):

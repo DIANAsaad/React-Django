@@ -257,12 +257,12 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
 
     registerSocketHandler("enrollment_deleted", (message: any) => {
       setCourses((prevCourses) => [
-        ...prevCourses.filter((c) => c.id !== message.id),
+        ...prevCourses.filter((c) => c.id !== message),
       ]);
     });
     registerSocketHandler("unenrollment_details", (message: any) => {
       setEnrollments((prevEnrollments) => [
-        ...prevEnrollments.filter((e) => e.id !== message.id),
+        ...prevEnrollments.filter((e) => e.id !== message),
       ]);
     });
   }, []);

@@ -108,7 +108,7 @@ const handleNewComment = (
 };
 
 export const CommentProvider = ({ children }: { children: ReactNode }) => {
-  const { accessToken, registerSocketHandler, user } = useAuth();
+  const { accessToken, registerSocketHandler } = useAuth();
   const [comments, setComments] = useState<CommentWithReplies[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -199,33 +199,15 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     registerSocketHandler("comment_created", (message: any) => {
-      const relevantComment = comments.find(
-        (comment) =>
-          message.reply_to_id === comment.id &&
-          user?.id === comment.commentor.id
-      );
-
-      if (
-        relevantComment ||
-        user?.is_instructor ||
-        user?.is_staff ||
-        user?.id === message.commentor.id
-      ) {
-        setComments((prevComments) => {
-          const commentExists = prevComments.some(
-            (comment) => comment.id === message.id
-          );
-          if (commentExists) {
-            return prevComments;
-          }
-          return handleNewComment(
-            prevComments || [],
-            normalizeComment(message)
-          );
-        });
-      }
+      setComments((prevComments) => {
+        return handleNewComment(prevComments || [], normalizeComment(message));
+      });
     });
-
+    registerSocketHandler("student_commented", (message: any) => {
+      setComments((prevComments) => {
+        return handleNewComment(prevComments || [], normalizeComment(message));
+      });
+    });
     registerSocketHandler("comment_deleted", (message: any) => {
       const removeComment = (
         comments: CommentWithReplies[],
