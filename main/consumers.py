@@ -40,25 +40,32 @@ def get_user_from_token(token):
     except Exception as e:
         logger.warning(f"Coudlnt excute the token: {e}")
         return AnonymousUser
-    
+
+
 @database_sync_to_async
 def user_is_instructor(user):
-    return user.groups.filter(name="instructors").exists()
+    return user.groups.filter(name="Instructors").exists()
+
+@database_sync_to_async
+def user_is_student(user):
+    return user.groups.filter(name="Students").exists()
+
 
 class AppConsumer(AsyncWebsocketConsumer):
-    
+
     async def connect(self):
         # Initialize group name
         self.public_group_name = "LMS"
         self.private_group_name = None
         self.can_edit_group_name = "Editors"
+        self.students_group_name = "Students"
         token = self.scope.get("query_string", b"").decode().split("=")[-1]
 
         # Add user to public and private groups if authenticated
 
         if token:
             self.scope["user"] = await get_user_from_token(token=token)
-            user=self.scope["user"]
+            user = self.scope["user"]
             if user.is_authenticated:
                 self.private_group_name = f"user_{user.id}"
                 await self.channel_layer.group_add(
@@ -67,12 +74,13 @@ class AppConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_add(
                     self.private_group_name, self.channel_name
                 )
-                if (
-                    self.scope["user"].is_staff
-                    or  await user_is_instructor(user)
-                ):
+                if self.scope["user"].is_staff or await user_is_instructor(user):
                     await self.channel_layer.group_add(
                         self.can_edit_group_name, self.channel_name
+                    )
+                elif await user_is_student(user):
+                    await self.channel_layer.group_add(
+                        self.students_group_name, self.channel_name
                     )
             else:
                 await self.close()
@@ -150,15 +158,6 @@ class AppConsumer(AsyncWebsocketConsumer):
     async def comment_created(self, event):
         """Handle comment_created event."""
         await self.send_event("comment_created", event.get("message", ""))
-
-    async def student_commented(self, event):
-        """Handle comment_created event."""
-        await self.send_event("student_commented", event.get("message", ""))
-
-    async def reply_to_student(self, event):
-        """Handle comment_created event."""
-        await self.send_event("reply_to_student", event.get("message", ""))
-
 
     # COMMENT DELETED
     async def comment_deleted(self, event):

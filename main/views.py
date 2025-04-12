@@ -41,6 +41,7 @@ import json
 from django.db.models import Q
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from itertools import chain
 
 # Authentication & Authorization
 
@@ -345,7 +346,7 @@ class GetCommentsView(APIView):
             )
             combined_comments = comments
         else:
-            # Students only see their own comments
+            # Students only see their own comments and broadcasts
             comments = Comment.objects.filter(
                 Q(commentor=request.user)
                 | Q(reply_to_id__isnull=False),  # Get user's comments + all replies
@@ -651,30 +652,41 @@ class AddCommentView(APIView):
             commentor_id = request.user.id
             channel_layer = get_channel_layer()
             if comment["reply_to_id"] is not None:
-                reciever_id = (
-                    Comment.objects.filter(id=comment["reply_to_id"])
-                    .values("commentor_id")
+                info = (
+                    Comment.objects.select_related("commentor")
+                    .filter(id=comment["reply_to_id"])
                     .first()
                 )
-                reciever_id = reciever_id["commentor_id"] if reciever_id else None
+                reciever_id = info.commentor.id if info else None
                 # a student might reply to himself and that would create a duplication
-                if reciever_id != request.user.id:
-                    private_student_group_name = f"user_{reciever_id}"
+                if (
+                    reciever_id != request.user.id
+                    and info.commentor.groups.filter(name="Students").exists()
+                ):
+                    private_group_name = f"user_{reciever_id}"
                     async_to_sync(channel_layer.group_send)(
-                        private_student_group_name,
-                        {"type": "reply_to_student", "message": comment},
+                        private_group_name,
+                        {"type": "comment_created", "message": comment},
                     )
                 # values is used with filter not get since its a queryset, to access the first result we use first
             if not (
                 request.user.is_staff
-                or request.user.groups.filter(name="instructors").exists()
-            ) :
+                or request.user.groups.filter(name="Instructors").exists()
+            ):
                 private_student_group_name = f"user_{commentor_id}"
                 async_to_sync(channel_layer.group_send)(
                     private_student_group_name,
-                    {"type": "student_commented", "message": comment},
+                    {"type": "comment_created", "message": comment},
                 )
-
+            # IF ITS A BROADCAST
+            if (
+                request.user.is_staff
+                or request.user.groups.filter(name="Instructors").exists()
+            ) and comment["reply_to_id"] is None:
+                async_to_sync(channel_layer.group_send)(
+                    "Students",  # Group name
+                    {"type": "comment_created", "message": comment},
+                )
             async_to_sync(channel_layer.group_send)(
                 "Editors",  # Group name
                 {"type": "comment_created", "message": comment},

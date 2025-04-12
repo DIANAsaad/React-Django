@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",
+    "django.contrib.staticfiles",
     "main",
     "crispy_forms",
     "crispy_bootstrap5",
@@ -48,7 +50,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "channels",
-    "daphne",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -102,10 +103,10 @@ TEMPLATES = [
 ]
 
 
-ASGI_APPLICATION = 'LMS.asgi.application'
+ASGI_APPLICATION = "LMS.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer", 
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
 WSGI_APPLICATION = "LMS.wsgi.application"
@@ -183,7 +184,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 
-
 LOGIN_REDIRECT_URL = "/home"
 LOGOUT_REDIRECT_URL = "/"
 
@@ -192,6 +192,16 @@ MEDIA_ROOT = (
     BASE_DIR / "LMS" / "media"
 )  # Directory where media files are stored locally
 
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "/static/"
+
+# Directory where Django will collect static files
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Additional directories to look for static files
+STATICFILES_DIRS = [
+    BASE_DIR / "LMS" / "static",
+]
 
 X_FRAME_OPTIONS = "DENY"  # This will allow content to be embedded anywhere
 CSP_FRAME_SRC = ["'self'", "https://achieve.cld.bz/"]
