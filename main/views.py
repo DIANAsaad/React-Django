@@ -11,6 +11,7 @@ from main.models import (
     Comment,
     CourseEnrollment,
     AchieveUser,
+    Notification,
 )
 from django.shortcuts import get_object_or_404
 from main.utils import delete_object, delete_object_by_condition
@@ -33,6 +34,7 @@ from main.serializers import (
     AnswerSerializer,
     CommentSerializer,
     EnrollmentSerializer,
+    NotificationSerializer,
 )
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -41,7 +43,7 @@ import json
 from django.db.models import Q
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from itertools import chain
+
 
 # Authentication & Authorization
 
@@ -747,11 +749,19 @@ class EnrollUserView(APIView):
             user_id = serializer.data["user_id"]
             enrolled_by = serializer.data["enrolled_by"]
             enrolled_by_id = enrolled_by["id"]
+            noti_message = f"you have been enrolled in course: {course["course_title"]}:{course["id"]}"
+            notification = Notification.objects.create(
+                reciever_id=user_id, message=noti_message
+            )
+            message = {
+                "course": course,
+                "notification": NotificationSerializer(notification).data,
+            }
             private_student_group_name = f"user_{user_id}"
             private_teacher_group_name = f"user_{enrolled_by_id}"
             async_to_sync(channel_layer.group_send)(
                 private_student_group_name,
-                {"type": "enrollment_created", "message": course},
+                {"type": "enrollment_created", "message": message},
             )
             async_to_sync(channel_layer.group_send)(
                 private_teacher_group_name,

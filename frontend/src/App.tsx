@@ -19,6 +19,7 @@ import EditExtrenalLink from "./components/course/modules/externalLinks/EditExte
 import AddQuiz from "./components/course/modules/quiz/AddQuiz";
 import { QuizProvider } from "./context/QuizContext";
 import { CommentProvider } from "./context/CommentContext";
+import { NotificationProvider } from "./context/NotificafionsContext";
 import QuizPage from "./components/course/modules/quiz/QuizPage";
 import ResultsPage from "./components/course/modules/quiz/ResultsPage";
 import CommentPage from "./components/course/modules/comment/CommentPage";
@@ -142,7 +143,7 @@ const App: React.FC = () => {
           path="/notAuthorized"
           element={
             <ProtectedRoute>
-              <NotAuthorized/>
+              <NotAuthorized />
             </ProtectedRoute>
           }
         />
@@ -153,21 +154,23 @@ const App: React.FC = () => {
 
 const AppWrapper: React.FC = () => (
   <AuthProvider>
-    <EditButtonProvider>
-      <CourseProvider>
-        <ModuleProvider>
-          <FlashcardProvider>
-            <ExternalLinkProvider>
-              <QuizProvider>
-                <CommentProvider>
-                  <App />
-                </CommentProvider>
-              </QuizProvider>
-            </ExternalLinkProvider>
-          </FlashcardProvider>
-        </ModuleProvider>
-      </CourseProvider>
-    </EditButtonProvider>
+    <NotificationProvider>
+      <EditButtonProvider>
+        <CourseProvider>
+          <ModuleProvider>
+            <FlashcardProvider>
+              <ExternalLinkProvider>
+                <QuizProvider>
+                  <CommentProvider>
+                    <App />
+                  </CommentProvider>
+                </QuizProvider>
+              </ExternalLinkProvider>
+            </FlashcardProvider>
+          </ModuleProvider>
+        </CourseProvider>
+      </EditButtonProvider>
+    </NotificationProvider>
   </AuthProvider>
 );
 

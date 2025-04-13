@@ -14,6 +14,7 @@ from .models import (
     Comment,
     CommentImage,
     CourseEnrollment,
+    Notification
 )
 from django.shortcuts import get_object_or_404
 
@@ -378,3 +379,11 @@ class CommentSerializer(serializers.ModelSerializer):
             image_list.append(image)
         CommentImage.objects.bulk_create(image_list)
         return comment
+
+#NOTIFICATIONS
+
+class NotificationSerializer(serializers.ModelSerializer):
+    reciever=AchieveUserSerializer(read_only=True)
+    class Meta:
+        model=Notification
+        fields=["reciever", "message"]

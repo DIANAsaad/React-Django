@@ -43,7 +43,7 @@ const AddComment: React.FC<AddCommentProps> = ({ reply_to_id }) => {
       comment: "",
       images: [],
       lesson_id: Number(moduleId),
-      reply_to_id: null,
+      reply_to_id,
     });
   };
 
@@ -62,6 +62,7 @@ const AddComment: React.FC<AddCommentProps> = ({ reply_to_id }) => {
           required
           className="comment-input"
         />
+    
       </div>
       <div className="form-group form-group-inline">
         <label htmlFor="images">Upload Images:</label>

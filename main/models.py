@@ -243,3 +243,11 @@ class CommentImage(models.Model):
             if os.path.isfile(self.image.path):
                 os.remove(self.image.path)
         super().delete(*args, **kwargs)
+
+
+
+# Norification Pannel
+class Notification(models.Model):
+    reciever=models.ForeignKey(AchieveUser, on_delete=models.CASCADE, related_name="recievers")
+    message=models.CharField(blank=True,null=True)
+
