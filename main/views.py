@@ -349,6 +349,12 @@ class GetCommentsView(APIView):
             combined_comments = comments
         else:
             # Students only see their own comments and broadcasts
+            broadcasts = Comment.objects.filter(
+                Q(commentor__is_staff=True) | Q(commentor__groups__name="Instructors"),
+                lesson_id=lesson_id,
+                reply_to_id=None,
+            ).prefetch_related("images")
+            print(broadcasts)
             comments = Comment.objects.filter(
                 Q(commentor=request.user)
                 | Q(reply_to_id__isnull=False),  # Get user's comments + all replies
@@ -370,7 +376,9 @@ class GetCommentsView(APIView):
                 comment.replies.set(comment_replies)
                 strict_student_replies.extend(comment_replies)
 
-            combined_comments = list(student_comments) + list(strict_student_replies)
+            combined_comments = (
+                student_comments + strict_student_replies + list(broadcasts)
+            )
         data = {"comments": CommentSerializer(combined_comments, many=True).data}
         return Response(data, status=status.HTTP_200_OK)
 

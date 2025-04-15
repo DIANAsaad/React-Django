@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import "../../styles/Base.css";
 import EditButton from "./EditButton";
+import NotificationPanel from "./NotificationPanel";
 import { useAuth } from "../../context/AuthContext";
 
 interface BaseProps {
@@ -22,6 +23,9 @@ const BaseWrapper: React.FC<BaseProps> = ({ children, options }) => {
           <div className="content-base">
             <div className="content-header">
               {(user?.is_staff || user?.is_instructor) && <EditButton />}
+              <div className="notification-container">
+                <NotificationPanel />
+              </div>
             </div>
             <div className="content-children">{children}</div>
           </div>

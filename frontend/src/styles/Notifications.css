@@ -1,0 +1,118 @@
+/* Container for the bell and panel */
+.notification-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Bell Icon */
+  .notification-bell {
+    font-size: 24px;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+  
+  .notification-bell:hover {
+    color: #007bff;
+  }
+  
+  /* Notification Count Badge */
+  .notification-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ff4d4f;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 2px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Notification Panel */
+  .notification-panel {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    z-index: 1000;
+    padding: 15px;
+    display: none; /* Initially hidden */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* Show the panel on hover */
+  .notification-container:hover .notification-panel {
+    display: block;
+    opacity: 1;
+  }
+  
+  /* Notification Panel Header */
+  .notification-panel h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+  }
+  
+  /* Notification List */
+  .notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .notification {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .notification:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .notification p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .notification .icon {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  
+  /* No Notifications Message */
+  .no-notifications {
+    text-align: center;
+    color: #999;
+    font-size: 0.9rem;
+  }

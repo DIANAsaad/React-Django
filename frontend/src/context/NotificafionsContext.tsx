@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState, useEffect } from "react";
+import { createContext, ReactNode, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 
@@ -67,7 +67,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useNotificationContext = () => {
-  const context = NotificationContext;
+  const context = useContext(NotificationContext);
   if (context === undefined) {
     throw new Error(
       "useNotificationContext must be used within a Notification Provider"
