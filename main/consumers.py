@@ -124,10 +124,10 @@ class AppConsumer(AsyncWebsocketConsumer):
         """Helper method to send events to the WebSocket."""
         await self.send(text_data=json.dumps({"type": event_type, "message": message}))
 
-    # PUBLIC POOL
-    async def public_message(self, event):
-        """Handle messages sent to the public group."""
-        await self.send_event("public_message", event.get("message", ""))
+    # NOTIFICATION 
+    async def notification(self, event):
+        """Handle notification sent."""
+        await self.send_event("notification", event.get("message", ""))
 
     # PRIVATE POOL
     async def private_message(self, event):

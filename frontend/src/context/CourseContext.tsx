@@ -245,7 +245,7 @@ export const CourseProvider = ({ children }: { children: ReactNode }) => {
     registerSocketHandler("enrollment_created", (message: any) => {
       setCourses((prevCourses) => [
         ...(prevCourses || []),
-        normalizeCourse(message.course),
+        normalizeCourse(message),
       ]);
     });
     registerSocketHandler("enrollment_details", (message: any) => {

@@ -49,10 +49,10 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     }}},[accessToken]);
 
     useEffect(() => {
-      registerSocketHandler("enrollment_created", (message: any) => {
+      registerSocketHandler("notification", (message: any) => {
         setNotifications((prevNotifications) => [
           ...(prevNotifications || []),
-          message.notification,
+          message,
         ]);
   
       });

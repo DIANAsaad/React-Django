@@ -21,9 +21,9 @@ const BaseWrapper: React.FC<BaseProps> = ({ children, options }) => {
         <div className="row">
           <Sidebar options={options} />
           <div className="content-base">
-            <div className="content-header">
+            <div className="content-header d-flex">
               {(user?.is_staff || user?.is_instructor) && <EditButton />}
-              <div className="notification-container">
+              <div className="notification-container"style={{ marginLeft: "0.6em" }}>
                 <NotificationPanel />
               </div>
             </div>

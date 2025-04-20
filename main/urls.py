@@ -32,7 +32,8 @@ from main.views import (
     EnrollUserView,
     GetEnrollmentInfoView,
     GetAllUsersView,
-    UnenrollUserView
+    UnenrollUserView,
+    GetNotificationsView,
 )
 
 
@@ -68,6 +69,11 @@ urlpatterns = [
         "get_enrollments/<int:course_id>",
         GetEnrollmentInfoView.as_view(),
         name="get_enrollments",
+    ),
+    path(
+        "notifications/<int:reciever_id>",
+        GetNotificationsView.as_view(),
+        name="notifications",
     ),
     # Perfom actions
     path("add_course", AddCourseView.as_view(), name="add_Course"),
@@ -123,5 +129,9 @@ urlpatterns = [
         name="delete_comment",
     ),
     path("enroll_user", EnrollUserView.as_view(), name="enroll_user"),
-    path("unenroll_user/<int:enrollment_id>", UnenrollUserView.as_view(), name="unenroll_user")
+    path(
+        "unenroll_user/<int:enrollment_id>",
+        UnenrollUserView.as_view(),
+        name="unenroll_user",
+    ),
 ]

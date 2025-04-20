@@ -52,19 +52,23 @@ class AchieveUser(AbstractUser):
 
 class CourseEnrollment(models.Model):
     course = models.ForeignKey(
-        "Course", on_delete=models.CASCADE, 
+        "Course",
+        on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
-        AchieveUser, on_delete=models.CASCADE, 
+        AchieveUser,
+        on_delete=models.CASCADE,
     )
     enrolled_at = models.DateTimeField(default=timezone.now)
-    enrolled_by=models.ForeignKey(
+    enrolled_by = models.ForeignKey(
         AchieveUser, on_delete=models.CASCADE, related_name="enrolled_by", default=None
     )
+
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['course', 'user'], name='unique_enrollment')
+            models.UniqueConstraint(fields=["course", "user"], name="unique_enrollment")
         ]
+
 
 class Course(models.Model):
     creator = models.ForeignKey(
@@ -245,9 +249,15 @@ class CommentImage(models.Model):
         super().delete(*args, **kwargs)
 
 
-
 # Norification Pannel
 class Notification(models.Model):
-    reciever=models.ForeignKey(AchieveUser, on_delete=models.CASCADE, related_name="recievers")
-    message=models.CharField(blank=True,null=True)
-
+    reciever = models.ForeignKey(
+        AchieveUser, on_delete=models.CASCADE, related_name="recievers"
+    )
+    enrollment = models.ForeignKey(
+        CourseEnrollment, on_delete=models.CASCADE, default=None, null=True, related_name="enrollment_notifications"
+    )
+    comment = models.ForeignKey(
+        Comment, on_delete=models.CASCADE, default=None, null=True, related_name="comment_notifications"
+    )
+    message = models.CharField(blank=True, null=True)

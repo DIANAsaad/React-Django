@@ -3,12 +3,14 @@ import { useEditButtonContext } from "../../context/EditButtonContext";
 
 import "../../styles/EditButton.css";
 
-
 const EditButton: React.FC = () => {
   const { editButton, setEditButton } = useEditButtonContext();
 
   return (
     <div className="switch-container">
+      <span className="edit-mode-text">
+        {editButton ? "Edit Mode" : "Edit Mode"}
+      </span>
       <label className="switch">
         <input
           type="checkbox"
@@ -17,9 +19,6 @@ const EditButton: React.FC = () => {
         />
         <span className="slider round"></span>
       </label>
-      <span className="edit-mode-text">
-        {editButton ? "Edit Mode" : "Edit Mode"}
-      </span>
     </div>
   );
 };

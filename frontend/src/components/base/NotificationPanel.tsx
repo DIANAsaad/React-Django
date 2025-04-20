@@ -1,17 +1,31 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { useNotificationContext } from '../../context/NotificafionsContext';
 import '../../styles/Notifications.css';
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import {useAuth} from '../../context/AuthContext'
 
 const NotificationPanel : React.FC =()=>{
-    const {notifications}=useNotificationContext();
+    const {notifications, fetchNotifications}=useNotificationContext();
+    const [isOpen, setIsOpen]=useState<boolean>(false);
+    const{user}=useAuth();
+
+    if (!user){
+      return;
+    }
+
+    useEffect(()=>{
+      fetchNotifications(user.id)
+    },[user.id, fetchNotifications]
+    )
 
     return <>
       <div className="notification-container">
       {/* Bell Icon */}
       <div className="notification-bell">
-        <i className="bell-icon">🔔</i>
-        {notifications.length > 0 && (
+      <FontAwesomeIcon icon={faBell} className="bell-icon" onClick={()=>setIsOpen(true)}/>
+        {
+        (notifications.length > 0 && isOpen===false)&& (
           <span className="notification-count">{notifications.length}</span>
         )}
       </div>

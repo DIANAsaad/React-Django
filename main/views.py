@@ -383,6 +383,20 @@ class GetCommentsView(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
+class GetNotificationsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,*args,**kwargs):
+        reciever_id=kwargs.get("reciever_id")
+        try:
+          notifications=Notification.objects.filter(reciever_id=reciever_id).all()
+          data={
+            "notifications":NotificationSerializer(notifications, many=True).data
+         }
+          return Response(data, status=status.HTTP_200_OK)
+        except Notification.DoesNotExist:
+            return Response({"error:notification was not found"}, status=status.HTTP_404_NOT_FOUND)
+
 # Functionality
 
 # Course
@@ -759,17 +773,18 @@ class EnrollUserView(APIView):
             enrolled_by_id = enrolled_by["id"]
             noti_message = f"you have been enrolled in course: {course["course_title"]}:{course["id"]}"
             notification = Notification.objects.create(
-                reciever_id=user_id, message=noti_message
+                reciever_id=user_id, message=noti_message, enrollment_id=serializer.data["id"]
             )
-            message = {
-                "course": course,
-                "notification": NotificationSerializer(notification).data,
-            }
+           
             private_student_group_name = f"user_{user_id}"
             private_teacher_group_name = f"user_{enrolled_by_id}"
             async_to_sync(channel_layer.group_send)(
                 private_student_group_name,
-                {"type": "enrollment_created", "message": message},
+                {"type": "enrollment_created", "message":course},
+            )
+            async_to_sync(channel_layer.group_send)(
+                private_student_group_name,
+                {"type": "notification", "message":NotificationSerializer(notification).data},
             )
             async_to_sync(channel_layer.group_send)(
                 private_teacher_group_name,
