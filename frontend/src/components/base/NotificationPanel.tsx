@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import { useNotificationContext } from '../../context/NotificafionsContext';
 import '../../styles/Notifications.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,8 +6,8 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 import {useAuth} from '../../context/AuthContext'
 
 const NotificationPanel : React.FC =()=>{
-    const {notifications, fetchNotifications}=useNotificationContext();
-    const [isOpen, setIsOpen]=useState<boolean>(false);
+    const {notifications, fetchNotifications, isOpen, setIsOpen}=useNotificationContext();
+  
     const{user}=useAuth();
 
     if (!user){

@@ -12,6 +12,8 @@ interface NotificationContextProps {
   fetchNotifications: (reciever_id: number) => void;
   loading: boolean;
   error: string | null;
+  isOpen:boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NotificationContext = createContext<NotificationContextProps | undefined>(
@@ -24,6 +26,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const { accessToken, registerSocketHandler } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen]=useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchNotifications = useCallback(()=>{ async (reciever_id: number) => {
@@ -54,7 +57,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
           ...(prevNotifications || []),
           message,
         ]);
-  
+        setIsOpen(false);
       });
      
     }, []);
@@ -62,7 +65,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, fetchNotifications, loading, error }}
+      value={{ notifications, fetchNotifications, loading, error, isOpen,setIsOpen }}
     >
       {children}
     </NotificationContext.Provider>
