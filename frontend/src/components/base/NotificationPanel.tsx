@@ -6,7 +6,7 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 import {useAuth} from '../../context/AuthContext'
 
 const NotificationPanel : React.FC =()=>{
-    const {notifications, fetchNotifications, isOpen, setIsOpen}=useNotificationContext();
+    const {notifications, fetchNotifications, isOpen, setIsOpen, isNotRead, setIsNotRead}=useNotificationContext();
   
     const{user}=useAuth();
 
@@ -23,10 +23,12 @@ const NotificationPanel : React.FC =()=>{
       <div className="notification-container">
       {/* Bell Icon */}
       <div className="notification-bell">
-      <FontAwesomeIcon icon={faBell} className="bell-icon" onClick={()=>setIsOpen(true)}/>
+      <FontAwesomeIcon icon={faBell} className="bell-icon" onClick={()=>{setIsOpen(true);
+        setIsNotRead(0); // Reset for new notifications
+      }}/>
         {
         (notifications.length > 0 && isOpen===false)&& (
-          <span className="notification-count">{notifications.length}</span>
+          <span className="notification-count">{isNotRead}</span>
         )}
       </div>
     <div className="notification-panel">

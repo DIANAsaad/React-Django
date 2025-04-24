@@ -14,6 +14,8 @@ interface NotificationContextProps {
   error: string | null;
   isOpen:boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsNotRead:React.Dispatch<React.SetStateAction<number|null>>;
+  isNotRead:number|null;
 }
 
 const NotificationContext = createContext<NotificationContextProps | undefined>(
@@ -28,6 +30,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen]=useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const[isNotRead, setIsNotRead]=useState<number|null>(null);
 
   const fetchNotifications = useCallback(()=>{ async (reciever_id: number) => {
     if (!accessToken) {
@@ -58,6 +61,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
           message,
         ]);
         setIsOpen(false);
+        setIsNotRead((prevCount)=> prevCount? prevCount+1:1);
       });
      
     }, []);
@@ -65,7 +69,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, fetchNotifications, loading, error, isOpen,setIsOpen }}
+      value={{ notifications, fetchNotifications, loading, error, isOpen,setIsOpen, isNotRead, setIsNotRead }}
     >
       {children}
     </NotificationContext.Provider>
