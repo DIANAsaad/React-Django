@@ -71,7 +71,7 @@ urlpatterns = [
         name="get_enrollments",
     ),
     path(
-        "notifications/<int:reciever_id>",
+        "notifications",
         GetNotificationsView.as_view(),
         name="notifications",
     ),

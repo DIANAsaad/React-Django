@@ -354,7 +354,6 @@ class GetCommentsView(APIView):
                 lesson_id=lesson_id,
                 reply_to_id=None,
             ).prefetch_related("images")
-            print(broadcasts)
             comments = Comment.objects.filter(
                 Q(commentor=request.user)
                 | Q(reply_to_id__isnull=False),  # Get user's comments + all replies
@@ -386,16 +385,20 @@ class GetCommentsView(APIView):
 class GetNotificationsView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self,request,*args,**kwargs):
-        reciever_id=kwargs.get("reciever_id")
+    def get(self, request, *args, **kwargs):
+        reciever_id = request.user.id
         try:
-          notifications=Notification.objects.filter(reciever_id=reciever_id).all()
-          data={
-            "notifications":NotificationSerializer(notifications, many=True).data
-         }
-          return Response(data, status=status.HTTP_200_OK)
+            notifications = Notification.objects.filter(reciever_id=reciever_id).all()
+            print(notifications)
+            data = {
+                "notifications": NotificationSerializer(notifications, many=True).data
+            }
+            return Response(data, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
-            return Response({"error:notification was not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error:notification was not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
 
 # Functionality
 
@@ -773,18 +776,23 @@ class EnrollUserView(APIView):
             enrolled_by_id = enrolled_by["id"]
             noti_message = f"you have been enrolled in course: {course["course_title"]}:{course["id"]}"
             notification = Notification.objects.create(
-                reciever_id=user_id, message=noti_message, enrollment_id=serializer.data["id"]
+                reciever_id=user_id,
+                message=noti_message,
+                enrollment_id=serializer.data["id"],
             )
-           
+
             private_student_group_name = f"user_{user_id}"
             private_teacher_group_name = f"user_{enrolled_by_id}"
             async_to_sync(channel_layer.group_send)(
                 private_student_group_name,
-                {"type": "enrollment_created", "message":course},
+                {"type": "enrollment_created", "message": course},
             )
             async_to_sync(channel_layer.group_send)(
                 private_student_group_name,
-                {"type": "notification", "message":NotificationSerializer(notification).data},
+                {
+                    "type": "notification",
+                    "message": NotificationSerializer(notification).data,
+                },
             )
             async_to_sync(channel_layer.group_send)(
                 private_teacher_group_name,

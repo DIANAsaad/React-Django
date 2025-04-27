@@ -252,7 +252,7 @@ class CommentImage(models.Model):
 # Norification Pannel
 class Notification(models.Model):
     reciever = models.ForeignKey(
-        AchieveUser, on_delete=models.CASCADE, related_name="recievers"
+        AchieveUser, on_delete=models.CASCADE, related_name="notifications"
     )
     enrollment = models.ForeignKey(
         CourseEnrollment, on_delete=models.CASCADE, default=None, null=True, related_name="enrollment_notifications"
