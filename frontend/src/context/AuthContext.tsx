@@ -8,7 +8,8 @@ import React, {
 import axios, { AxiosError } from "axios";
 import { ReactNode } from "react";
 import useLocalStorage from "../hooks/use-local-storage";
-import usePrevious from "../hooks/use-previous";
+
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const TOKEN_EXPIRATION_TIME = 86_400_000;
 
@@ -66,18 +67,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [socketHandlers, setSocketHandlers] = useState<SocketHandlers>({});
 
-  const fetchAndSetUser = useCallback(async () => {
-    if (!accessToken) return;
-    try {
-      const { data } = await axios.get("http://127.0.0.1:8000/user", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      setUser(data);
-    } catch (error) {
-      console.error("Failed to fetch user", error);
-      setUser(null);
-    }
-  }, [accessToken]);
+  const fetchAndSetUser = useCallback(
+    async (accessToken: string) => {
+      if (!accessToken) return;
+      try {
+        const { data } = await axios.get("http://127.0.0.1:8000/user", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setUser(data);
+      } catch (error) {
+        console.error("Failed to fetch user", error);
+        setUser(null);
+      }
+    },
+    [accessToken]
+  );
 
   const fetchUsers = useCallback(async () => {
     if (!accessToken) return;
@@ -92,6 +96,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Failed to fetch users");
     }
   }, [accessToken]);
+
+  const connectSocket = useCallback(
+    async (accessToken: string) => {
+      if (!accessToken) {
+        return console.log("no access token, not connecting ws");
+      }
+      const ws = new WebSocket(`ws://127.0.0.1:8000/ws/?token=${accessToken}`);
+      setSocket(ws);
+
+      ws.onopen = () => {
+        console.log("Connected to WebSocket");
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+    },
+    [accessToken]
+  );
 
   const refreshAccessToken = useCallback(async () => {
     if (!refreshToken) return;
@@ -108,11 +131,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // SetState cannopt be waited, fetchAndSetUser is async and might use expired token.
       if (newAccessToken && newAccessToken !== accessToken) {
         setAccessToken(newAccessToken);
+        await fetchAndSetUser(newAccessToken);
+        await connectSocket(newAccessToken);
+      } else if (newAccessToken && newAccessToken === accessToken) {
+        await fetchAndSetUser(accessToken ? accessToken : "");
+        await connectSocket(accessToken ? accessToken : "");
       }
       if (newRefreshToken && newRefreshToken !== refreshToken) {
         setRefreshToken(newRefreshToken);
       }
-
+      setIsLoading(false);
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error("Failed to refresh access token", axiosError?.message);
@@ -127,23 +155,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setAccessToken,
     setRefreshToken,
     fetchAndSetUser,
+    connectSocket,
   ]);
-
-  const connectSocket = useCallback(async () => {
-    if (!accessToken) {
-      return console.log("no access token, not connecting ws");
-    }
-    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/?token=${accessToken}`);
-    setSocket(ws);
-
-    ws.onopen = () => {
-      console.log("Connected to WebSocket");
-    };
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-  }, [accessToken]);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -183,37 +196,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [accessToken, refreshToken, setAccessToken, setRefreshToken]);
 
   useEffect(() => {
-    if (accessToken && refreshToken) {
-      (async () => {
-        try {
-          // Immediately try to refresh
-          await refreshAccessToken();
-        } catch (error) {
-          console.error("Error in immediate refresh/fetch:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      })();
+    if (refreshToken) {
+      refreshAccessToken().catch((error) => {
+        console.error("Error in immediate refresh/fetch:", error);
+      });
     } else {
-      // If we have no tokens, not loading
       setIsLoading(false);
     }
-  }, []);
-
-
-  useEffect(()=>{
-    if (accessToken){
-      fetchAndSetUser()
-    }
-  },[accessToken])
-
-  const previousUser = usePrevious(user);
-
-  useEffect(() => {
-    if (user?.id !== previousUser?.id) {
-      connectSocket();
-    }
-  }, [user]);
+  }, [refreshToken]);
 
   useEffect(() => {
     if (socket) {
@@ -250,7 +240,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * or return null to block rendering the children.
    */
   if (isLoading) {
-    return null; // or a <LoadingSpinner /> or a loading screen
+    return <LoadingSpinner />; // or a <LoadingSpinner /> or a loading screen
   }
 
   return (
