@@ -129,18 +129,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const newAccessToken = data.access_token;
       const newRefreshToken = data.refresh_token;
       // SetState cannopt be waited, fetchAndSetUser is async and might use expired token.
-      if (newAccessToken && newAccessToken !== accessToken) {
+      if (newAccessToken) {
         setAccessToken(newAccessToken);
         await fetchAndSetUser(newAccessToken);
         await connectSocket(newAccessToken);
-      } else if (newAccessToken && newAccessToken === accessToken) {
-        await fetchAndSetUser(accessToken ? accessToken : "");
-        await connectSocket(accessToken ? accessToken : "");
+
+        if (newRefreshToken && newRefreshToken !== refreshToken) {
+          setRefreshToken(newRefreshToken);
+        }
+        setIsLoading(false);
       }
-      if (newRefreshToken && newRefreshToken !== refreshToken) {
-        setRefreshToken(newRefreshToken);
-      }
-      setIsLoading(false);
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error("Failed to refresh access token", axiosError?.message);
@@ -233,7 +231,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         clearInterval(refreshInterval);
       }
     };
-  }, [refreshAccessToken, refreshToken]);
+  }, [refreshToken]);
 
   /**
    * If still loading and no user loaded yet, you can show a spinner

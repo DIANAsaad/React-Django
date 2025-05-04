@@ -691,9 +691,21 @@ class AddCommentView(APIView):
                     and info.commentor.groups.filter(name="Students").exists()
                 ):
                     private_group_name = f"user_{reciever_id}"
+                    notification = Notification.objects.create(
+                        reciever_id=reciever_id,
+                        message=f"you have a new reply on your comment",
+                        comment_id=comment["reply_to_id"],
+                    )
                     async_to_sync(channel_layer.group_send)(
                         private_group_name,
                         {"type": "comment_created", "message": comment},
+                    )
+                    async_to_sync(channel_layer.group_send)(
+                        private_group_name,
+                        {
+                            "type": "notification",
+                            "message": NotificationSerializer(notification).data,
+                        },
                     )
                 # values is used with filter not get since its a queryset, to access the first result we use first
             if not (
@@ -710,9 +722,21 @@ class AddCommentView(APIView):
                 request.user.is_staff
                 or request.user.groups.filter(name="Instructors").exists()
             ) and comment["reply_to_id"] is None:
+                broadcast_notification = Notification.objects.create(
+                    lesson_id=comment["lesson_id"],
+                    message=f"A new broadcast has been added this lesson",
+                    comment_id=comment["id"],
+                )
                 async_to_sync(channel_layer.group_send)(
                     "Students",  # Group name
                     {"type": "comment_created", "message": comment},
+                )
+                async_to_sync(channel_layer.group_send)(
+                    "Students",
+                    {
+                        "type": "notification",
+                        "message": NotificationSerializer(broadcast_notification).data,
+                    },
                 )
             async_to_sync(channel_layer.group_send)(
                 "Editors",  # Group name
