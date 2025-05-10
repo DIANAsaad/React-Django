@@ -707,6 +707,24 @@ class AddCommentView(APIView):
                             "message": NotificationSerializer(notification).data,
                         },
                     )
+                    if reciever_id != request.user.id and (
+                        info.commentor.groups.filter(name="Instructors").exists()
+                        or info.commentor.is_staff
+                    ):
+
+                        staff_not = Notification.objects.create(
+                            reciever_id=reciever_id,
+                            message=f"A new reply on added in lesson ID {comment["lesson_id"]}",
+                            comment_id=comment["reply_to_id"],
+                        )
+                        async_to_sync(channel_layer.group_send)(
+                            "Instructors",
+                            {
+                                "type": "notification",
+                                "message": NotificationSerializer(staff_not).data,
+                            },
+                        )
+
                 # values is used with filter not get since its a queryset, to access the first result we use first
             if not (
                 request.user.is_staff
@@ -738,10 +756,21 @@ class AddCommentView(APIView):
                         "message": NotificationSerializer(broadcast_notification).data,
                     },
                 )
+                is_broadcast = True
             async_to_sync(channel_layer.group_send)(
                 "Editors",  # Group name
                 {"type": "comment_created", "message": comment},
             )
+            if is_broadcast:
+                async_to_sync(channel_layer.group_send)(
+                    "Instructors",
+                    {
+                        "type": "notification",
+                        "message": NotificationSerializer(broadcast_notification).data,
+                    },
+                )
+                is_broadcast = False
+
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
