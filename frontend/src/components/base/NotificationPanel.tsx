@@ -6,13 +6,8 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../../context/AuthContext";
 
 const NotificationPanel: React.FC = () => {
-  const {
-    notifications,
-    isOpen,
-    setIsOpen,
-    isNotRead,
-    setIsNotRead,
-  } = useNotificationContext();
+  const { notifications, isOpen, setIsOpen, isNotRead, setIsNotRead } =
+    useNotificationContext();
 
   const { user } = useAuth();
 
@@ -43,7 +38,6 @@ const NotificationPanel: React.FC = () => {
             {notifications?.map((notification) => {
               return (
                 <div className="notification" key={notification.id}>
-                  <div className="icon">N</div>
                   <p> {notification.message}</p>
                 </div>
               );

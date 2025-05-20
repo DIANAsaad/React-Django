@@ -675,6 +675,7 @@ class AddCommentView(APIView):
         if serializer.is_valid():
             serializer.save()
             # Send WebSocket message
+            is_broadcast = False
             comment = serializer.data
             commentor_id = request.user.id
             channel_layer = get_channel_layer()
@@ -686,39 +687,36 @@ class AddCommentView(APIView):
                 )
                 reciever_id = info.commentor.id if info else None
                 # a student might reply to himself and that would create a duplication
-                if (
-                    reciever_id != request.user.id
-                    and info.commentor.groups.filter(name="Students").exists()
-                ):
-                    private_group_name = f"user_{reciever_id}"
-                    notification = Notification.objects.create(
+                if reciever_id != request.user.id:
+                    if info.commentor.groups.filter(name="Students").exists():
+                        private_group_name = f"user_{reciever_id}"
+                        notification = Notification.objects.create(
                         reciever_id=reciever_id,
                         message=f"you have a new reply on your comment",
                         comment_id=comment["reply_to_id"],
                     )
-                    async_to_sync(channel_layer.group_send)(
+                        async_to_sync(channel_layer.group_send)(
                         private_group_name,
                         {"type": "comment_created", "message": comment},
                     )
-                    async_to_sync(channel_layer.group_send)(
+                        async_to_sync(channel_layer.group_send)(
                         private_group_name,
                         {
                             "type": "notification",
                             "message": NotificationSerializer(notification).data,
                         },
                     )
-                    if reciever_id != request.user.id and (
+                    elif  (
                         info.commentor.groups.filter(name="Instructors").exists()
                         or info.commentor.is_staff
                     ):
-
                         staff_not = Notification.objects.create(
                             reciever_id=reciever_id,
-                            message=f"A new reply on added in lesson ID {comment["lesson_id"]}",
+                            message=f"A new reply was added in lesson ID {comment["lesson_id"]}",
                             comment_id=comment["reply_to_id"],
                         )
                         async_to_sync(channel_layer.group_send)(
-                            "Instructors",
+                            "Editors",
                             {
                                 "type": "notification",
                                 "message": NotificationSerializer(staff_not).data,
@@ -726,6 +724,7 @@ class AddCommentView(APIView):
                         )
 
                 # values is used with filter not get since its a queryset, to access the first result we use first
+            # If commentor is student
             if not (
                 request.user.is_staff
                 or request.user.groups.filter(name="Instructors").exists()
@@ -735,11 +734,26 @@ class AddCommentView(APIView):
                     private_student_group_name,
                     {"type": "comment_created", "message": comment},
                 )
+                if comment["reply_to_id"] is None:  # No replyyy
+                    staff_notification = Notification.objects.create(
+                        lesson_id=comment["lesson_id"],
+                        message=f"A student left a comment",
+                        comment_id=comment["id"],
+                    )
+                    async_to_sync(channel_layer.group_send)(
+                        "Editors",
+                        {
+                            "type": "notification",
+                            "message": NotificationSerializer(staff_notification).data,
+                        },
+                    )
+
             # IF ITS A BROADCAST
             if (
                 request.user.is_staff
                 or request.user.groups.filter(name="Instructors").exists()
             ) and comment["reply_to_id"] is None:
+                is_broadcast = True
                 broadcast_notification = Notification.objects.create(
                     lesson_id=comment["lesson_id"],
                     message=f"A new broadcast has been added this lesson",
@@ -756,20 +770,25 @@ class AddCommentView(APIView):
                         "message": NotificationSerializer(broadcast_notification).data,
                     },
                 )
-                is_broadcast = True
             async_to_sync(channel_layer.group_send)(
                 "Editors",  # Group name
                 {"type": "comment_created", "message": comment},
             )
             if is_broadcast:
+                staff_broadcast_notification = Notification.objects.create(
+                    message=f"A new broadcast has been added to lesson {comment["lesson_id"]}",
+                    lesson_id=comment["lesson_id"],
+                    comment_id=comment["id"],
+                )
                 async_to_sync(channel_layer.group_send)(
-                    "Instructors",
+                    "Editors",
                     {
                         "type": "notification",
-                        "message": NotificationSerializer(broadcast_notification).data,
+                        "message": NotificationSerializer(
+                            staff_broadcast_notification
+                        ).data,
                     },
                 )
-                is_broadcast = False
 
             return Response(status=status.HTTP_201_CREATED)
         else:
