@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 class AchieveUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AchieveUser
-        fields = ["id", "first_name", "last_name", "email"]
+        fields = ["id", "first_name", "last_name", "email", "last_seen_notifications"]
 
 
 class AchieveUserLoginSerializer(serializers.Serializer):
@@ -386,4 +386,4 @@ class NotificationSerializer(serializers.ModelSerializer):
     reciever=AchieveUserSerializer(read_only=True)
     class Meta:
         model=Notification
-        fields=["reciever", "message"]
+        fields=["id","reciever", "message", "created_at"]

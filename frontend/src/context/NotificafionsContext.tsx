@@ -12,6 +12,7 @@ import { useAuth } from "./AuthContext";
 interface Notification {
   id: number;
   message: string;
+  created_at:Date
 }
 
 interface NotificationContextProps {

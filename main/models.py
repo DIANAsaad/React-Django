@@ -31,6 +31,7 @@ class AchieveUser(AbstractUser):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     username = models.CharField(max_length=255, blank=True, null=True)
+    last_seen_notifications=models.DateTimeField(default=timezone.now, blank=True, null=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
@@ -280,3 +281,4 @@ class Notification(models.Model):
         null=True,
         related_name="lesson_notifications",
     )
+    created_at=models.DateTimeField(default=timezone.now, blank=True, null=True)

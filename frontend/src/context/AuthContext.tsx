@@ -21,6 +21,7 @@ interface AchieveUser {
   email: string;
   is_staff: boolean;
   is_instructor: boolean;
+  last_seen_notifications:Date
 }
 
 // Define AuthContext type
@@ -108,9 +109,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       ws.onopen = () => {
         console.log("Connected to WebSocket");
       };
+      ws.onclose = () => {
+        console.log("disconnected from WebSocket");
+      };
 
-      ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
+      ws.onclose = (event) => {
+        console.log("Disconnected from WebSocket", event);
       };
     },
     [accessToken]

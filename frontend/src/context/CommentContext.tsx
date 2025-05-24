@@ -113,7 +113,7 @@ export const CommentProvider = ({ children }: { children: ReactNode }) => {
   const [comments, setComments] = useState<CommentWithReplies[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const {setIsOpen} = useNotificationContext();
+  const { setIsOpen } = useNotificationContext();
 
   // fetch comments when in lesson
   const fetchComments = useCallback(

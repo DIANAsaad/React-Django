@@ -36,6 +36,10 @@ const NotificationPanel: React.FC = () => {
           <h2> Your Notifications</h2>
           <div className="notifications-list">
             {notifications?.map((notification) => {
+              if (notification.created_at>user?.last_seen_notifications){
+                setIsNotRead((prev)=>prev? prev+1:1);
+                setIsOpen(false);
+              }
               return (
                 <div className="notification" key={notification.id}>
                   <p> {notification.message}</p>

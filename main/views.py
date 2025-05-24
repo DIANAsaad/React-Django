@@ -678,13 +678,16 @@ class AddCommentView(APIView):
             is_broadcast = False
             comment = serializer.data
             commentor_id = request.user.id
+            name= request.user.first_name
             channel_layer = get_channel_layer()
             if comment["reply_to_id"] is not None:
                 info = (
-                    Comment.objects.select_related("commentor")
+                    Comment.objects.select_related("commentor", "lesson")
                     .filter(id=comment["reply_to_id"])
+                    .only("lesson__module_title", "lesson__id", "commentor__id", "commentor__first_name")
                     .first()
                 )
+                lesson=info.lesson.module_title
                 reciever_id = info.commentor.id if info else None
                 # a student might reply to himself and that would create a duplication
                 if reciever_id != request.user.id:
@@ -692,7 +695,7 @@ class AddCommentView(APIView):
                         private_group_name = f"user_{reciever_id}"
                         notification = Notification.objects.create(
                         reciever_id=reciever_id,
-                        message=f"you have a new reply on your comment",
+                        message=f"{name} replied to your comment in lesson {lesson}",
                         comment_id=comment["reply_to_id"],
                     )
                         async_to_sync(channel_layer.group_send)(
@@ -712,7 +715,7 @@ class AddCommentView(APIView):
                     ):
                         staff_not = Notification.objects.create(
                             reciever_id=reciever_id,
-                            message=f"A new reply was added in lesson ID {comment["lesson_id"]}",
+                            message=f"{name} replied to you in lesson  {lesson}",
                             comment_id=comment["reply_to_id"],
                         )
                         async_to_sync(channel_layer.group_send)(
@@ -756,7 +759,7 @@ class AddCommentView(APIView):
                 is_broadcast = True
                 broadcast_notification = Notification.objects.create(
                     lesson_id=comment["lesson_id"],
-                    message=f"A new broadcast has been added this lesson",
+                    message=f"{name} added a new broadcast to lesson {comment["lesson_id"]}",
                     comment_id=comment["id"],
                 )
                 async_to_sync(channel_layer.group_send)(
