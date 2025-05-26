@@ -34,6 +34,7 @@ from main.views import (
     GetAllUsersView,
     UnenrollUserView,
     GetNotificationsView,
+    UpdateLastSeenNotView,
 )
 
 
@@ -134,4 +135,5 @@ urlpatterns = [
         UnenrollUserView.as_view(),
         name="unenroll_user",
     ),
+    path("update_last_seen_notifications", UpdateLastSeenNotView.as_view(), name="update_last_seen_not")
 ]

@@ -21,7 +21,7 @@ interface AchieveUser {
   email: string;
   is_staff: boolean;
   is_instructor: boolean;
-  last_seen_notifications:Date
+  last_seen_notifications: Date;
 }
 
 // Define AuthContext type
@@ -29,6 +29,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   fetchUsers: () => Promise<void>;
+  updateLastSeenNotifications: () => Promise<void>;
   isAuthenticated: boolean;
   user: AchieveUser | null;
   users: AchieveUser[];
@@ -97,6 +98,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Failed to fetch users");
     }
   }, [accessToken]);
+
+  const updateLastSeenNotifications = useCallback(
+    async () => {
+      if (!accessToken) return;
+      try {
+        const response = await axios.patch(
+          "http://127.0.0.1:8000/update_last_seen_notifications", 
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        user!.last_seen_notifications = response.data.last_seen_notifications;
+      } catch (error) {
+        console.error("Failed to update last seen notifications", error);
+      }
+    },
+    [accessToken]
+  );
 
   const connectSocket = useCallback(
     async (accessToken: string) => {
@@ -250,6 +271,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         users,
         fetchUsers,
+        updateLastSeenNotifications,
         login,
         logout,
         isAuthenticated: !!user,

@@ -53,7 +53,6 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         },
       });
       setNotifications(response.data.notifications||[]);
-      setIsOpen(true);
     } catch (err) {
       setError("Failed to fetch notifications");
     } finally {

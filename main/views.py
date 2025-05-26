@@ -43,7 +43,7 @@ import json
 from django.db.models import Q
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-
+from django.utils import timezone
 
 # Authentication & Authorization
 
@@ -678,38 +678,43 @@ class AddCommentView(APIView):
             is_broadcast = False
             comment = serializer.data
             commentor_id = request.user.id
-            name= request.user.first_name
+            name = request.user.first_name
             channel_layer = get_channel_layer()
             if comment["reply_to_id"] is not None:
                 info = (
                     Comment.objects.select_related("commentor", "lesson")
                     .filter(id=comment["reply_to_id"])
-                    .only("lesson__module_title", "lesson__id", "commentor__id", "commentor__first_name")
+                    .only(
+                        "lesson__module_title",
+                        "lesson__id",
+                        "commentor__id",
+                        "commentor__first_name",
+                    )
                     .first()
                 )
-                lesson=info.lesson.module_title
+                lesson = info.lesson.module_title
                 reciever_id = info.commentor.id if info else None
                 # a student might reply to himself and that would create a duplication
                 if reciever_id != request.user.id:
                     if info.commentor.groups.filter(name="Students").exists():
                         private_group_name = f"user_{reciever_id}"
                         notification = Notification.objects.create(
-                        reciever_id=reciever_id,
-                        message=f"{name} replied to your comment in lesson {lesson}",
-                        comment_id=comment["reply_to_id"],
-                    )
+                            reciever_id=reciever_id,
+                            message=f"{name} replied to your comment in lesson {lesson}",
+                            comment_id=comment["reply_to_id"],
+                        )
                         async_to_sync(channel_layer.group_send)(
-                        private_group_name,
-                        {"type": "comment_created", "message": comment},
-                    )
+                            private_group_name,
+                            {"type": "comment_created", "message": comment},
+                        )
                         async_to_sync(channel_layer.group_send)(
-                        private_group_name,
-                        {
-                            "type": "notification",
-                            "message": NotificationSerializer(notification).data,
-                        },
-                    )
-                    elif  (
+                            private_group_name,
+                            {
+                                "type": "notification",
+                                "message": NotificationSerializer(notification).data,
+                            },
+                        )
+                    elif (
                         info.commentor.groups.filter(name="Instructors").exists()
                         or info.commentor.is_staff
                     ):
@@ -916,4 +921,25 @@ class UnenrollUserView(APIView):
         except CourseEnrollment.DoesNotExist:
             raise NotFound(
                 detail="Enrollment not found", code=status.HTTP_404_NOT_FOUND
+            )
+
+
+class UpdateLastSeenNotView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, *args, **kwargs):
+        print(request.header)
+        try:
+            user = request.user
+            user.last_seen_notification = timezone.now()
+            user.save()
+            data = {
+                "last_seen_notification": AchieveUserSerializer(user).data[
+                    "last_seen_notification"
+                ]
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except KeyError:
+            return Response(
+                {"error": "Invalid data provided."}, status=status.HTTP_400_BAD_REQUEST
             )

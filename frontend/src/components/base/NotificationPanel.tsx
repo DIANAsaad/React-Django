@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNotificationContext } from "../../context/NotificafionsContext";
 import "../../styles/Notifications.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,12 +9,20 @@ const NotificationPanel: React.FC = () => {
   const { notifications, isOpen, setIsOpen, isNotRead, setIsNotRead } =
     useNotificationContext();
 
-  const { user } = useAuth();
-
+  const { user, updateLastSeenNotifications } = useAuth();
   if (!user) {
     return;
   }
-
+  useEffect(() => {
+    if (!user) return;
+    const unreadCount = notifications.filter(
+      (notification) => notification.created_at > user.last_seen_notifications
+    ).length;
+    setIsNotRead(unreadCount);
+    if (unreadCount === 0) {
+      setIsOpen(true);
+    }
+  }, [notifications, user?.last_seen_notifications, setIsNotRead, setIsOpen]);
   return (
     <>
       <div className="notification-container">
@@ -26,6 +34,7 @@ const NotificationPanel: React.FC = () => {
             onClick={() => {
               setIsOpen(true);
               setIsNotRead(0); // Reset for new notifications
+              updateLastSeenNotifications()
             }}
           />
           {notifications.length > 0 && isOpen === false && (
@@ -33,13 +42,10 @@ const NotificationPanel: React.FC = () => {
           )}
         </div>
         <div className="notification-panel">
+
           <h2> Your Notifications</h2>
           <div className="notifications-list">
             {notifications?.map((notification) => {
-              if (notification.created_at>user?.last_seen_notifications){
-                setIsNotRead((prev)=>prev? prev+1:1);
-                setIsOpen(false);
-              }
               return (
                 <div className="notification" key={notification.id}>
                   <p> {notification.message}</p>
