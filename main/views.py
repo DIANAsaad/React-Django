@@ -389,7 +389,6 @@ class GetNotificationsView(APIView):
         reciever_id = request.user.id
         try:
             notifications = Notification.objects.filter(reciever_id=reciever_id).all()
-            print(notifications)
             data = {
                 "notifications": NotificationSerializer(notifications, many=True).data
             }
@@ -928,18 +927,19 @@ class UpdateLastSeenNotView(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, *args, **kwargs):
-        print(request.header)
         try:
+            print(request.data)
             user = request.user
-            user.last_seen_notification = timezone.now()
+            user.last_seen_notifications = timezone.now()
             user.save()
             data = {
-                "last_seen_notification": AchieveUserSerializer(user).data[
-                    "last_seen_notification"
+                "last_seen_notifications": AchieveUserSerializer(user).data[
+                    "last_seen_notifications"
                 ]
             }
             return Response(data, status=status.HTTP_200_OK)
-        except KeyError:
+        except Exception as e:
+            print("UpdateLastSeenNotView error:", e)
             return Response(
-                {"error": "Invalid data provided."}, status=status.HTTP_400_BAD_REQUEST
+                {"error": f"Invalid data provided {e}."}, status=status.HTTP_400_BAD_REQUEST
             )

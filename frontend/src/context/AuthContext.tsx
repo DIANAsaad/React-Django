@@ -105,13 +105,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const response = await axios.patch(
           "http://127.0.0.1:8000/update_last_seen_notifications", 
+          {},
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           }
         );
-        user!.last_seen_notifications = response.data.last_seen_notifications;
+        if (!user) return;
+        user.last_seen_notifications = response.data.last_seen_notifications;
       } catch (error) {
         console.error("Failed to update last seen notifications", error);
       }
